@@ -5308,7 +5308,7 @@ Object  InformLibrary "(Inform Library)"
 #Ifdef TARGET_ZCODE;
 
 [ ShowVerbSub address lines da meta i j;
-    if (((noun->#dict_par1) & 1) == 0)
+    if (noun == 0 || ((noun->#dict_par1) & 1) == 0)
         "Try typing ~showverb~ and then the name of a verb.";
     meta = ((noun->#dict_par1) & 2)/2;
     i = $ff-(noun->#dict_par2);
