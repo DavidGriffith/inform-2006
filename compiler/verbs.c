@@ -294,9 +294,9 @@ static int find_or_renumber_verb(char *English_verb, int *new_number)
             {   p[1] = *new_number;
                 return 0;
             }
-            return(p[1]);
+            return((uchar)p[1]);
         }
-        p=p+p[0];
+        p=p+(uchar)p[0];
     }
     return(-1);
 }
