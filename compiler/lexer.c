@@ -600,7 +600,7 @@ static int tokeniser_grid[256];
 /*  This list cannot safely be changed without also changing the header
     separator #defines.  The ordering is significant in that (i) all entries
     beginning with the same character must be adjacent and (ii) that if
-    X is a an initial substring of Y then X must come before Y.
+    X is an initial substring of Y then X must come before Y.
 
     E.g. --> must occur before -- to prevent "-->0" being tokenised
     wrongly as "--", ">", "0" rather than "-->", "0".                        */
