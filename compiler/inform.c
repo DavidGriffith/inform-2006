@@ -1381,15 +1381,20 @@ static int copy_icl_word(char *from, char *to)
 
 static void execute_icl_command(char *p);
 
-static int execute_icl_header(char *filename)
+static int execute_icl_header(char *argname)
 {
   FILE *command_file;
   char cli_buff[256], fw[256];
   int line = 0;
   int errcount = 0;
   int i;
+  char filename[PATHLEN]; 
+  int x = 0;
 
-  command_file = fopen(filename, "r");
+  do
+    {   x = translate_in_filename(x, filename, argname, 0, 1);
+        command_file = fopen(filename,"r");
+    } while ((command_file == NULL) && (x != 0));
   if (!command_file) {
     /* Fail silently. The regular compiler will try to open the file
        again, and report the problem. */

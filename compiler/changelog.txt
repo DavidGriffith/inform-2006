@@ -1,3 +1,4 @@
+031231 added filename extensions to icl_header_ext (CK)
 031229 removed 2 lines in expressc that warned on obj.prop->i (CK)
 031227 removed unnecessary local variables from assembleg_instruction()
        in asm.c (DK)
@@ -63,4 +64,3 @@
        C62122 applied.  see inform-comp.patch and fixes-comp.txt. (CK)
 030928 Style statement added to Glulx Inform, glulx-style-patch.txt
 030928 Modified verbs.c for Extend/Verb synonym issue C62126, M Coyne
-
