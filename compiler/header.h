@@ -69,7 +69,6 @@
 /* ------------------------------------------------------------------------- */
 
 /* #define UNIX */
-#define PC_WIN32
 
 /* ------------------------------------------------------------------------- */
 /*   The first task is to include the ANSI header files, and typedef         */
@@ -2531,6 +2530,7 @@ extern char  *all_text,    *all_text_top;
 extern int   no_abbreviations;
 extern int   abbrevs_lookup_table_made, is_abbreviation;
 extern uchar *abbreviations_at;
+extern uchar *abbreviations_gl;
 extern int  *abbrev_values;
 extern int  *abbrev_quality;
 extern int  *abbrev_freqs;
