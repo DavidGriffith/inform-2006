@@ -253,9 +253,10 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
              }\
              jump Call__Error;\
          }\
+         #iftrue (#version_number==4); y=6; #ifnot;\
          @check_arg_count 3 ?~A__x;y++;@check_arg_count 4 ?~A__x;y++;\
          @check_arg_count 5 ?~A__x;y++;@check_arg_count 6 ?~A__x;y++;\
-         @check_arg_count 7 ?~A__x;y++;@check_arg_count 8 ?~A__x;y++;.A__x;",
+         @check_arg_count 7 ?~A__x;y++;@check_arg_count 8 ?~A__x;y++;.A__x; #endif;",
         "#ifdef INFIX;if (obj has infix__watching) n=1;#endif;\
          #ifdef DEBUG;if (debug_flag & 1 ~= 0) n=1;#endif;\
          if (n==1) {\
