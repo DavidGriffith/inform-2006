@@ -586,7 +586,7 @@ static int32 unique_task_id(void)
 #endif
 
 #ifndef PATHLEN
-#define PATHLEN 128
+#define PATHLEN 192
 #endif
 
 #ifndef Temporary_File
@@ -1124,7 +1124,7 @@ typedef struct operator_s
 
 #define SYMBOL_TT    0                      /* value = index in symbol table */
 #define NUMBER_TT    1                      /* value = the number            */
-#define DQ_TT        2                      /* no value                      */
+#define DQ_TT        2                      /* value = 0 if quoted, 1 if not */
 #define SQ_TT        3                      /* no value                      */
 #define SEP_TT       4                      /* value = the _SEP code         */
 #define EOF_TT       5                      /* no value                      */
@@ -2349,6 +2349,7 @@ extern dbgl get_current_dbgl(void);
 extern dbgl get_error_report_dbgl(void);
 extern int32 get_current_line_start(void);
 extern void terminate_file(void);
+extern void print_main_line(void);
 
 extern void put_token_back(void);
 extern void get_next_token(void);
