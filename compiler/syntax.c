@@ -97,6 +97,7 @@ extern int parse_directive(int internal_flag)
             || ((!(sflags[token_value] & UNKNOWN_SFLAG))
                 && (!(sflags[token_value] & REPLACE_SFLAG))))
         {   ebf_error("routine name", token_text);
+            duplicate_error();
             return(FALSE);
         }
 
