@@ -50,6 +50,7 @@
 /*     #define MACINTOSH   -  for the Apple Mac under Think C or Codewarrior */
 /*     #define MAC_MPW     -  for MPW under Codewarrior (and maybe Think C)  */
 /*     #define OS2         -  for OS/2 32-bit mode under IBM's C Set++       */
+/*     #define OSX         -  for the Apple Mac with OS X (another Unix)     */
 /*     #define PC          -  for 386+ IBM PCs, eg. Microsoft Visual C/C++   */
 /*     #define PC_QUICKC   -  for small IBM PCs under QuickC                 */
 /*     #define PC_WIN32    -  for Borland C++ or Microsoft Visual C++        */
@@ -284,6 +285,7 @@ static int32 unique_task_id(void)
 #define FILE_EXTENSIONS
 /* 5 */
 #define Temporary_Directory "/tmp"
+#define PATHLEN 512
 #endif
 /* ------------------------------------------------------------------------- */
 /*   Macintosh block                                                         */
@@ -337,6 +339,32 @@ static int32 unique_task_id(void)
 /* 4 */
 #define FN_SEP '/'
 #define FILE_EXTENSIONS
+#endif
+/* ------------------------------------------------------------------------- */
+/*   OSX block                                                              */
+/* ------------------------------------------------------------------------- */
+#ifdef OSX
+/* 1 */
+#define MACHINE_STRING   "Mac OS X"
+/* 2 */
+#define CHAR_IS_SIGNED
+/* 3 */
+#define DEFAULT_MEMORY_SIZE LARGE_SIZE
+/* 4 */
+#define FN_SEP '/'
+#define FILE_EXTENSIONS
+/* 5 */
+#define Temporary_Directory "/tmp"
+#define INCLUDE_TASK_ID
+#define _POSIX_C_SOURCE 199506L
+#define _XOPEN_SOURCE 500
+#ifdef MAIN_INFORM_FILE
+#include <sys/types.h>
+#include <unistd.h>
+static int32 unique_task_id(void)
+{   return (int32)getpid();
+}
+#endif
 #endif
 /* ------------------------------------------------------------------------- */
 /*   PC and PC_QUICKC block                                                  */
@@ -567,6 +595,10 @@ static int32 unique_task_id(void)
 
 #ifndef FN_ALT
 #define FN_ALT ','
+#endif
+
+#ifndef PATHLEN
+#define PATHLEN 128
 #endif
 
 #ifndef Temporary_File
