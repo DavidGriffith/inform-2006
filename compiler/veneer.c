@@ -2155,7 +2155,9 @@ static void compile_symbol_table_routine(void)
     null_dbgl.b1 = 0; null_dbgl.b2 = 0; null_dbgl.b3 = 0; null_dbgl.cc = 0;
 
     veneer_mode = TRUE; j = symbol_index("Symb__Tab", -1);
-    local_variables.keywords[0] = "a"; /* ensure no _vararg_count header */
+    local_variables.keywords[0] = "type"; /* ensure no _vararg_count header */
+    local_variables.keywords[1] = "value";
+    construct_local_variable_tables();
     assign_symbol(j,
         assemble_routine_header(2, FALSE, "Symb__Tab", &null_dbgl, FALSE, j),
         ROUTINE_T);
