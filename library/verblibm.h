@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   VERBLIBM:  Core of standard verbs library.
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -1347,6 +1347,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     x = 0; ! To prevent a "not used" error
     AfterRoutines();
 ];
+
 ! ----------------------------------------------------------------------------
 !   The object tree and determining the possibility of moves
 ! ----------------------------------------------------------------------------
