@@ -1,0 +1,38 @@
+031107 uploaded commenstar.patch and applied betaver.patch (CK)
+031107 applied s15b.patch so Array declarations compile under 6.21 (CK)
+031107 applied keydelay.patch to add KeyDelay()
+       and scripting stuff (CK)
+031129 s15lib.patch stops warnings from s15.patch and
+       requires s11.patch (CK)
+031127 nodebug.patch turns off default DEBUG (CK)
+031126 applied S5.patch to implement before_implicit (RF, CK)
+031126 applied L61011c.patch for minor alterations to colour,
+       PrintToBuffer(), turn counter, and comment character (RF, CK)
+031126 applied S31askto.patch to implement ASK X TO Y (CK)
+031122 applied drawfunc.patch which tidies S37, L61007 and L60709
+       by making some common I/O functions biplatform (CK)
+031122 applied L61036.patch (CK)
+031122 applied L61011b.patch to reflect changed turn-counting (CK)
+031122 applied RF's writelist.h as in suggestion 3 (S3.patch) (CK)
+031122 applied L61035.patch (TAKE ALL FROM BOX messages) (CK)
+031110 updated parserm.h to add configurable COMMENT_CHARACTER for
+       transcript usage (MC)
+031108 updated parserm.h to prevent extra blank line from NO_SCORE patch (MC)
+031026 S26etc.patch applied for multiple undo and fixing problems
+       in S2etc.patch and L61023to34.patch (CK)
+031022 S2G.patch applied for recording/replay in Glulx and i18n (CK)
+031018 Tentative patch for suggestion 37 ("(A)") applied (CK)
+031018 Patches for suggestions 2, 26, 35, 46, 54, 48 applied (CK)
+031008 ifdef.patch (reinstating deleted ifdef)
+031005 L61023to34.patch (modified 34) (CK)
+031005 L61022.patch V6 routines. (CK)
+031005 L61020.patch cant_go and Changedefaults modified fix (CK)
+031005 L61013to19.patch applied (CK)
+031005 L61907to11.patch Patches L6108-10 applied, modified 07 and 11
+       (CK)
+031005 Patches L60708. L60709. L61001. L61002. L61004. L61006 applied
+       added 'wordsize' codeblock to Parser.h (CK) L60708toL61006.patch
+030818 Text reformatted and reordered - see style.txt and comments at
+       end of each .h file. (RF) BiPlatform.zip
+000711 Inform Library 6/10 updated for Glulx capability by Andrew
+       Plotkin
