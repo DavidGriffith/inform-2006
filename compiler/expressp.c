@@ -52,6 +52,7 @@ static void function_call_triggered(void);
 static int comma_allowed, arrow_allowed, superclass_allowed,
            bare_prop_allowed,
            array_init_ambiguity, action_ambiguity,
+           evaluate_defined,
 
            etoken_count, inserting_token, bracket_level;
 
@@ -122,6 +123,28 @@ but not used as a value:", unicode);
         case SYMBOL_TT:
         ReceiveSymbol:
             symbol = current_token.value;
+
+            if (evaluate_defined)
+            {
+                if ((current_token.text[0] == 'V')
+                    && (current_token.text[1] == 'N')
+                    && (current_token.text[2] == '_')
+                    && (strlen(current_token.text)==7))
+                {   
+                    v = (VNUMBER >= atoi(current_token.text+3));
+                }
+                else 
+                {
+                    v = ((sflags[symbol] & UNKNOWN_SFLAG) == 0);
+                    mark_symbol_as_used = v;
+                }
+                current_token.value = v;
+                current_token.marker = 0;
+                current_token.symtype = CONSTANT_T;
+                current_token.symflags = 0;
+                current_token.type = SMALL_NUMBER_TT;
+                break;
+            }
 
             mark_symbol_as_used = TRUE;
 
@@ -334,11 +357,21 @@ but not used as a value:", unicode);
 
                 case HASH_SEP:
                     system_constants.enabled = TRUE;
+                    directives.enabled = TRUE;
                     get_next_token();
+                    directives.enabled = FALSE;
                     system_constants.enabled = FALSE;
+                    if (token_type == DIRECTIVE_TT)
+                    {
+                        /* unfortunately parse_expression is not re-entrant,
+                           so we cannot yet have IFDEF within expressions */
+                        put_token_back();
+                        current_token.type = ENDEXP_TT;
+                        break;
+                    }
                     if (token_type != SYSTEM_CONSTANT_TT)
                     {   ebf_error(
-                        "'r$', 'n$' or internal Inform constant name after '#'",
+                        "internal Inform constant name after '#'",
                         token_text);
                         break;
                     }
@@ -1671,6 +1704,9 @@ extern assembly_operand parse_expression(int context)
                                 minus sign is ambiguous, and brackets always
                                 indicate subexpressions, not function calls
 
+            IFDEF_CONTEXT       like CONSTANT_CONTEXT, but identifiers are 
+                                given values according to whether defined
+
         Return value: an assembly operand.
 
         If the type is OMITTED_OT, then the expression has no resulting value.
@@ -1698,6 +1734,7 @@ extern assembly_operand parse_expression(int context)
     bare_prop_allowed = (context == RETURN_Q_CONTEXT);
     array_init_ambiguity = ((context == ARRAY_CONTEXT) ||
         (context == ASSEMBLY_CONTEXT));
+    evaluate_defined = (context == IFDEF_CONTEXT);
 
     action_ambiguity = (context == ACTION_Q_CONTEXT);
 
@@ -1705,6 +1742,7 @@ extern assembly_operand parse_expression(int context)
     if (context == ACTION_Q_CONTEXT) context = QUANTITY_CONTEXT;
     if (context == RETURN_Q_CONTEXT) context = QUANTITY_CONTEXT;
     if (context == ARRAY_CONTEXT) context = CONSTANT_CONTEXT;
+    if (context == IFDEF_CONTEXT) context = CONSTANT_CONTEXT;
 
     etoken_count = 0;
     inserting_token = FALSE;
