@@ -46,7 +46,7 @@ char Temp1_Name[PATHLEN], Temp2_Name[PATHLEN], Temp3_Name[PATHLEN];
 /*   Opening and closing source code files                                   */
 /* ------------------------------------------------------------------------- */
 
-extern void load_sourcefile(char *filename_given, int same_directory_flag)
+extern void load_sourcefile(char *filename_given, int same_directory_flag, int ignore_missing)
 {
     /*  Meaning: open a new file of Inform source.  (The lexer picks up on
         this by noticing that input_file has increased.)                     */
@@ -61,6 +61,8 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag)
                 (input_file==0)?1:0);
         handle = fopen(name,"r");
     } while ((handle == NULL) && (x != 0));
+
+    if(handle == NULL && ignore_missing==1) return;
 
     if (filename_storage_left <= (int)strlen(name))
         memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);

@@ -69,6 +69,7 @@
 /* ------------------------------------------------------------------------- */
 
 /* #define UNIX */
+#define PC_WIN32
 
 /* ------------------------------------------------------------------------- */
 /*   The first task is to include the ANSI header files, and typedef         */
@@ -2245,7 +2246,7 @@ extern void write_debug_string(char *s);
 extern void close_debug_file(void);
 extern void add_to_checksum(void *address);
 
-extern void load_sourcefile(char *story_name, int style);
+extern void load_sourcefile(char *story_name, int style, int ignore_missing);
 extern int file_load_chars(int file_number, char *buffer, int length);
 extern void close_all_source(void);
 

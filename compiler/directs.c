@@ -8,6 +8,12 @@
 
 #include "header.h"
 
+typedef struct conststr_s {
+    int    consttoken_id;
+    char* textvalue;
+    void* child;
+} conststr_s;
+
 int no_routines,                   /* Number of routines compiled so far     */
     no_named_routines,             /* Number not embedded in objects         */
     no_locals,                     /* Number of locals in current routine    */
@@ -23,11 +29,56 @@ static int constant_made_yet;      /* Have any constants been defined yet?   */
 
 static int ifdef_stack[32], ifdef_sp;
 
+/* ========================================================================= */
+/* Because of the limited use for string constant values during compilation, */
+/* processing time is of slightly less importance that memory consumption.   */
+/* For this reason, the string-constant list is implemented as forward-only  */
+/* chain of walkable nodes, making memory allocation exactly proportionate   */
+/* to the number of constant strings.                                        */
+/* ------------------------------------------------------------------------- */
+conststr_s *cs_oldest=NULL;
+conststr_s *cs_youngest=NULL;
+void record_token_string(int token_id, char* text)
+{
+    //--create and initialize the next list element
+    conststr_s *cs_next=my_calloc(sizeof(conststr_s),1,"constant_string element");
+    cs_next->child=NULL;
+    cs_next->consttoken_id=token_id;
+    cs_next->textvalue=my_calloc(sizeof(char),strlen(text)+1,"constant_string string");
+    strcpy(cs_next->textvalue,text);
+
+    if(cs_oldest==NULL) 
+        cs_oldest=cs_youngest=cs_next; //--first element, so oldest and youngest
+    else 
+    {
+        cs_youngest->child=cs_next; //--point old youngest to new youngest
+        cs_youngest=cs_next; //--reset youngest pointer
+    }
+}
+char* retrieve_token_string(int token_id){
+    conststr_s *current_p=cs_oldest; 
+    while(current_p!=NULL){
+        if(current_p->consttoken_id==token_id) return current_p->textvalue;
+        current_p=current_p->child;
+    }
+    return NULL;
+}
+void free_constant_string_list()
+{
+    conststr_s *next_p=NULL,*current_p=cs_oldest; 
+    while(current_p!=NULL){
+        next_p=current_p->child;
+        my_free(&(current_p->textvalue),"constant_string string");
+        my_free(&current_p,"constant_string element");
+        current_p=next_p;
+    }
+    cs_oldest=cs_youngest=NULL;
+}
 /* ------------------------------------------------------------------------- */
 
 extern int parse_given_directive(void)
 {   int *trace_level; int32 i, j, k, n, flag;
-
+    char *name;
     switch(token_value)
     {
 
@@ -114,6 +165,9 @@ extern int parse_given_directive(void)
         if (!((token_type == SEP_TT) && (token_value == SETEQUALS_SEP)))
             put_token_back();
 
+        //save off the untranslated string value here; we may need these during compilation (particularly #include directives)
+        if(token_type==DQ_TT) record_token_string(i,token_text); 
+        
         {   assembly_operand AO = parse_expression(CONSTANT_CONTEXT);
             if (AO.marker != 0)
             {   assign_marked_symbol(i, AO.marker, AO.value,
@@ -400,29 +454,51 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         break;
 
     /* --------------------------------------------------------------------- */
-    /*   Include "[>]filename"                                               */
+    /*   Include "[>][?]filename" | <CONSTANT>;                              */
     /* --------------------------------------------------------------------- */
 
     case INCLUDE_CODE:
-        get_next_token();
-        if (token_type != DQ_TT)
-        {   ebf_error("filename in double-quotes", token_text);
-            panic_mode_error_recovery(); return FALSE;
-        }
-
-        {   char *name = token_text;
-
-            get_next_token();
-            if (!((token_type == SEP_TT) && (token_value == SEMICOLON_SEP)))
-                ebf_error("semicolon ';' after Include filename", token_text);
-
-            if (strcmp(name, "language__") == 0)
-                 load_sourcefile(Language_Name, 0);
-            else if (name[0] == '>')
-                 load_sourcefile(name+1, 1);
-            else load_sourcefile(name, 0);
+        get_next_token(); 
+        //--check for errors
+        if (token_type != DQ_TT && token_type != SYMBOL_TT)
+        {   ebf_error("filename as constant or in double-quotes", token_text);
+            panic_mode_error_recovery(); 
             return FALSE;
         }
+        //--assign value to name (lookuping value of constant if necessary)
+        if (token_type == SYMBOL_TT)
+        {   name = retrieve_token_string(token_value);
+			if(name==NULL)
+			{
+				ebf_error("string-type constant", token_text);
+				panic_mode_error_recovery(); 
+				return FALSE;
+			}
+			sflags[token_value] |= USED_SFLAG;
+        }
+        else name = token_text;
+        
+        //--more error checks
+        get_next_token();
+        if (!((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))) //--ensure followed by semicolon
+            ebf_error("semicolon ';' after Include filename", token_text);
+
+        if(strlen(name)==0) ebf_error("filename is empty", token_text);//--ensure not empty
+        
+        if (strcmp(name, "language__") == 0) //-- one special case 
+            load_sourcefile(Language_Name, 0, 0);
+        else 
+        {    //--detect include options, and separate from filename 
+            int suppress_warning=0, local_dir_only=0, offset=0;
+            char c0=name[0], c1=name[1];
+            if (c0 == '>' || c1 == '>') local_dir_only=1; 
+            if (c0 == '?' || c1 == '?') suppress_warning=1; 
+            offset=suppress_warning+local_dir_only;
+            if(offset == 1 && c0 == c1) offset=2; //-- handle ">>file.h" or "??file.h"
+            //--import file
+            load_sourcefile(name+offset, local_dir_only, suppress_warning);
+        }
+        return FALSE;
 
     /* --------------------------------------------------------------------- */
     /*   Link "filename"                                                     */
@@ -947,6 +1023,7 @@ extern void directs_allocate_arrays(void)
 
 extern void directs_free_arrays(void)
 {
+    free_constant_string_list();
 }
 
 /* ========================================================================= */

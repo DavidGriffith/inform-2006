@@ -385,7 +385,7 @@ extern void set_memory_sizes(int size_flag)
 
     /* Regardless of size_flag... */
     MAX_SOURCE_FILES = 256;
-    MAX_INCLUSION_DEPTH = 5;
+    MAX_INCLUSION_DEPTH = 7;
     MAX_LOCAL_VARIABLES_z = 16;
     MAX_LOCAL_VARIABLES_g = 32;
     DICT_WORD_SIZE_z = 6;

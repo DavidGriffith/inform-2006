@@ -1655,7 +1655,7 @@ static int dictionary_find(char *dword)
 
 extern int dictionary_add(char *dword, int x, int y, int z)
 {   int n; uchar *p;
-    int ggfr, gfr, fr, r;
+    int ggfr, gfr=0, fr=0, r;
     int ggf = VACANT, gf = VACANT, f = VACANT, at = root;
     int a, b;
     int res=((version_number==3)?4:6);

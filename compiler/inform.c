@@ -896,7 +896,7 @@ static void run_pass(void)
 {
     lexer_begin_prepass();
     files_begin_prepass();
-    load_sourcefile(Source_Name, 0);
+    load_sourcefile(Source_Name, 0, 0);
 
     begin_pass();
 
