@@ -123,8 +123,8 @@ Array LanguagePronouns table
   !             mfnmfnmfnmfn
 
     'it'      $$001000111000                    NULL
-    'him'     $$100000000000                    NULL
-    'her'     $$010000000000                    NULL
+    'him'     $$100000100000                    NULL
+    'her'     $$010000010000                    NULL
     'them'    $$000111000111                    NULL;
 
 Array LanguageDescriptors table
@@ -397,22 +397,18 @@ Constant COMMA__TX      = ", ";
 [ ThatOrThose obj;      ! Used in the accusative
     if (obj == player)            { print "you"; return; }
     if (obj has pluralname)       { print "those"; return; }
-    if (obj has animate) {
-        if (obj has female)       { print "her"; return; }
-        else
-            if (obj hasnt neuter) { print "him"; return; }
-    }
+    if (obj has female)           { print "her"; return; }
+    if (obj has male or animate)
+        if (obj hasnt neuter)     { print "him"; return; }
     print "that";
 ];
 
 [ ItOrThem obj;
     if (obj == player)            { print "yourself"; return; }
     if (obj has pluralname)       { print "them"; return; }
-    if (obj has animate) {
-        if (obj has female)       { print "her"; return; }
-        else
-            if (obj hasnt neuter) { print "him"; return; }
-    }
+    if (obj has female)           { print "her"; return; }
+    if (obj has male or animate)
+        if (obj hasnt neuter)     { print "him"; return; }
     print "it";
 ];
 
@@ -423,11 +419,9 @@ Constant COMMA__TX      = ", ";
 [ CThatOrThose obj;     ! Used in the nominative
     if (obj == player)            { print "You"; return; }
     if (obj has pluralname)       { print "Those"; return; }
-    if (obj has animate) {
-        if (obj has female)       { print "She"; return; }
-        else
-            if (obj hasnt neuter) { print "He"; return; }
-    }
+    if (obj has female)           { print "She"; return; }
+    if (obj has male or animate)
+        if (obj hasnt neuter)     { print "He"; return; }
     print "That";
 ];
 
