@@ -165,7 +165,8 @@ extern int parse_given_directive(void)
         if (!((token_type == SEP_TT) && (token_value == SETEQUALS_SEP)))
             put_token_back();
 
-        /* Save off the untranslated string value here; we may need these during compilation (particularly #include directives) */
+        /* Save off the untranslated string value here; we may need these
+           during compilation (particularly #include directives) */
         if(token_type==DQ_TT) record_token_string(i,token_text); 
         
         {   assembly_operand AO = parse_expression(CONSTANT_CONTEXT);
