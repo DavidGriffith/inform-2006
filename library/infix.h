@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   INFIX:  Support for the optional library debugger extension "Infix".
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -384,6 +384,22 @@ Array InfixRV_rop --> 32;
 Array InfixRV_types --> 32;
 Array InfixRV_commas --> 32;
 
+[ InfixInBounds addr index n;
+    if (addr < #array__start || addr > #array__end)
+        rtrue;
+    for (n=#lowest_array_number : n<=#highest_array_number : n++) {
+        if (addr == Symb__Tab(INFIXTT_ARRAY, n)) {
+            if (temp__global3 == 1 or 3)
+                temp__global2=temp__global2*WORDSIZE+WORDSIZE-1;
+            if (index > temp__global2) {
+                print "Array index out of range";
+                rfalse;
+            }
+        }
+    }
+    rtrue;
+];
+
 [ InfixRvalue acc w i n flag base expecting_term max maxi lop rop lvalside
               a b sysfun_f;
 
@@ -447,7 +463,7 @@ Array InfixRV_commas --> 32;
                 InfixRV_rvals-->n = w; InfixRV_types-->n = base + 7;
               ']&', ']#':
                 InfixRV_rvals-->n = w; InfixRV_types-->n = base + 10;
-              './/':
+              THEN1__WD:
                 InfixRV_rvals-->n = w; InfixRV_types-->n = base + 12;
               '::':
                 InfixRV_rvals-->n = w; InfixRV_types-->n = base + 13;
@@ -515,12 +531,14 @@ Array InfixRV_commas --> 32;
               'post--':     acc = (InfixRV_rvals-->lop) - 1;
             }
             switch (InfixRV_op-->lvalside) {
-              './/':
+              THEN1__WD:
                 (InfixRV_lop-->lvalside).(InfixRV_rop-->lvalside) = acc;
               '->':
-                (InfixRV_lop-->lvalside)->(InfixRV_rop-->lvalside) = acc;
+                if (InfixInBounds(InfixRV_lop-->lvalside, InfixRV_rop-->lvalside))
+                    (InfixRV_lop-->lvalside)->(InfixRV_rop-->lvalside) = acc;
               '-->':
-                (InfixRV_lop-->lvalside)-->(InfixRV_rop-->lvalside) = acc;
+                if (InfixInBounds(InfixRV_lop-->lvalside, WORDSIZE * InfixRV_rop-->lvalside))
+                    (InfixRV_lop-->lvalside)-->(InfixRV_rop-->lvalside) = acc;
               default:
                 w = InfixRV_lvals-->lvalside; if (w == -1) return -1;
                 @storew #globals_array w acc;
@@ -532,7 +550,7 @@ Array InfixRV_commas --> 32;
           '(rcall':
             sysfun_f = false;
             switch (InfixRV_op-->lop) {
-              './/':
+              THEN1__WD:
                 a = InfixRV_lop-->lop; b = InfixRV_rop-->lop;
               default:
                 a = InfixRV_rvals-->lop; b = call;
@@ -831,17 +849,19 @@ Array InfixRV_commas --> 32;
           1:    print "-->"; a=0;
           2:    print "string"; a=1;
           3:    print "table"; a=1;
+          4:    print "buffer"; a=WORDSIZE;
         }
-        print " ", infix_data2, "^; == "; b=infix_data2; if (x) b++;
-        for (w=b-1 : w>=a : w--)
-            if (infix_data1 == 0 or 2) { if (noun->w) break; }
+        print " ", infix_data2 + 1 - a, "^; == "; b = infix_data2;
+        for (w=b : w>=a : w--)
+            if (infix_data1 == 0 or 2 or 4) { if (noun->w) break; }
             else { if (noun-->w) break; }
-        if (b-1-w <= 5) w=b-1;
-        for (: x<=w : x++)
-            if (infix_data1 == 0 or 2) print noun->x, " ";
+        if (b-w < 5) w=b;
+        for (: x<=w : x++) {
+            if (infix_data1 == 0 or 2 or 4) print noun->x, " ";
             else print noun-->x, " ";
-        if (w < a) print "(", b-a, " zero entries)";
-        else if (w < b-1) print "(then ", b-1-w, " zero entries)";
+            if (x+1 == a) print ": ";
+            }
+        if (w < b) print "(then ", b-w, " zero entries)";
         new_line;
       INFIXTT_ACTION:
         if (brief) "; == ", noun;
