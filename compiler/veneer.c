@@ -610,8 +610,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
         "addr top;\
          if (addr==0 or -1) rfalse;\
          top = addr;\
-         #IfV5; #Iftrue (#version_number == 6);\
-         @log_shift addr $FFFF -> top; #Endif; #Iftrue (#version_number == 7);\
+         #IfV5; #iftrue (#version_number == 6) || (#version_number == 7);\
          @log_shift addr $FFFF -> top; #Endif; #Endif;\
          if (Unsigned__Compare(top, $001A-->0) >= 0) rfalse;\
          if (addr>=1 && addr<=(#largest_object-255)) rtrue;\
