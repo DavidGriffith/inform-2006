@@ -1,13 +1,12 @@
-! ------------------------------------------------------------------------------
+! ==============================================================================
 !   LINKLPA:  Link declarations of common properties and attributes.
 !
-!   Supplied for use with Inform 6                        Serial number 030901
-!                                                                 Release 6/11
-!   Copyright (c) Graham Nelson 1993-2003
-!       but freely usable (see manuals)
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
 !   This file is automatically Included in your game file by "Parser".
-! ------------------------------------------------------------------------------
+! ==============================================================================
 
 System_file;
 
@@ -31,9 +30,8 @@ Constant WORD_HIGHBIT = $80000000;
 Attribute animate;
 #Ifdef USE_MODULES;
     #Iffalse (animate == 0);
-    Message error "Please move your Attribute declarations after the
-                   Include ~Parser~ line: otherwise it will be impossible
-                   to USE_MODULES";
+    Message error "Please move your Attribute declarations after the Include ~Parser~ line:
+                   otherwise it will be impossible to USE_MODULES";
     #Endif;
 #Endif;
 
@@ -69,12 +67,13 @@ Attribute female;
 Attribute neuter;
 Attribute pluralname;
 
+! ------------------------------------------------------------------------------
+
 Property additive before NULL;
 #Ifdef USE_MODULES;
     #Iffalse (before == 4);
-    #Message error "Please move your Property declarations after the
-                   Include ~Parser~ line: otherwise it will be impossible
-                   to USE_MODULES";
+    Message error "Please move your Property declarations after the Include ~Parser~ line:
+                   otherwise it will be impossible to USE_MODULES";
    #Endif;
 #Endif;
 
@@ -134,13 +133,4 @@ Property parse_name 0;
 Property articles;
 Property inside_description;
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
-!   2.  Re-ordered XXX_to properties to match XXX_obj objects.
-!
 ! ==============================================================================

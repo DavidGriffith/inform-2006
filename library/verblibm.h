@@ -1,13 +1,12 @@
-! ------------------------------------------------------------------------------
+! ==============================================================================
 !   VERBLIBM:  Core of standard verbs library.
 !
-!   Supplied for use with Inform 6                        Serial number 030901
-!                                                                 Release 6/11
-!   Copyright (c) Graham Nelson 1993-2003
-!       but freely usable (see manuals)
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
 !   This file is automatically Included in your game file by "VerbLib".
-! ------------------------------------------------------------------------------
+! ==============================================================================
 
 System_file;
 
@@ -16,7 +15,7 @@ Constant DEBUG;
 Constant Grammar__Version2;
 Include "linklpa";
 Include "linklv";
-#Endif;
+#Endif; ! MODULE_MODE
 
 ! ------------------------------------------------------------------------------
 
@@ -34,14 +33,14 @@ Include "linklv";
     }
     if (Headline ~= 0) print (string) Headline;
     #Ifdef TARGET_ZCODE;
-    print "Release ", (0-->1) & $03ff, " / Serial number ";
-    for (i=18 : i<24 : i++) print (char) 0->i;
+    print "Release ", (HDR_GAMERELEASE-->0) & $03ff, " / Serial number ";
+    for (i=0 : i<6 : i++) print (char) HDR_GAMESERIAL->i;
     #Ifnot; ! TARGET_GLULX;
     print "Release ";
-    @aloads 52 0 i;
+    @aloads ROM_GAMERELEASE 0 i;
     print i;
     print " / Serial number ";
-    for (i=0 : i<6 : i++) print (char) 54->i;
+    for (i=0 : i<6 : i++) print (char) ROM_GAMESERIAL->i;
     #Endif; ! TARGET_
     print " / Inform v"; inversion;
     print " Library ", (string) LibRelease, " ";
@@ -64,24 +63,24 @@ Include "linklv";
     ix = 0; ! shut up compiler warning
     if (standard_interpreter > 0) {
         print "Standard interpreter ", standard_interpreter/256, ".", standard_interpreter%256,
-            " (", 0->$1e;
-        #iftrue #version_number == 6;
-        print (char) '.', 0->$1f;
-        #ifnot;
-        print (char) 0->$1f;
-        #endif;
+            " (", HDR_TERPNUMBER->0;
+        #Iftrue (#version_number == 6);
+        print (char) '.', HDR_TERPVERSION->0;
+        #Ifnot;
+        print (char) HDR_TERPVERSION->0;
+        #Endif;
         print ") / ";
         }
     else {
-        print "Interpreter ", 0->$1e, " Version ";
-        #iftrue #version_number == 6;
-        print 0->$1f;
-        #ifnot;
-        print (char)0->$1f;
-        #endif;
+        print "Interpreter ", HDR_TERPNUMBER->0, " Version ";
+        #Iftrue (#version_number == 6);
+        print HDR_TERPVERSION->0;
+        #Ifnot;
+        print (char) HDR_TERPVERSION->0;
+        #Endif;
         print " / ";
     }
-               
+
     #Ifnot; ! TARGET_GLULX;
     @gestalt 1 0 ix;
     print "Interpreter version ", ix / $10000, ".", (ix & $FF00) / $100,
@@ -100,12 +99,16 @@ Include "linklv";
     print "** Library error ", n, " (", p1, ",", p2, ") **^** ";
     switch (n) {
       1:    print "preposition not found (this should not occur)";
-      2:    print "Property value not routine or string: ~", (property) p2, "~ of ~", (name) p1, "~ (", p1, ")";
-      3:    print "Entry in property list not routine or string: ~", (property) p2, "~ list of ~", (name) p1, "~ (", p1, ")";
-      4:    print "Too many timers/daemons are active simultaneously.  The limit is the library constant MAX_TIMERS (currently ",
-                MAX_TIMERS, ") and should be increased";
+      2:    print "Property value not routine or string: ~", (property) p2, "~ of ~", (name) p1,
+                  "~ (", p1, ")";
+      3:    print "Entry in property list not routine or string: ~", (property) p2, "~ list of ~",
+                  (name) p1, "~ (", p1, ")";
+      4:    print "Too many timers/daemons are active simultaneously.
+                  The limit is the library constant MAX_TIMERS (currently ",
+                  MAX_TIMERS, ") and should be increased";
       5:    print "Object ~", (name) p1, "~ has no ~time_left~ property";
-      7:    print "The object ~", (name) p1, "~ can only be used as a player object if it has the ~number~ property";
+      7:    print "The object ~", (name) p1, "~ can only be used as a player object if it has
+                  the ~number~ property";
       8:    print "Attempt to take random entry from an empty table array";
       9:    print p1, " is not a valid direction property number";
       10:   print "The player-object is outside the object tree";
@@ -237,7 +240,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 [ Print__Spaces n;
     while (n > 0) {
         @streamchar ' ';
-        n = n-1;
+        n = n - 1;
     }
 ];
 
@@ -246,10 +249,10 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 [ WriteListFrom o style depth;
 
     #Ifdef TARGET_ZCODE;
-    @push c_style;      @push lt_value;   @push listing_together;   
-    @push listing_size; @push wlf_indent; @push inventory_stage;    
+    @push c_style;      @push lt_value;   @push listing_together;
+    @push listing_size; @push wlf_indent; @push inventory_stage;
     #Ifnot; ! TARGET_GLULX
-    @copy c_style sp;      @copy lt_value sp;   @copy listing_together sp;   
+    @copy c_style sp;      @copy lt_value sp;   @copy listing_together sp;
     @copy listing_size sp; @copy wlf_indent sp; @copy inventory_stage sp;
     #Endif;
 
@@ -262,11 +265,11 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     WriteListR(o, depth);
 
     #Ifdef TARGET_ZCODE;
-    @pull inventory_stage;  @pull wlf_indent; @pull listing_size;   
-    @pull listing_together; @pull lt_value;   @pull c_style;        
+    @pull inventory_stage;  @pull wlf_indent; @pull listing_size;
+    @pull listing_together; @pull lt_value;   @pull c_style;
     #Ifnot; ! TARGET_GLULX
-    @copy sp inventory_stage;  @copy sp wlf_indent; @copy sp listing_size;   
-    @copy sp listing_together; @copy sp lt_value;   @copy sp c_style;        
+    @copy sp inventory_stage;  @copy sp wlf_indent; @copy sp listing_size;
+    @copy sp listing_together; @copy sp lt_value;   @copy sp c_style;
     #Endif;
     rtrue;
 ];
@@ -329,7 +332,8 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
         m = sizes_p->i;
         if (j == 0) mr = 0;
         else {
-            if (j.list_together ~= 0 or lt_value && ZRegion(j.list_together) == 2 or 3 && j.list_together == mr) senc--;
+            if (j.list_together ~= 0 or lt_value && ZRegion(j.list_together) == 2 or 3 &&
+                j.list_together == mr) senc--;
             mr = j.list_together;
         }
     }
@@ -377,9 +381,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
                 #Ifdef TARGET_ZCODE;
                 @push lt_value; @push listing_together; @push listing_size;
                 #Ifnot; ! TARGET_GLULX;
-                @copy lt_value sp;
-                @copy listing_together sp;
-                @copy listing_size sp;
+                @copy lt_value sp; @copy listing_together sp; @copy listing_size sp;
                 #Endif; ! TARGET_;
 
                 lt_value = j.list_together; listing_together = j; wlf_indent++;
@@ -445,7 +447,8 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
     n = j;
     for (i=1,j=o : i<=n : j=NextEntry(j,depth),i++,senc++) {
-        if (j.list_together ~= 0 or lt_value && ZRegion(j.list_together) == 2 or 3 && j.list_together==mr) senc--;
+        if (j.list_together ~= 0 or lt_value && ZRegion(j.list_together) == 2 or 3 &&
+            j.list_together==mr) senc--;
         mr = j.list_together;
     }
 
@@ -480,9 +483,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
                 #Ifdef TARGET_ZCODE;
                 @push lt_value; @push listing_together; @push listing_size;
                 #Ifnot; ! TARGET_GLULX;
-                @copy lt_value sp;
-                @copy listing_together sp;
-                @copy listing_size sp;
+                @copy lt_value sp; @copy listing_together sp; @copy listing_size sp;
                 #Endif; ! TARGET_;
 
                 lt_value = j.list_together; listing_together = j; wlf_indent++;
@@ -491,9 +492,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
                 #Ifdef TARGET_ZCODE;
                 @pull listing_size; @pull listing_together; @pull lt_value;
                 #Ifnot; ! TARGET_GLULX;
-                @copy sp listing_size;
-                @copy sp listing_together;
-                @copy sp lt_value;
+                @copy sp listing_size; @copy sp listing_together; @copy sp lt_value;
                 #Endif; ! TARGET_;
 
                 if (k == 3) {
@@ -656,10 +655,9 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     }
 ];
 
-
 ! ----------------------------------------------------------------------------
-!  Much better menus can be created using the optional library extension
-!  "menus.h".  These are provided for compatibility with previous practice:
+!  Much better menus can be created using one of the optional library
+!  extensions.  These are provided for compatibility with previous practice:
 ! ----------------------------------------------------------------------------
 
 [ LowKey_Menu menu_choices EntryR ChoiceR lines main_title i j;
@@ -681,7 +679,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
         print "> ";
 
         #Ifdef TARGET_ZCODE;
-        #IFV3;
+        #IfV3;
         read buffer parse;
         #Ifnot;
         read buffer parse DrawStatusLine;
@@ -710,7 +708,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 #Ifdef TARGET_ZCODE;
 
-#IFV3;
+#IfV3;
 
 [ DoMenu menu_choices EntryR ChoiceR; LowKey_Menu(menu_choices, EntryR, ChoiceR); ];
 
@@ -731,24 +729,24 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
     oldcl = 0;
     @erase_window $ffff;
-    #Iftrue #version_number==6;
+    #Iftrue (#version_number == 6);
     @set_cursor -1;
-    ch=0->38;
+    ch = HDR_FONTWUNITS->0;
     #Ifnot;
-    ch=1;
+    ch = 1;
     #Endif;
-    i=ch*(lines+7);
+    i = ch * (lines+7);
     @split_window i;
-    i = 0->33;
+    i = HDR_SCREENWCHARS->0;
     if (i == 0) i = 80;
     @set_window 1;
     @set_cursor 1 1;
 
-    #Iftrue #version_number==6;
+    #Iftrue (#version_number == 6);
     @set_font 4 -> cw;
-    cw=0->39;
+    cw = HDR_FONTHUNITS->0;
     #Ifnot;
-    cw=1;
+    cw = 1;
     #Endif;
 
     style reverse;
@@ -761,13 +759,13 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     y=y+ch; @set_cursor y 1; spaces(i);
     @set_cursor y x; print (string) RKEY__TX;
     j=1+(i-18)*cw; @set_cursor y j;
-       
+
     if (menu_nesting == 1) print (string) QKEY1__TX;
     else                   print (string) QKEY2__TX;
     style roman;
-    y=y+2*ch;
+    y = y+2*ch;
     @set_cursor y x; font off;
-    
+
     if (menu_choices ofclass String) print (string) menu_choices;
     else                             menu_choices.call();
 
@@ -779,7 +777,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
             }
             y=1+(cl-1)*ch; @set_cursor y x; print ">";
         }
-           
+
         oldcl = cl;
         @read_char 1 -> pkey;
         if (pkey == NKEY1__KY or NKEY2__KY or 130) {
@@ -798,7 +796,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
             @erase_window $ffff;
             @split_window ch;
-            i = 0->33; if ( i== 0) i = 80;
+            i = HDR_SCREENWCHARS->0; if ( i== 0) i = 80;
             @set_window 1; @set_cursor 1 1; style reverse; spaces(i);
             j=1+(i/2-item_width)*cw;
             @set_cursor 1 j;
@@ -817,7 +815,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     menu_nesting--; if (menu_nesting > 0) rfalse;
     font on; @set_cursor 1 1;
     @erase_window $ffff; @set_window 0;
-    #Iftrue #version_number==6;
+    #Iftrue (#version_number == 6);
     @set_cursor -2;
     #Endif;
     new_line; new_line; new_line;
@@ -1052,20 +1050,20 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 ];
 
 [ ScriptOnSub;
-    transcript_mode = ((0-->8) & 1);
+    transcript_mode = ((HDR_GAMEFLAGS-->0) & 1);
     if (transcript_mode) return L__M(##ScriptOn, 1);
     @output_stream 2;
-    if (((0-->8) & 1) == 0) return L__M(##ScriptOn, 3);
+    if (((HDR_GAMEFLAGS-->0) & 1) == 0) return L__M(##ScriptOn, 3);
     L__M(##ScriptOn, 2); VersionSub();
     transcript_mode = true;
 ];
 
 [ ScriptOffSub;
-    transcript_mode = ((0-->8) & 1);
+    transcript_mode = ((HDR_GAMEFLAGS-->0) & 1);
     if (transcript_mode == false) return L__M(##ScriptOff, 1);
     L__M(##ScriptOff, 2);
     @output_stream -2;
-    if ((0-->8) & 1) return L__M(##ScriptOff, 3);
+    if ((HDR_GAMEFLAGS-->0) & 1) return L__M(##ScriptOff, 3);
     transcript_mode = false;
 ];
 
@@ -1077,7 +1075,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ CommandsOffSub;
     if (xcommsdir == 1) @output_stream -4;
-    xcommsdir=0;
+    xcommsdir = 0;
     L__M(##CommandsOff, 1);
 ];
 
@@ -1264,17 +1262,16 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ ScoreSub;
     #Ifdef NO_SCORE;
-    if (deadflag == 0)
-        "There is no score in this story.";
+    if (deadflag == 0) L__M(##Score, 2);
     #Ifnot;
-    L__M(##Score);
+    L__M(##Score, 1);
     PrintRank();
-    #Endif;
+    #Endif; ! NO_SCORE
 ];
 
 #Ifndef TaskScore;
 [ TaskScore i;
-  return task_scores->i;
+    return task_scores->i;
 ];
 #Endif;
 
@@ -1370,8 +1367,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 ];
 
 [ IndirectlyContains o1 o2;
-    ! Does o1 indirectly contain o2?  (Same as testing if their common
-    ! ancestor is o1.)
+    ! Does o1 indirectly contain o2?  (Same as testing if their common ancestor is o1.)
     while (o2 ~= 0) {
         if (o1 == o2) rtrue;
         if (o2 ofclass Class) rfalse;
@@ -1939,7 +1935,8 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
         new_line;
         if (flag == 1) text1 = text2;
         print (string) text1, " ";
-        WriteListFrom(child(descin), ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+WORKFLAG_BIT);
+        WriteListFrom(child(descin),
+          ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+WORKFLAG_BIT);
         return k;
     }
 
@@ -1983,7 +1980,8 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     visibility_levels = 1;
     visibility_ceiling = parent(player);
     while ((parent(visibility_ceiling) ~= 0)
-      && (visibility_ceiling hasnt container || visibility_ceiling has open || visibility_ceiling has transparent)) {
+      && (visibility_ceiling hasnt container || visibility_ceiling has open ||
+          visibility_ceiling has transparent)) {
         visibility_ceiling = parent(visibility_ceiling);
         visibility_levels++;
     }
@@ -2400,9 +2398,10 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 [ TraceOnSub; parser_trace=1; "[Trace on.]"; ];
 
 [ TraceLevelSub;
-    parser_trace=noun;
+    parser_trace = noun;
     print "[Parser tracing set to level ", parser_trace, ".]^";
 ];
+
 [ TraceOffSub; parser_trace=0; "Trace off."; ];
 
 [ RoutinesOnSub;  debug_flag = debug_flag | 1;  "[Message listing on.]"; ];
@@ -2505,7 +2504,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ ScopeSub;
     x_scope_count = 0;
-    LoopOverScope(#r$Print_ScL, noun);
+    LoopOverScope(Print_ScL, noun);
     if (x_scope_count == 0) "Nothing is in scope.";
 ];
 
@@ -2574,19 +2573,10 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     s = action;
     lm_n = n;
     lm_o = x1;
-    action=sw__var;
+    action = sw__var;
     if (RunRoutines(LibraryMessages, before) ~= 0) { action = s; rfalse; }
     action = s;
     LanguageLM(n, x1);
 ];
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
-!   2.  Sorted 'stub' verb routines.
-!
 ! ==============================================================================

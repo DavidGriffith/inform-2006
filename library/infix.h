@@ -1,16 +1,17 @@
-! ------------------------------------------------------------------------------
+! ==============================================================================
 !   INFIX:  Support for the optional library debugger extension "Infix".
 !
-!   Supplied for use with Inform 6                        Serial number 030901
-!                                                                 Release 6/11
-!   Copyright (c) Graham Nelson 1999-2003
-!       but freely usable (see manuals)
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
 !
-!   This file is automatically Included in your game file by "Grammar" if
-!   you supply the -X compiler switch.
-! ------------------------------------------------------------------------------
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
+!
+!   This file is automatically Included in your game file by "Grammar" if you
+!   supply the -X compiler switch.
+! ==============================================================================
 
 System_file;
+
+! ------------------------------------------------------------------------------
 
 #Ifdef DEBUG;
 
@@ -38,24 +39,25 @@ Array  infix_tolowercase -> 256;
 Array  infix_text buffer 126;
 #Ifnot;
 Array  infix_text -> 128;
-#Endif;
+#Endif; ! VN_
 
 
-[ InfixPrintAttribute x;  print (string) #attribute_names_array-->x; ];
+[ InfixPrintAttribute x; print (string) #attribute_names_array-->x; ];
 
-[ InfixPrintProperty x;   print (property) x; ];
+[ InfixPrintProperty x;  print (property) x; ];
 
-[ InfixPrintGlobal x;     print (string) #global_names_array-->x; ];
+[ InfixPrintGlobal x;    print (string) #global_names_array-->x; ];
 
-[ InfixPrintAction x;     print (string) #action_names_array-->(x-#lowest_action_number); ];
+[ InfixPrintAction x;    print (string) #action_names_array-->(x-#lowest_action_number); ];
 
-[ InfixPrintRoutine x;    print (string) #routine_names_array-->(x-#lowest_routine_number); ];
+[ InfixPrintRoutine x;   print (string) #routine_names_array-->(x-#lowest_routine_number); ];
 
-[ InfixPrintConstant x;   print (string) #constant_names_array-->(x-#lowest_constant_number); ];
+[ InfixPrintConstant x;  print (string) #constant_names_array-->(x-#lowest_constant_number); ];
 
-[ InfixPrintArray x;      print (string) #array_names_array-->(x-#lowest_array_number); ];
+[ InfixPrintArray x;     print (string) #array_names_array-->(x-#lowest_array_number); ];
 
-[ InfixPrintFakeAction x; print (string) #fake_action_names_array-->(x-#lowest_fake_action_number); ];
+[ InfixPrintFakeAction x;
+                        print (string) #fake_action_names_array-->(x-#lowest_fake_action_number); ];
 
 [ InfixPrintPA x n;
     for (n=#lowest_routine_number : n<=#highest_routine_number : n++) {
@@ -107,17 +109,20 @@ Array  infix_text -> 128;
         if (itlc->(it2->0) ~= wa->0) jump XL;
         for (j=1 : j<k : j++)
             if (itlc->(it2->j) ~= wa->j) jump XL;
-        parsed_number = i + range1 + plus; rtrue;
+        parsed_number = i + range1 + plus;
+        rtrue;
       .XL;
     }
     rfalse;
 ];
 
 [ InfixActionToken;
-    if (InfixMatchPrule(InfixPrintAction, #lowest_action_number, #highest_action_number, WordAddress(wn), WordLength(wn))) {
+    if (InfixMatchPrule(InfixPrintAction, #lowest_action_number,
+        #highest_action_number, WordAddress(wn), WordLength(wn))) {
         wn++; infix_lvalue = parsed_number; return 0;
     }
-    if (InfixMatchPrule(InfixPrintFakeAction, #lowest_fake_action_number, #highest_fake_action_number, WordAddress(wn), WordLength(wn))) {
+    if (InfixMatchPrule(InfixPrintFakeAction, #lowest_fake_action_number,
+        #highest_fake_action_number, WordAddress(wn), WordLength(wn))) {
         wn++; infix_lvalue = parsed_number; return 0;
     }
     return -1;
@@ -173,13 +178,13 @@ Array  infix_text -> 128;
         parsed_number = n*sign; return 1;
     }
 
-! Parse character constant 'a'
+    ! Parse character constant 'a'
 
     if (wl == 3 && wa->0 == ''' && wa->2 == ''') {
         parsed_number = wa->1; return 1;
     }
 
-! ##Action, 'dword'
+    ! ##Action, 'dword'
 
     switch (w) {
       '##':
@@ -194,8 +199,8 @@ Array  infix_text -> 128;
         parsed_number = w; return 1;
     }
 
-! Test for attribute, property, class name, variable name, array name, routine
-! name, constant name
+    ! Test for attribute, property, class name, variable name, array name, routine
+    ! name, constant name
 
     wn--;
     if ((wa->0 >= 'a' && wa->0 <= 'z') ||
@@ -204,22 +209,26 @@ Array  infix_text -> 128;
 
 
         infix_term_type = INFIXTT_ATTRIBUTE;
-        if (InfixMatchPrule(InfixPrintAttribute, #lowest_attribute_number, #highest_attribute_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintAttribute, #lowest_attribute_number,
+            #highest_attribute_number, wa, wl)) {
             wn++; return 1; }
 
         infix_term_type = INFIXTT_PROPERTY;
-        if (InfixMatchPrule(InfixPrintProperty, #lowest_property_number, #highest_property_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintProperty, #lowest_property_number,
+            #highest_property_number, wa, wl)) {
             wn++; return 1; }
 
         infix_term_type = INFIXTT_GLOBAL;
-        if (InfixMatchPrule(InfixPrintGlobal, #lowest_global_number, #highest_global_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintGlobal, #lowest_global_number,
+            #highest_global_number, wa, wl)) {
             infix_parsed_lvalue = parsed_number-16;
             parsed_number = #globals_array-->infix_parsed_lvalue;
             wn++; return 1;
         }
 
         infix_term_type = INFIXTT_ARRAY;
-        if (InfixMatchPrule(InfixPrintArray, #lowest_array_number, #highest_array_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintArray, #lowest_array_number,
+            #highest_array_number, wa, wl)) {
             infix_parsed_lvalue = parsed_number;
             parsed_number = Symb__Tab(INFIXTT_ARRAY,parsed_number);
             infix_data1 = temp__global3;
@@ -228,7 +237,8 @@ Array  infix_text -> 128;
         }
 
         infix_term_type = INFIXTT_ROUTINE;
-        if (InfixMatchPrule(InfixPrintRoutine, #lowest_routine_number, #highest_routine_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintRoutine, #lowest_routine_number,
+            #highest_routine_number, wa, wl)) {
             infix_parsed_lvalue = parsed_number;
             parsed_number = Symb__Tab(INFIXTT_ROUTINE,parsed_number);
             infix_data1 = temp__global3;
@@ -237,7 +247,8 @@ Array  infix_text -> 128;
         }
 
         infix_term_type = INFIXTT_CONSTANT;
-        if (InfixMatchPrule(InfixPrintConstant, #lowest_constant_number, #highest_constant_number, wa, wl)) {
+        if (InfixMatchPrule(InfixPrintConstant, #lowest_constant_number,
+            #highest_constant_number, wa, wl)) {
             infix_parsed_lvalue = parsed_number;
             parsed_number = Symb__Tab(INFIXTT_CONSTANT,parsed_number);
             infix_data1 = temp__global3;
@@ -264,7 +275,7 @@ Array  infix_text -> 128;
         parsed_number = i; return 1;
     }
     return -1;
-];
+]; ! end of InfixRvalueTerm
 
 [ InfixBigScope x;
     if (scope_stage == 1) return false;  ! No multiples here
@@ -363,7 +374,7 @@ Array  infix_text -> 128;
     for (i=2 : i<buffer->1 + 2 : i++)
         if (buffer->i == '~') { buffer->i = '['; altered = true; }
     return altered;
-];
+]; ! end of InfixCheckLineSpaced
 
 Array InfixRV_rvals --> 32;
 Array InfixRV_lvals --> 32;
@@ -649,7 +660,7 @@ Array InfixRV_commas --> 32;
         if (rop < n) InfixRV_types-->rop = -2;
         if (flag == false && lop >= 0) InfixRV_types-->lop = -2;
     } ! end of for (::)
-];
+]; ! end of InfixRvalue
 
 ! ------------------------------------------------------------------------
 
@@ -720,7 +731,7 @@ Array InfixRV_commas --> 32;
 
 [ InfixHex x y;
     y = (x & $7f00) / $100;
-    if (x < 0) y=y+$80;
+    if (x < 0) y = y + $80;
     x = x & $ff;
     print (Infixhexdigit) y/$10, (Infixhexdigit) y, (Infixhexdigit) x/$10, (Infixhexdigit) x;
 ];
@@ -806,7 +817,8 @@ Array InfixRV_commas --> 32;
         if (a & 1) <<Showverb noun>>;
       INFIXTT_ROUTINE:
         if (brief) "; == ", noun;
-        print "; Routine ", (InfixPrintRoutine) infix_parsed_lvalue, " (number ", infix_parsed_lvalue, ", packed address ", noun, ")^";
+        print "; Routine ", (InfixPrintRoutine) infix_parsed_lvalue, " (number ",
+          infix_parsed_lvalue, ", packed address ", noun, ")^";
       INFIXTT_GLOBAL:
         if (brief) "; == ", noun;
         print "; Global ", (InfixPrintGlobal) infix_parsed_lvalue, " == ", noun, "^";
@@ -838,11 +850,11 @@ Array InfixRV_commas --> 32;
             " (numbered ", noun, ")^Is not generated by any grammar";
         print "; Action ", (InfixPrintAction) noun,
             " (numbered ", noun, ")^";
-        w = 0-->4;
-        for (b=0 : b<(0-->4 + 5)-->0 : b++) {
-            w = 0-->4 + 7 + b*9;
+        w = HDR_DICTIONARY-->0;
+        for (b=0 : b<(HDR_DICTIONARY-->0 + 5)-->0 : b++) {
+            w = HDR_DICTIONARY-->0 + 7 + b*9;
             if ((w->#dict_par1) & 1) {
-                a = (0-->7)-->($ff-(w->#dict_par2));
+                a = (HDR_STATICMEMORY-->0)-->($ff-(w->#dict_par2));
                 lines = a->0; a++;
                 for (: lines>0 : lines--) {
                     a = UnpackGrammarLine(a);
@@ -867,7 +879,7 @@ Array InfixRV_commas --> 32;
         if (noun == true) "; true"; if (noun == false) "; false";
         "; ", noun;
     }
-];
+]; ! end of InfixExamineP
 
 [ InfixDescribeWatchSub x y z s flag aflag;
     print "; The Infix ~;watch~ verb allows you to set a watch on any named
@@ -1014,28 +1026,28 @@ Array InfixRV_commas --> 32;
     InfixList(#lowest_fake_action_number, #highest_fake_action_number, #fake_action_names_array);
 ];
 
-Verb meta ";i" ";inv" ";inventory"
+Verb meta ';i' ';inv' ';inventory'
     *                                           -> InfixInv;
-Verb meta ";x" ";examine"
+Verb meta ';x' ';examine'
     * InfixRvalue                               -> InfixExamine;
-Verb meta ";xo" ";examineo"
+Verb meta ';xo' ';examineo'
     * InfixRvalue                               -> InfixExamineO;
-Verb meta ";xs" ";examines"
+Verb meta ';xs' ';examines'
     * InfixRvalue                               -> InfixExamineS;
-Verb meta ";<"
+Verb meta ';<'
     * InfixActionToken                          -> InfixAction
     * InfixActionToken InfixRvalue              -> InfixAction
     * InfixActionToken InfixRvalue InfixRvalue  -> InfixAction;
-Verb meta ";"
+Verb meta ';//'
     *                                           -> InfixWelcome
     * InfixRvalue                               -> InfixEval;
-Verb meta ";give"
+Verb meta ';give'
     * InfixRvalue InfixRvalue                   -> InfixGive;
-Verb meta ";move"
+Verb meta ';move'
     * InfixRvalue "to" InfixRvalue              -> InfixMove;
-Verb meta ";remove"
+Verb meta ';remove'
     * InfixRvalue                               -> InfixRemove;
-Verb meta ";watch" ";w"
+Verb meta ';watch' ';w'
     *                                           -> InfixWatchOn
     * "timers"/"daemons"                        -> TimersOn
     * "timers"/"daemons" "off"                  -> TimersOff
@@ -1050,13 +1062,4 @@ Verb meta ";watch" ";w"
 
 #Endif; ! DEBUG
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
-!   2.  Added final #Endif to match initial #Ifdef DEBUG;
-!
 ! ==============================================================================

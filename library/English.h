@@ -1,19 +1,18 @@
-! ------------------------------------------------------------------------------
-!   Inform Language Definition File: English 030901
+! ==============================================================================
+!   ENGLISH:  Language Definition File
 !
-!   Supplied for use with Inform 6
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
 !
-!   Copyright (c) Graham Nelson 1993-2003
-!       but freely usable (see manuals)
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
 !   This file is automatically Included in your game file by "parserm".
 !   Strictly, "parserm" includes the file named in the "language__" variable,
-!   whose contents can be defined by the +language_name=XXX compiler setting
-!   (with a default of "english").
+!   whose contents can be defined by+language_name=XXX compiler setting (with a
+!   default of "english").
 !
-!   Define the constant DIALECT_US before including "Parser" to
-!   obtain American English
-! ------------------------------------------------------------------------------
+!   Define the constant DIALECT_US before including "Parser" to obtain American
+!   English.
+! ==============================================================================
 
 System_file;
 
@@ -24,42 +23,44 @@ System_file;
 Constant EnglishNaturalLanguage;    ! Needed to keep old pronouns mechanism
 
 Class   CompassDirection
-    with  number 0, article "the",
-          description [;
-              if (location provides compasslook && location.compasslook(self)) rtrue;
-              print "You see nothing special ";
-              if (self ~= u_obj or d_obj) print "to the ";
-              print_ret (name) self, ".";
-              ],
-    has   scenery;
+  with  number 0, article "the",
+        description [;
+            if (location provides compass_look && location.compass_look(self)) rtrue;
+            if (self.compass_look()) rtrue;
+            L__M(##Look, 7, self);
+        ],
+        compass_look false,
+  has   scenery;
+
 Object Compass "compass" has concealed;
-IFNDEF WITHOUT_DIRECTIONS;
+
+#Ifndef WITHOUT_DIRECTIONS;
 CompassDirection -> n_obj "north"
-                    with name 'n//' 'north',    door_dir n_to;
+                    with door_dir n_to, name 'n//' 'north';
 CompassDirection -> s_obj "south"
-                    with name 's//' 'south',    door_dir s_to;
+                    with door_dir s_to, name 's//' 'south';
 CompassDirection -> e_obj "east"
-                    with name 'e//' 'east',     door_dir e_to;
+                    with door_dir e_to, name 'e//' 'east';
 CompassDirection -> w_obj "west"
-                    with name 'w//' 'west',     door_dir w_to;
+                    with door_dir w_to, name 'w//' 'west';
 CompassDirection -> ne_obj "northeast"
-                    with name 'ne' 'northeast', door_dir ne_to;
+                    with door_dir ne_to, name 'ne' 'northeast';
 CompassDirection -> nw_obj "northwest"
-                    with name 'nw' 'northwest', door_dir nw_to;
+                    with door_dir nw_to, name 'nw' 'northwest';
 CompassDirection -> se_obj "southeast"
-                    with name 'se' 'southeast', door_dir se_to;
+                    with door_dir se_to, name 'se' 'southeast';
 CompassDirection -> sw_obj "southwest"
-                    with name 'sw' 'southwest', door_dir sw_to;
+                    with door_dir sw_to, name 'sw' 'southwest';
 CompassDirection -> u_obj "above"
-                    with name 'u//' 'up' 'ceiling' 'above' 'sky',     door_dir u_to;
+                    with door_dir u_to, name 'u//' 'up' 'ceiling' 'above' 'sky';
 CompassDirection -> d_obj "below"
-                    with name 'd//' 'down' 'floor' 'below' 'ground',  door_dir d_to;
-ENDIF;
-CompassDirection -> out_obj "outside"
-                    with                               door_dir out_to,
-                    compasslook 0;  ! use it somewhere just to satisfy the compiler
+                    with door_dir d_to, name 'd//' 'down' 'floor' 'below' 'ground';
+#endif; ! WITHOUT_DIRECTIONS
+
 CompassDirection -> in_obj "inside"
-                    with                               door_dir in_to;
+                    with door_dir in_to, name 'in' 'inside';
+CompassDirection -> out_obj "outside"
+                    with door_dir out_to, name 'out' 'outside';
 
 ! ------------------------------------------------------------------------------
 !   Part II.   Vocabulary
@@ -272,12 +273,15 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
 ];
 
 [ LanguageVerb i;
-    if (i == 'l//') { print "look"; rtrue; }
-    if (i == 'z//') { print "wait"; rtrue; }
-    if (i == 'x//') { print "examine"; rtrue; }
-    if (i == 'i//' or 'inv' or 'inventory')
-                    { print "inventory"; rtrue; }
-    rfalse;
+    switch (i) {
+      'i//','inv','inventory':
+               print "take inventory";
+      'l//':   print "look";
+      'x//':   print "examine";
+      'z//':   print "wait";
+      default: rfalse;
+    }
+    rtrue;
 ];
 
 Constant NKEY__TX       = "N = next subject";
@@ -375,32 +379,29 @@ Constant WHICH__TX      = "which ";
         2:  print_ret (ctheyreorthats) x1, " already closed.";
         3:  "You close ", (the) x1, ".";
     }
-  CommandsOn:
-    #Ifdef TARGET_GLULX;
-    switch(n) {
-      2: "[Commands are currently replaying.]";
-      3: "[Command recording already on.]";
-      4: "[Command recording failed.]";
-      }
-    #Endif;
-    "[Command recording on.]";
-  CommandsOff:
-    #Ifdef TARGET_GLULX;
-    switch(n) {
-      2: "[Command recording already off.]";
-      }
-    #Endif;
-    "[Command recording off.]";
-  CommandsRead:
-    #Ifdef TARGET_GLULX;
-    switch(n) {
-      2: "[Commands are already replaying.]";
-      3: "[Command replay failed.  Command recording is on.]";
-      4: "[Command replay failed.]";
-      5: "[Command replay complete.]";
-      }
-    #Endif;
-    "[Replaying commands.]";
+  CommandsOff: switch (n) {
+        1: "[Command recording off.]";
+        #Ifdef TARGET_GLULX;
+        2: "[Command recording already off.]";
+        #Endif; ! TARGET_
+    }
+  CommandsOn: switch (n) {
+        1: "[Command recording on.]";
+        #Ifdef TARGET_GLULX;
+        2: "[Commands are currently replaying.]";
+        3: "[Command recording already on.]";
+        4: "[Command recording failed.]";
+        #Endif; ! TARGET_
+    }
+  CommandsRead: switch (n) {
+        1: "[Replaying commands.]";
+        #Ifdef TARGET_GLULX;
+        2: "[Commands are already replaying.]";
+        3: "[Command replay failed.  Command recording is on.]";
+        4: "[Command replay failed.]";
+        5: "[Command replay complete.]";
+        #Endif; ! TARGET_
+    }
   Consult:  "You discover nothing of interest in ", (the) x1, ".";
   Cut:      "Cutting ", (thatorthose) x1, " up would achieve little.";
   Dig:      "Digging would achieve nothing here.";
@@ -494,7 +495,8 @@ Constant WHICH__TX      = "which ";
             if (x1 has pluralname) " lead nowhere."; else " leads nowhere.";
     }
   Insert: switch (n) {
-        1:  "You need to be holding ", (the) x1, " before you can put ", (itorthem) x1, " into something else.";
+        1:  "You need to be holding ", (the) x1, " before you can put ", (itorthem) x1,
+            " into something else.";
         2:  print_ret (Cthatorthose) x1, " can't contain things.";
         3:  print_ret (The) x1, " ", (isorare) x1, " closed.";
         4:  "You'll need to take ", (itorthem) x1, " off first.";
@@ -557,9 +559,10 @@ Constant WHICH__TX      = "which ";
         2:  print " (in ", (the) x1, ")";
         3:  print " (as ", (object) x1, ")";
         4:  print "^On ", (the) x1;
-            WriteListFrom(child(x1),ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
+            WriteListFrom(child(x1),
+              ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
             ".";
-        default:
+        5,6:
             if (x1 ~= location) {
                 if (x1 has supporter) print "^On "; else print "^In ";
                 print (the) x1, " you";
@@ -568,8 +571,10 @@ Constant WHICH__TX      = "which ";
             print " can ";
             if (n == 5) print "also ";
             print "see ";
-            WriteListFrom(child(x1),ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+WORKFLAG_BIT);
+            WriteListFrom(child(x1),
+              ENGLISH_BIT+RECURSE_BIT+PARTINV_BIT+TERSE_BIT+CONCEAL_BIT+WORKFLAG_BIT);
             if (x1 ~= location) "."; else " here.";
+        7:  "You see nothing unexpected in that direction.";
     }
   LookUnder: switch (n) {
         1:  "But it's dark.";
@@ -631,7 +636,8 @@ Constant WHICH__TX      = "which ";
         38: "That's not a verb I recognise.";
             #Endif;
         39: "That's not something you need to refer to in the course of this game.";
-        40: "You can't see ~", (address) pronoun_word, "~ (", (the) pronoun_obj, ") at the moment.";
+        40: "You can't see ~", (address) pronoun_word, "~ (", (the) pronoun_obj,
+            ") at the moment.";
         41: "I didn't understand the way that finished.";
         42: if (x1 == 0) print "None"; else print "Only ", (number) x1;
             print " of those ";
@@ -655,8 +661,8 @@ Constant WHICH__TX      = "which ";
         51: "(Since something dramatic has happened, your list of commands has been cut short.)";
         52: "^Type a number from 1 to ", x1, ", 0 to redisplay or press ENTER.";
         53: "^[Please press SPACE.]";
-        54: "[Comment noted.]";
-        55: "[Warning: SCRIPT is not on.]";
+        54: "[Comment recorded.]";
+        55: "[Comment NOT recorded.]";
     }
   No,Yes:   "That was a rhetorical question.";
   NotifyOff:
@@ -680,7 +686,7 @@ Constant WHICH__TX      = "which ";
             "to be locked.";
         3:  print_ret (ctheyreorthats) x1, " already open.";
         4:  print "You open ", (the) x1, ", revealing ";
-            if (WriteListFrom(child(x1),ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT) == 0) "nothing.";
+            if (WriteListFrom(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT) == 0) "nothing.";
             ".";
         5:  "You open ", (the) x1, ".";
     }
@@ -744,10 +750,13 @@ Constant WHICH__TX      = "which ";
         1:  "Save failed.";
         2:  "Ok.";
     }
-  Score:    if (deadflag) print "In that game you scored "; else print "You have so far scored ";
+  Score: switch (n) {
+        1:  if (deadflag) print "In that game you scored "; else print "You have so far scored ";
             print score, " out of a possible ", MAX_SCORE, ", in ", turns, " turn";
             if (turns ~= 1) print "s";
             return;
+        2:  "There is no score in this story.";
+    }
   ScriptOff: switch (n) {
         1:  "Transcripting is already off.";
         2:  "^End of transcript.";
@@ -762,13 +771,13 @@ Constant WHICH__TX      = "which ";
         1:  "But it's dark.";
         2:  "There is nothing on ", (the) x1, ".";
         3:  print "On ", (the) x1;
-            WriteListFrom(child(x1),ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
+            WriteListFrom(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
             ".";
         4:  "You find nothing of interest.";
         5:  "You can't see inside, since ", (the) x1, " ", (isorare) x1, " closed.";
         6:  print_ret (The) x1, " ", (isorare) x1, " empty.";
         7:  print "In ", (the) x1;
-            WriteListFrom(child(x1),ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
+            WriteListFrom(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT+ISARE_BIT);
             ".";
     }
   Set:      "No, you can't set ", (thatorthose) x1, ".";
@@ -871,21 +880,8 @@ Constant WHICH__TX      = "which ";
 ! Yes:  see No.
 ];
 
+! ==============================================================================
+
 Constant LIBRARY_ENGLISH;       ! for dependency checking.
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
-!   2.  Added Constant LIBRARY_ENGLISH;
-!
-!   3.  Changed #n$l to 'l//' in LanguageVerb().
-!
-!   4.  Re-ordered in_obj *before* out_obj.
-!
-!   5.  Sorted actions in Language_LM().
-!
 ! ==============================================================================

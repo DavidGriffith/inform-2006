@@ -1,13 +1,16 @@
-! ------------------------------------------------------------------------------
+! ==============================================================================
 !   LINKLV:  Link declarations of library variables.
 !
-!   Supplied for use with Inform 6                        Serial number 030901
-!                                                                 Release 6/11
-!   Copyright (c) Graham Nelson 1993-2003
-!       but freely usable (see manuals)
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
 !   This file is automatically Included in your game file by "verblibm" only if
 !   you supply the -U compiler switch to use pre-compiled Modules.
+! ==============================================================================
+
+System_file;
+
 ! ------------------------------------------------------------------------------
 
 Import global location;
@@ -19,9 +22,7 @@ Import global standard_interpreter;
 Import global undo_flag;
 Import global transcript_mode;
 
-#Ifdef DEBUG;
 Import global xcommsdir;
-#Endif; ! DEBUG
 
 Import global turns;
 Import global the_time;
@@ -161,11 +162,4 @@ Import global old_himobj;
 Import global old_herobj;
 #Endif; ! EnglishNaturalLanguage
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
 ! ==============================================================================

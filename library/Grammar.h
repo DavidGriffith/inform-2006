@@ -1,16 +1,15 @@
-! ------------------------------------------------------------------------------
+! ==============================================================================
 !   GRAMMAR:  Grammar table entries for the standard verbs library.
 !
-!   Supplied for use with Inform 6                        Serial number 030901
-!                                                                 Release 6/11
-!   Copyright (c) Graham Nelson 1993-2003
-!       but freely usable (see manuals)
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!
+!   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
 !   In your game file, Include three library files in this order:
 !       Include "Parser";
 !       Include "VerbLib";
 !       Include "Grammar";
-! ------------------------------------------------------------------------------
+! ==============================================================================
 
 System_file;
 
@@ -18,9 +17,6 @@ System_file;
 !  The "meta-verbs", commands to the game rather than in the game, come first:
 ! ------------------------------------------------------------------------------
 
-Verb meta 'fullscore' 'full'
-    *                                           -> FullScore
-    * 'score'                                   -> FullScore;
 Verb meta 'brief' 'normal'
     *                                           -> LMode1;
 Verb meta 'verbose' 'long'
@@ -28,12 +24,19 @@ Verb meta 'verbose' 'long'
 Verb meta 'superbrief' 'short'
     *                                           -> LMode3;
 Verb meta 'notify'
+    *                                           -> NotifyOn
     * 'on'                                      -> NotifyOn
     * 'off'                                     -> NotifyOff;
 Verb meta 'pronouns' 'nouns'
     *                                           -> Pronouns;
 Verb meta 'quit' 'q//' 'die'
     *                                           -> Quit;
+Verb meta 'recording'
+    *                                           -> CommandsOn
+    * 'on'                                      -> CommandsOn
+    * 'off'                                     -> CommandsOff;
+Verb meta 'replay'
+    *                                           -> CommandsRead;
 Verb meta 'restart'
     *                                           -> Restart;
 Verb meta 'restore'
@@ -42,22 +45,19 @@ Verb meta 'save'
     *                                           -> Save;
 Verb meta 'score'
     *                                           -> Score;
+Verb meta 'fullscore' 'full'
+    *                                           -> FullScore
+    * 'score'                                   -> FullScore;
 Verb meta 'script' 'transcript'
     *                                           -> ScriptOn
-    * 'off'                                     -> ScriptOff
-    * 'on'                                      -> ScriptOn;
+    * 'on'                                      -> ScriptOn
+    * 'off'                                     -> ScriptOff;
 Verb meta 'noscript' 'unscript'
     *                                           -> ScriptOff;
 Verb meta 'verify'
     *                                           -> Verify;
 Verb meta 'version'
     *                                           -> Version;
-Verb meta 'recording'
-    *                                           -> CommandsOn
-    * 'on'                                      -> CommandsOn
-    * 'off'                                     -> CommandsOff;
-Verb meta 'replay'
-    *                                           -> CommandsRead;
 
 #Ifndef NO_PLACES;
 Verb meta 'objects'
@@ -118,7 +118,7 @@ Verb meta 'tree'
 #Ifdef TARGET_GLULX;
 Verb meta 'glklist'
     *                                           -> Glklist;
-#Endif; ! TARGET_;
+#Endif; ! TARGET_
 
 #Endif; ! DEBUG
 
@@ -370,7 +370,7 @@ Verb 'wake' 'awake' 'awaken'
     do w = NextWordStopped();
     until (w == -1 || (w == 'to' && action_to_be == ##Answer));
     wn--;
-    consult_words = wn-consult_from;
+    consult_words = wn - consult_from;
     if (consult_words == 0) return -1;
     if (action_to_be == ##Answer or ##Ask or ##Tell) {
         w = wn; wn = consult_from; parsed_number = NextWord();
@@ -411,18 +411,16 @@ Verb 'wake' 'awake' 'awaken'
 #Endif; ! TARGET_GLULX
 
 #Ifndef PrintRank;
-Constant Make__PR;
-#Endif;
-
-#Ifdef Make__PR;
+! Constant Make__PR;
+! #Endif;
+! #Ifdef Make__PR;
 [ PrintRank; "."; ];
 #Endif;
 
 #Ifndef ParseNoun;
-Constant Make__PN;
-#Endif;
-
-#Ifdef Make__PN;
+! Constant Make__PN;
+! #Endif;
+! #Ifdef Make__PN;
 [ ParseNoun obj; obj = obj; return -1; ];
 #Endif;
 
@@ -433,17 +431,8 @@ Constant Make__PN;
 #Include "infix";
 #Endif;
 
+! ==============================================================================
+
 Constant LIBRARY_GRAMMAR;       ! for dependency checking
 
-! ==============================================================================
-!
-!   Changes for Library 6/11, Compiler 6.30
-!   Roger Firth -- September 2003
-!
-!   1.  Normalization of bracing, tabs and #Ifdefs.
-!
-!   2.  Added Constant LIBRARY_GRAMMAR.
-!
-!   3.  Sorted verb definitions.
-!
 ! ==============================================================================
