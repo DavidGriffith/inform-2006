@@ -222,7 +222,8 @@ extern void make_global(int array_flag, int name_only)
     {   if (array_flag)
             ebf_error("new array name", token_text);
         else ebf_error("new global variable name", token_text);
-        panic_mode_error_recovery(); return;
+        duplicate_error();
+        panic_mode_error_recovery(); put_token_back(); return;
     }
 
     if ((!array_flag) && (sflags[i] & USED_SFLAG))
@@ -242,13 +243,13 @@ extern void make_global(int array_flag, int name_only)
     else
     {   if (!glulx_mode && no_globals==233)
         {   error("All 233 global variables already declared");
-            panic_mode_error_recovery();
+            panic_mode_error_recovery(); put_token_back();
             return;
         }
         if (glulx_mode && no_globals==MAX_GLOBAL_VARIABLES)
         {   error_numbered("All global variables already declared; max is",
                 MAX_GLOBAL_VARIABLES);
-            panic_mode_error_recovery();
+            panic_mode_error_recovery(); put_token_back();
             return;
         }
 
@@ -336,7 +337,7 @@ extern void make_global(int array_flag, int name_only)
                ebf_error("'->', '-->', 'string', 'table' or 'buffer'", token_text);
              else
                ebf_error("'=', '->', '-->', 'string', 'table' or 'buffer'", token_text);
-             panic_mode_error_recovery();
+             panic_mode_error_recovery(); put_token_back();
              return;
          }
 
