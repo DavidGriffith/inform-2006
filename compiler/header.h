@@ -480,6 +480,13 @@ static int32 unique_task_id(void)
 #define Debugging_File "gamedebug"
 #endif
 #endif
+#ifndef Translation_File
+#ifdef FILE_EXTENSIONS
+#define Translation_File "informtx.txt"
+#else
+#define Translation_File "informtx"
+#endif
+#endif
 
 #ifdef FILE_EXTENSIONS
 #ifndef Source_Extension
@@ -2193,6 +2200,7 @@ extern void ebf_error(char *s1, char *s2);
 extern void char_error(char *s, int ch);
 extern void unicode_char_error(char *s, int32 uni);
 extern void no_such_label(char *lname);
+extern void duplicate_error(void);
 extern void warning(char *s);
 extern void warning_numbered(char *s1, int val);
 extern void warning_named(char *s1, char *s2);
@@ -2203,6 +2211,7 @@ extern void link_error_named(char *s1, char *s2);
 extern int  compiler_error(char *s);
 extern int  compiler_error_named(char *s1, char *s2);
 extern void print_sorry_message(void);
+extern char *tx(char *native);
 
 #ifdef ARC_THROWBACK
 extern int  throwback_switch;
@@ -2272,6 +2281,7 @@ extern void add_to_checksum(void *address);
 extern void load_sourcefile(char *story_name, int style, int ignore_missing);
 extern int file_load_chars(int file_number, char *buffer, int length);
 extern void close_all_source(void);
+extern char *file_read_line(char *buf, int maxlen, FILE *f);
 
 extern void output_file(void);
 
@@ -2315,6 +2325,7 @@ extern char Debugging_Name[];
 extern char Transcript_Name[];
 extern char Language_Name[];
 extern char Charset_Map[];
+extern char Translation_Name[];
 extern char Include_Path[];
 
 extern char banner_line[];
@@ -2494,7 +2505,6 @@ extern void assign_marked_symbol(int index, int marker, int32 value, int type);
 extern void assign_symbol(int index, int32 value, int type);
 extern void issue_unused_warnings(void);
 extern void write_the_identifier_names(void);
-extern void duplicate_error(void);
 
 /* ------------------------------------------------------------------------- */
 /*   Extern definitions for "syntax"                                         */
