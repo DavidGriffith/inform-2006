@@ -4510,7 +4510,7 @@ Object  InformLibrary "(Inform Library)"
             #Endif; ! LanguageInitialise
 
             new_line;
-            ExtensionRunRoutines(ext_initialise);
+            LibraryExtensions.RunAll(ext_initialise);
             j = Initialise();
             last_score = score;
             move player to location;
@@ -6425,18 +6425,32 @@ Array magic_array -->         ! This is so nitfol can do typo correction /
 ! ==============================================================================
 
 Object  LibraryExtensions "(Library Extensions)"
-  with  ext_initialise 0,
+  with  RunAll [ prop a1 a2 a3
+            obj rval max;
+            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
+                rval = obj.prop(a1, a2, a3);
+                if (rval > max) max = rval;
+            }
+            return max;
+        ],
+        RunUntil [ prop exitval a1 a2 a3
+            obj rval;
+            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
+                rval = obj.prop(a1, a2, a3);
+                if (rval == exitval) return rval;
+            }
+            return ~exitval;
+        ],
+        RunWhile [ prop exitval a1 a2 a3
+            obj rval;
+            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
+                rval = obj.prop(a1, a2, a3);
+                if (rval ~= exitval) return rval;
+            }
+            return exitval;
+        ],
+        ext_initialise 0,
         ext_messages 0,
   has   proper;
-
-[ ExtensionRunRoutines prop flag a1 a2 a3
-    obj rval;
-    objectloop (obj in LibraryExtensions)
-        if (obj provides prop && obj.prop ofclass Routine) {
-            rval = obj.prop(a1, a2, a3);
-            if (flag && rval) return rval;
-        }
-    rfalse;
-];
 
 ! ==============================================================================
