@@ -1,0 +1,36 @@
+! A test of the encode_text opcode.
+! Handy for experimenting with V9's variable dictionary resolution.
+
+Array input -> 63;
+Array parse buffer 63;
+Array output -> 32;
+
+[ DoNothing;
+];
+
+[ Main i len;
+
+  print "Enter some text, or press return to exit.^^";
+  input->0 = 60;
+
+  while (1)
+  {
+    print ">";
+    read input parse DoNothing;
+
+    len = input->1;
+    if (len == 0)
+      quit;
+
+    print "Input: ";
+    for (i = 0: i < len: i++)
+      print (char)(input->(i+2));
+
+    @encode_text input len 2 output;
+
+    print "^Output: ";
+    @print_addr output;
+    print "^^";
+  }
+];
+
