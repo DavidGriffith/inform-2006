@@ -1792,7 +1792,7 @@ extern void expressp_begin_pass(void)
 extern void expressp_allocate_arrays(void)
 {   ET = my_calloc(sizeof(expression_tree_node), MAX_EXPRESSION_NODES,
         "expression parse trees");
-    emitter_markers = my_calloc(sizeof(char), MAX_EXPRESSION_NODES,
+    emitter_markers = my_calloc(sizeof(int), MAX_EXPRESSION_NODES,
         "emitter markers");
     emitter_stack = my_calloc(sizeof(assembly_operand), MAX_EXPRESSION_NODES,
         "emitter stack");
