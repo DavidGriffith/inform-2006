@@ -67,7 +67,7 @@
 /*   out a block of definitions like those below.)                           */
 /* ------------------------------------------------------------------------- */
 
-#define PC_WIN32
+#define UNIX
 
 /* ------------------------------------------------------------------------- */
 /*   The first task is to include the ANSI header files, and typedef         */
@@ -660,7 +660,6 @@ static int32 unique_task_id(void)
 #define  MAX_ERRORS            100
 #define  MAX_IDENTIFIER_LENGTH  32
 #define  MAX_ABBREV_LENGTH      64
-#define  MAX_SOURCE_FILES      256
 #define  MAX_DICT_WORD_SIZE     40
 #define  MAX_NUM_ATTR_BYTES     39
 
@@ -2201,7 +2200,7 @@ extern int test_for_incdec(assembly_operand AO);
 /* ------------------------------------------------------------------------- */
 
 extern int  input_file;
-extern FileId InputFiles[];
+extern FileId *InputFiles;
 
 extern FILE *Temp1_fp, *Temp2_fp, *Temp3_fp;
 extern char Temp1_Name[], Temp2_Name[], Temp3_Name[];
@@ -2356,7 +2355,7 @@ extern int MAX_QTEXT_SIZE,  MAX_SYMBOLS,    HASH_TAB_SIZE,   MAX_DICT_ENTRIES,
            MAX_EXPRESSION_NODES, MAX_LABELS,            MAX_LINESPACE,
            MAX_LOW_STRINGS,      MAX_CLASSES,           MAX_CLASS_TABLE_SIZE,
            MAX_VERBS,            MAX_VERBSPACE,         MAX_ARRAYS,
-           MAX_INCLUSION_DEPTH;
+           MAX_INCLUSION_DEPTH,  MAX_SOURCE_FILES;
 
 extern int32 MAX_STATIC_STRINGS, MAX_ZCODE_SIZE, MAX_LINK_DATA_SIZE,
            MAX_TRANSCRIPT_SIZE,  MAX_INDIV_PROP_TABLE_SIZE,

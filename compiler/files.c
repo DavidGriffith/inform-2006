@@ -30,7 +30,7 @@ static int checksum_count;              /* similarly                         */
 /*   level is only concerned with file names and handles.                    */
 /* ------------------------------------------------------------------------- */
 
-FileId InputFiles[MAX_SOURCE_FILES];    /*  Ids for all the source files     */
+FileId *InputFiles=NULL;                /*  Ids for all the source files     */
 static char *filename_storage,          /*  Translated filenames             */
             *filename_storage_p;
 static int filename_storage_left;
@@ -54,8 +54,7 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag)
     char name[128]; int x = 0; FILE *handle;
 
     if (input_file == MAX_SOURCE_FILES)
-        fatalerror("Program contains too many source files: \
-increase #define MAX_SOURCE_FILES");
+        memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);
 
     do
     {   x = translate_in_filename(x, name, filename_given, same_directory_flag,
@@ -64,8 +63,7 @@ increase #define MAX_SOURCE_FILES");
     } while ((handle == NULL) && (x != 0));
 
     if (filename_storage_left <= strlen(name))
-        fatalerror("Source files have unduly long file names: \
-increase #define MAX_SOURCE_FILES");
+        memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);
 
     filename_storage_left -= strlen(name)+1;
     strcpy(filename_storage_p, name);
@@ -1101,10 +1099,13 @@ extern void files_allocate_arrays(void)
 {   filename_storage = my_malloc(MAX_SOURCE_FILES*64, "filename storage");
     filename_storage_p = filename_storage;
     filename_storage_left = MAX_SOURCE_FILES*64;
+    InputFiles = my_malloc(MAX_SOURCE_FILES*sizeof(FileId), 
+        "input file storage");
 }
 
 extern void files_free_arrays(void)
 {   my_free(&filename_storage, "filename storage");
+    my_free(&InputFiles, "input file storage");
 }
 
 /* ========================================================================= */

@@ -1,3 +1,4 @@
+031214 made MAX_SOURCE_FILES a dynamic memory setting (AP)
 031207 uploaded matching C62127.patch and fclose.patch (CK)
 031207 applied tidying.patch to remove unused code and
        standardize some temp_var operands. (CK)
