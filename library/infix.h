@@ -34,7 +34,11 @@ Global infix_data2;
 Global infix_lvalue;
 Global infix_parsed_lvalue;
 Array  infix_tolowercase -> 256;
+#Ifdef VN_1630;
+Array  infix_text buffer 126;
+#Ifnot;
 Array  infix_text -> 128;
+#Endif;
 
 
 [ InfixPrintAttribute x;  print (string) #attribute_names_array-->x; ];
