@@ -20,16 +20,16 @@ Import global sline2;
 Import global top_object;
 Import global standard_interpreter;
 Import global undo_flag;
+Import global just_undone;
 Import global transcript_mode;
-
 Import global xcommsdir;
 
+Import global sys_statusline_flag;
 Import global turns;
 Import global the_time;
 Import global time_rate;
 Import global time_step;
 Import global active_timers;
-
 Import global score;
 Import global last_score;
 Import global notify_mode;
@@ -53,6 +53,7 @@ Import global listing_size;
 Import global wlf_indent;
 Import global inventory_stage;
 Import global inventory_style;
+
 Import global pretty_flag;
 Import global menu_nesting;
 Import global menu_item;
@@ -60,11 +61,18 @@ Import global item_width;
 Import global item_name;
 Import global lm_n;
 Import global lm_o;
-
+Import global lm_s;
 #Ifdef DEBUG;
 Import global debug_flag;
 Import global x_scope_count;
 #Endif; ! DEBUG
+#Ifdef CLR_ON;
+Import global clr_fg;
+Import global clr_bg;
+Import global clr_fgstatus;
+Import global clr_bgstatus;
+#Endif; ! CLR_ON
+Import global statuswin_current;
 
 Import global action;
 Import global inp1;
@@ -85,24 +93,27 @@ Import global actors_location;
 Import global meta;
 Import global multiflag;
 Import global toomany_flag;
-
 Import global special_word;
 Import global special_number;
 Import global parsed_number;
 Import global consult_from;
 Import global consult_words;
+
 Import global notheld_mode;
 Import global onotheld_mode;
 Import global not_holding;
+
 Import global etype;
 Import global best_etype;
 Import global nextbest_etype;
+
 Import global pcount;
 Import global pcount2;
 Import global parameters;
 Import global nsns;
 Import global special_number1;
 Import global special_number2;
+
 Import global params_wanted;
 Import global inferfrom;
 Import global inferword;
@@ -110,9 +121,11 @@ Import global dont_infer;
 Import global action_to_be;
 Import global action_reversed;
 Import global advance_warning;
+
 Import global found_ttype;
 Import global found_tdata;
 Import global token_filter;
+Import global length_of_noun;
 Import global lookahead;
 Import global multi_mode;
 Import global multi_wanted;
@@ -128,8 +141,12 @@ Import global indef_possambig;
 Import global indef_nspec_at;
 Import global allow_plurals;
 Import global take_all_rule;
+Import global dict_flags_of_noun;
 Import global pronoun_word;
 Import global pronoun_obj;
+Import global pronoun__word;
+Import global pronoun__obj;
+
 Import global scope_reason;
 Import global scope_token;
 Import global scope_error;
@@ -137,11 +154,13 @@ Import global scope_stage;
 Import global ats_flag;
 Import global ats_hls;
 Import global placed_in_flag;
+
 Import global number_matched;
 Import global number_of_classes;
 Import global match_length;
 Import global match_from;
 Import global bestguess_score;
+
 Import global wn;
 Import global num_words;
 Import global verb_word;
@@ -151,7 +170,15 @@ Import global oops_from;
 Import global saved_oops;
 Import global held_back_mode;
 Import global hb_wn;
+Import global caps_mode;
+Import global print_anything_result;
+Import global initial_lookmode;
+Import global before_first_turn;
+
 Import global short_name_case;
+Import global dict_start;
+Import global dict_entry_size;
+Import global dict_end;
 
 #Ifdef EnglishNaturalLanguage;
 Import global itobj;
