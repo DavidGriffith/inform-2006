@@ -1,0 +1,21 @@
+! Test of the assert statement
+
+[ Main win i;
+
+#Ifdef TARGET_GLULX;
+  @setiosys 2 0;
+  win = glk($0023,0,0,0,3,0);
+  glk($002F,win);
+#Endif;
+
+  i = 1;
+  print "Asserting a true statement ...^";
+  assert i == 1;
+  print "Asserting a false statement ...^";
+  assert i == 2;
+  print "Done!^";
+];
+
+! Uncomment the next line for a custom assert handler
+![ AssertFailed; print "^Foo, we failed an assertion...^"; ];
+
