@@ -330,7 +330,10 @@ but not used as a value:", unicode);
 
                     if (strlen(token_text) > 4)
                         obsolete_warning(
-                            "'#n$word' is now superseded by ''word''");
+                            "'#n$word' was superseded by ''word''");
+                    else
+                        obsolete_warning(
+                            "'#n$letter' was superseded by ''letter//''");
                     current_token.type  = DICTWORD_TT;
                     current_token.value = 0;
                     current_token.text  = token_text + 3;
