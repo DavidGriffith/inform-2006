@@ -2777,7 +2777,7 @@ Constant UNLIT_BIT  =  32;
 ! ----------------------------------------------------------------------------
 
 [ NounDomain domain1 domain2 context    first_word i j k l
-                                        answer_words;
+                                        answer_words; l=l; ! suppress warning when compiling to GLULX 
     #Ifdef DEBUG;
     if (parser_trace >= 4) {
         print "   [NounDomain called at word ", wn, "^";
