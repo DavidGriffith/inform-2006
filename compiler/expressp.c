@@ -607,25 +607,25 @@ static int32 value_of_system_constant_z(int t)
 
 static int32 value_of_system_constant_g(int t)
 {
-  switch (t) {
-  case classes_table_SC:
-    return Write_RAM_At + class_numbers_offset;
-  case identifiers_table_SC:
-    return Write_RAM_At + identifier_names_offset;
-  case array_names_offset_SC:
-    return Write_RAM_At + array_names_offset;
-  case cpv__start_SC:
-    return prop_defaults_offset;
-  case cpv__end_SC:
-    return Write_RAM_At + class_numbers_offset;
-  case dictionary_table_SC:
-    return dictionary_offset;
-  case dynam_string_table_SC:
-    return abbreviations_offset;
-  case grammar_table_SC:
-    return grammar_table_offset;
-  case actions_table_SC:
-    return actions_offset;
+    switch (t) 
+    {   case classes_table_SC:
+            return Write_RAM_At + class_numbers_offset;
+        case identifiers_table_SC:
+            return Write_RAM_At + identifier_names_offset;
+        case array_names_offset_SC:
+            return Write_RAM_At + array_names_offset;
+        case cpv__start_SC:
+            return prop_defaults_offset;
+        case cpv__end_SC:
+            return Write_RAM_At + class_numbers_offset;
+        case dictionary_table_SC:
+            return dictionary_offset;
+        case dynam_string_table_SC:
+            return abbreviations_offset;
+        case grammar_table_SC:
+            return grammar_table_offset;
+        case actions_table_SC:
+            return actions_offset;
 
         case adjectives_table_SC:
             return adjectives_offset;
@@ -874,17 +874,16 @@ static int evaluate_term(token_data t, assembly_operand *o)
                      v = DICT_WORD_SIZE+6;
                      break;
 
-                 /* ###fix: need to fill more of these in! */
                  case lowest_attribute_number_SC:
                  case lowest_action_number_SC:
                  case lowest_routine_number_SC:
                  case lowest_array_number_SC:
                  case lowest_constant_number_SC:
                  case lowest_class_number_SC:
+                 case lowest_property_number_SC:
                  case oddeven_packing_SC:
                      o->type = BYTECONSTANT_OT; o->marker = 0; v = 0; break;
                  case lowest_object_number_SC:
-                 case lowest_property_number_SC:
                      o->type = BYTECONSTANT_OT; o->marker = 0; v = 1; break;
                  case lowest_global_number_SC:
                      o->type = BYTECONSTANT_OT; o->marker = 0; v = 0; break;
