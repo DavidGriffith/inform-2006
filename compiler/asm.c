@@ -945,9 +945,9 @@ extern void assemblez_instruction(assembly_instruction *AI)
 
 extern void assembleg_instruction(assembly_instruction *AI)
 {
-    uchar *start_pc, *opmodes_pc, *operands_pc;
+    uchar *start_pc, *opmodes_pc;
     int32 offset, j;
-    int operand_rules, no_operands_given, at_seq_point = FALSE;
+    int no_operands_given, at_seq_point = FALSE;
     int ix, k;
     opcodeg opco;
 
@@ -973,7 +973,6 @@ extern void assembleg_instruction(assembly_instruction *AI)
     if (execution_never_reaches_here)
         warning("This statement can never be reached");
 
-    operand_rules = opco.op_rules;
     execution_never_reaches_here = ((opco.flags & Rf) != 0);
 
     no_operands_given = AI->operand_count;
@@ -1005,8 +1004,6 @@ extern void assembleg_instruction(assembly_instruction *AI)
     for (ix=0; ix<opco.no; ix+=2) {
       byteout(0, 0);
     }
-
-    operands_pc = zcode_holding_area + zcode_ha_size;
 
     /* 2. Dispose of the special rules */
     /* There aren't any in Glulx. */
