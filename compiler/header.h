@@ -507,6 +507,9 @@ static int32 unique_task_id(void)
 #ifndef V8Code_Extension
 #define V8Code_Extension  ".z8"
 #endif
+#ifndef V9Code_Extension
+#define V9Code_Extension  ".z9"
+#endif
 #ifndef GlulxCode_Extension
 #define GlulxCode_Extension  ".ulx"
 #endif
@@ -527,6 +530,7 @@ static int32 unique_task_id(void)
 #define V6Code_Extension  ""
 #define V7Code_Extension  ""
 #define V8Code_Extension  ""
+#define V9Code_Extension  ""
 #define GlulxCode_Extension  ""
 #define Module_Extension  ""
 #define ICL_Extension     ""
@@ -729,7 +733,7 @@ typedef struct prop {
 typedef struct fpropt {
     uchar atts[6];
     char l;
-    prop pp[32];
+    prop pp[64];
 } fpropt;
 
 typedef struct objecttz {
@@ -1837,8 +1841,9 @@ typedef struct operator_s
 
 #define LABEL_MV              36     /* Ditto: marks "jump" operands */
 #define DELETED_MV            37     /* Ditto: marks bytes deleted from code */
-#define BRANCH_MV             38     /* Used in "asm.c" for routine coding */
-#define BRANCHMAX_MV          58     /* In fact, the range BRANCH_MV to
+#define EXPANDED_MV           38     /* asm.c again: marks branch to invert */
+#define BRANCH_MV             39     /* Used in "asm.c" for routine coding */
+#define BRANCHMAX_MV          59     /* In fact, the range BRANCH_MV to
                                         BRANCHMAX_MV all means the same thing.
                                         The position within the range means
                                         how far back from the label to go
