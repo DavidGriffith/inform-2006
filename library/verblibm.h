@@ -944,6 +944,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 ! ----------------------------------------------------------------------------
 
 [ MoveFloatingObjects i k l m address flag;
+    if (location == player or nothing) return;
     objectloop (i) {
         address = i.&found_in;
         if (address ~= 0 && i hasnt absent && ~~IndirectlyContains(player, i)) {
@@ -1378,7 +1379,6 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ ObjectScopedBySomething item i j k l m;
     i = item;
-    while (parent(i) ~= 0) i = parent(i);
     objectloop (j .& add_to_scope) {
         l = j.&add_to_scope;
         k = (j.#add_to_scope)/WORDSIZE;
@@ -1398,13 +1398,18 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
     ! If the item has been added to scope by something, it's first necessary
     ! for that something to be touchable.
-    i = ObjectScopedBySomething(item);
-    if (i ~= 0) {
-        if (ObjectIsUntouchable(i)) return;
-        ! An item immediately added to scope
-    }
 
     ancestor = CommonAncestor(player, item);
+    if (ancestor == 0) {
+        ancestor = item;
+        while (ancestor && (i = ObjectScopedBySomething(ancestor)) == 0)
+            ancestor = parent(ancestor);
+        if (i ~= 0) {
+            if (ObjectIsUntouchable(i, flag1, flag2)) return;
+            ! An item immediately added to scope
+        }
+    }
+    else
 
     ! First, a barrier between the player and the ancestor.  The player
     ! can only be in a sequence of enterable objects, and only closed
@@ -1464,10 +1469,6 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
         i = ObjectScopedBySomething(item);
         if (i ~= 0) ancestor = CommonAncestor(player, i);
     }
-
-    ! Are player and item in totally different places?
-
-    if (ancestor == 0) return L__M(##Take, 8, item);
 
     ! Is the player indirectly inside the item?
     if (ancestor == item) return L__M(##Take, 4, item);
@@ -1792,6 +1793,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ GoSub i j k df movewith thedir old_loc;
 
+    ! first, check if any PushDir object is touchable
     if (second ~= 0 && second notin Compass && ObjectIsUntouchable(second)) return;
 
     old_loc = location;
