@@ -175,8 +175,8 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
     },
     {   "Print__PName",
         "prop p size cla i;\
-         if (prop & $c000)\
-         {   cla = #classes_table-->(prop & $ff);\
+         cla = #classes_table-->(prop & $ff);\
+         if (prop & $c000 && cla <= #largest_object-255 && cla > 0 && cla in Class) {\
              print (name) cla, \"::\";\
              if ((prop & $8000) == 0) prop = (prop & $3f00)/$100;\
              else\
@@ -388,6 +388,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
          }",
         "if (identifier & $4000 ~= 0)\
          {   cla = #classes_table-->(identifier & $ff);\
+             if (cla > #largest_object-255 || cla < 1 || cla notin Class) rfalse;\
              identifier = (identifier & $3f00) / $100;\
              if (~~(obj ofclass cla)) rfalse; i=0-->5;\
              if (cla == 2) return i+2*identifier-2;\
@@ -2163,6 +2164,8 @@ static void compile_symbol_table_routine(void)
     assign_symbol(j,
         assemble_routine_header(2, FALSE, "Symb__Tab", &null_dbgl, FALSE, j),
         ROUTINE_T);
+    restart_lexer("", "Symb__Tab");
+
     sflags[j] |= SYSTEM_SFLAG + USED_SFLAG;
     if (trace_fns_setting==3) sflags[j] |= STAR_SFLAG;
 
