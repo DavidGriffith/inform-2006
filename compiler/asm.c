@@ -1652,7 +1652,6 @@ static void transfer_routine_z(void)
 
     {   uchar zero[1];
         zero[0] = 0;
-        while ((adjusted_pc%scale_factor)!=0) transfer_byte(zero);
         if (oddeven_packing_switch)
             while ((adjusted_pc%(scale_factor*2))!=0) transfer_byte(zero);
         else
