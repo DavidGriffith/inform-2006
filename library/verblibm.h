@@ -2576,7 +2576,8 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     lm_n = n;
     lm_o = x1;
     action = sw__var;
-    if (RunRoutines(LibraryMessages, before) ~= 0) { action = s; rfalse; }
+    if (RunRoutines(LibraryMessages, before) ~= 0)     { action = s; rfalse; }
+    if (ExtensionRunRoutines(ext_messages, true) ~= 0) { action = s; rfalse; }
     action = s;
     LanguageLM(n, x1);
 ];
