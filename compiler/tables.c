@@ -1130,8 +1130,7 @@ printf("        +---------------------+   %05lx\n", (long int) Out_Size);
 
 static void construct_storyfile_g(void)
 {   uchar *p;
-    int32 i, j, k, l, mark, strings_length,
-		limit;
+    int32 i, j, k, l, mark, strings_length, limit;
     int32 globals_at, dictionary_at, actions_at, preactions_at,
           abbrevs_at, prop_defaults_at, object_tree_at, object_props_at,
           grammar_table_at, charset_at, headerext_at,
