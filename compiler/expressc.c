@@ -469,7 +469,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
 
     assembly_operand zero_ao, max_ao, size_ao, en_ao, type_ao, an_ao,
         index_ao;
-    int x, y, byte_flag, read_flag;
+    int x, y, byte_flag, read_flag, from_module;
 
     if (AO1.marker == ARRAY_MV)
     {   
@@ -487,24 +487,25 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
             {   size_ao.value = array_sizes[x]; y=x;
             }
         }
-        if (size_ao.value==-1) compiler_error("Array size can't be found");
+        if (size_ao.value==-1) 
+            from_module=TRUE; /*compiler_error("Array size can't be found");*/
+        else {
+            type_ao = zero_ao; type_ao.value = array_types[y];
 
-        type_ao = zero_ao; type_ao.value = array_types[y];
-
-        if ((!is_systemfile()))
-            if (byte_flag)
-            {
-                if ((array_types[y] == WORD_ARRAY)
-                    || (array_types[y] == TABLE_ARRAY))
-                    warning("Using '->' to access a --> or table array");
-            }
-            else
-            {
-                if ((array_types[y] == BYTE_ARRAY)
-                    || (array_types[y] == STRING_ARRAY))
-                 warning("Using '-->' to access a -> or string array");
-            }
-
+            if ((!is_systemfile()))
+                if (byte_flag)
+                {
+                    if ((array_types[y] == WORD_ARRAY)
+                        || (array_types[y] == TABLE_ARRAY))
+                        warning("Using '->' to access a --> or table array");
+                }
+                else
+                {
+                    if ((array_types[y] == BYTE_ARRAY)
+                        || (array_types[y] == STRING_ARRAY))
+                    warning("Using '-->' to access a -> or string array");
+                }
+        }
     }
 
 
@@ -519,7 +520,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
     /* If we recognise AO1 as arising textually from a declared
        array, we can check bounds explicitly. */
 
-    if (AO1.marker == ARRAY_MV)
+    if ((AO1.marker == ARRAY_MV) && (!from_module))
     {   
         int passed_label = next_label++, failed_label = next_label++,
             final_label = next_label++; 
@@ -557,10 +558,10 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
         }
 
         en_ao = zero_ao; en_ao.value = ABOUNDS_RTE;
-    switch(oc) { case loadb_zc:  en_ao.value = ABOUNDS_RTE; break;
-                 case loadw_zc:  en_ao.value = ABOUNDS_RTE+1; break;
-                 case storeb_zc: en_ao.value = ABOUNDS_RTE+2; break;
-                 case storew_zc: en_ao.value = ABOUNDS_RTE+3; break; }
+        switch(oc) { case loadb_zc:  en_ao.value = ABOUNDS_RTE; break;
+                     case loadw_zc:  en_ao.value = ABOUNDS_RTE+1; break;
+                     case storeb_zc: en_ao.value = ABOUNDS_RTE+2; break;
+                     case storew_zc: en_ao.value = ABOUNDS_RTE+3; break; }
 
         index_ao = AO2;
         if ((AO2.type == VARIABLE_OT)&&(AO2.value == 0))
