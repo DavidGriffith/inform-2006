@@ -923,7 +923,7 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
         if ((AO2.type == LOCALVAR_OT)&&(AO2.value == 0))
         {   assembleg_store(temp_var2, AO2); /* ### could peek */
             assembleg_store(AO2, temp_var2);
-            index_ao = temp_var1;
+            index_ao = temp_var2;
         }
         assembleg_2_branch(jlt_gc, index_ao, zero_ao, failed_label);
         assembleg_2_branch(jlt_gc, index_ao, max_ao, passed_label);
