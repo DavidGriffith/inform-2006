@@ -467,12 +467,12 @@ static void pop_zm_stack(void)
 }
 
 static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
-    assembly_operand AO3)
+    assembly_operand AO3, int below)
 {   int vr;
-
     assembly_operand zero_ao, max_ao, size_ao, en_ao, type_ao, an_ao,
         index_ao;
     int x, y, byte_flag, read_flag, from_module;
+    int left_operand = ET[below].operator_number;
 
     if (AO1.marker == ARRAY_MV)
     {
@@ -569,7 +569,8 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
 
         index_ao = AO2;
         if ((AO2.type == VARIABLE_OT)&&(AO2.value == 0))
-        {   assemblez_store(temp_var2, AO2);
+        {   /* That is, if AO2 is the stack pointer */
+            assemblez_store(temp_var2, AO2);
             assemblez_store(AO2, temp_var2);
             index_ao = temp_var2;
         }
@@ -577,8 +578,17 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
         assemblez_2_branch(jl_zc, index_ao, max_ao, passed_label, TRUE);
         assemble_label_no(failed_label);
         an_ao = zero_ao; an_ao.value = y;
-        assemblez_6(call_vn2_zc, veneer_routine(RT__Err_VR), en_ao,
-            index_ao, size_ao, type_ao, an_ao);
+        /* V3 only supports 3 parameters for calls, so we have to use
+	    temp vars to get the array type and name to RT__Err. */
+        if (version_number == 3) {
+            assemblez_store(temp_var3, type_ao);
+            assemblez_store(temp_var4, an_ao);
+            assemblez_call_4(veneer_routine(RT__Err_VR), en_ao,
+                index_ao, size_ao);
+        }
+        else
+            assemblez_6(call_vn2_zc, veneer_routine(RT__Err_VR), en_ao,
+                index_ao, size_ao, type_ao, an_ao);
 
         /* We have to clear any of AO1, AO2, AO3 off the stack if
            present, so that we can achieve the same effect on the stack
@@ -606,15 +616,21 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
     /* Otherwise, compile a call to the veneer which verifies that
        the proposed read/write is within dynamic Z-machine memory. */
 
-    switch(oc) { case loadb_zc: vr = RT__ChLDB_VR; break;
-                 case loadw_zc: vr = RT__ChLDW_VR; break;
-                 case storeb_zc: vr = RT__ChSTB_VR; break;
-                 case storew_zc: vr = RT__ChSTW_VR; break; }
+    if (left_operand == PROP_ADD_OP || left_operand == MPROP_ADD_OP)
+        switch(oc) { case loadb_zc: vr = RT__ChLDPrB_VR; break;
+                     case loadw_zc: vr = RT__ChLDPrW_VR; break;
+                     case storeb_zc: vr = RT__ChSTPrB_VR; break;
+                     case storew_zc: vr = RT__ChSTPrW_VR; break; }
+    else
+        switch(oc) { case loadb_zc: vr = RT__ChLDB_VR; break;
+                     case loadw_zc: vr = RT__ChLDW_VR; break;
+                     case storeb_zc: vr = RT__ChSTB_VR; break;
+                     case storew_zc: vr = RT__ChSTW_VR; break; }
 
     if ((oc == loadb_zc) || (oc == loadw_zc))
-        assemblez_3_to(call_vs_zc, veneer_routine(vr), AO1, AO2, AO3);
+        assemblez_call_3_to(veneer_routine(vr), AO1, AO2, AO3);
     else
-        assemblez_4(call_vn_zc, veneer_routine(vr), AO1, AO2, AO3);
+        assemblez_call_4(veneer_routine(vr), AO1, AO2, AO3);
 }
 
 static assembly_operand check_nonzero_at_runtime_z(assembly_operand AO1,
@@ -687,10 +703,7 @@ static assembly_operand check_nonzero_at_runtime_z(assembly_operand AO1,
 
     assemble_label_no(failed_label);
     AO2.type = SHORT_CONSTANT_OT; AO2.value = rte_number; AO2.marker = 0;
-    if (version_number >= 5)
-      assemblez_3(call_vn_zc, veneer_routine(RT__Err_VR), AO2, AO1);
-    else
-      assemblez_3_to(call_zc, veneer_routine(RT__Err_VR), AO2, AO1, temp_var2);
+    assemblez_call_3(veneer_routine(RT__Err_VR), AO2, AO1);
 
     if (error_label != -1)
     {   /* Jump to the error label */
@@ -748,18 +761,18 @@ static void compile_conditional_z(int oc,
                 {   int pa_label = next_label++, fa_label = next_label++;
                     assembly_operand en_ao, zero_ao, max_ao;
                     assemblez_store(temp_var1, AO1);
-                    if ((AO1.type == VARIABLE_OT)&&(AO1.value == 0))
-                        assemblez_store(AO1, temp_var1);
                     assemblez_store(temp_var2, AO2);
                     if ((AO2.type == VARIABLE_OT)&&(AO2.value == 0))
                         assemblez_store(AO2, temp_var2);
+                    if ((AO1.type == VARIABLE_OT)&&(AO1.value == 0))
+                        assemblez_store(AO1, temp_var1);
                     zero_ao.type = SHORT_CONSTANT_OT; zero_ao.marker = 0;
                     zero_ao.value = 0; max_ao = zero_ao; max_ao.value = 48;
                     assemblez_2_branch(jl_zc,temp_var2,zero_ao,fa_label,TRUE);
                     assemblez_2_branch(jl_zc,temp_var2,max_ao,pa_label,TRUE);
                     assemble_label_no(fa_label);
                     en_ao = zero_ao; en_ao.value = 19;
-                    assemblez_4(call_vn_zc, veneer_routine(RT__Err_VR),
+                    assemblez_call_4(veneer_routine(RT__Err_VR),
                         en_ao, temp_var1, temp_var2);
                     va_flag = TRUE; va_label = next_label++;
                     assemblez_jump(va_label);
@@ -1661,8 +1674,7 @@ static void generate_code_from(int n, int void_flag)
                     assemblez_1_branch(jz_zc, temp_var2, ln, FALSE);
                     error_ao.type = SHORT_CONSTANT_OT; error_ao.marker = 0;
                     error_ao.value = DBYZERO_RTE;
-                    assemblez_2(call_vn_zc, veneer_routine(RT__Err_VR),
-                        error_ao);
+                    assemblez_call_2(veneer_routine(RT__Err_VR), error_ao);
                     assemblez_inc(temp_var2);
                     assemble_label_no(ln);
                     assemblez_2_to(o_n, temp_var1, temp_var2, Result);
@@ -1681,11 +1693,11 @@ static void generate_code_from(int n, int void_flag)
     switch(opnum)
     {   case ARROW_OP:
              access_memory_z(loadb_zc, ET[below].value,
-                                     ET[ET[below].right].value, Result);
+                                     ET[ET[below].right].value, Result, below);
              break;
         case DARROW_OP:
              access_memory_z(loadw_zc, ET[below].value,
-                                     ET[ET[below].right].value, Result);
+                                     ET[ET[below].right].value, Result, below);
              break;
         case UNARY_MINUS_OP:
              assemblez_2_to(sub_zc, zero_operand, ET[below].value, Result);
@@ -1721,7 +1733,7 @@ static void generate_code_from(int n, int void_flag)
              {   assembly_operand AO = ET[below].value;
 
                  if (runtime_error_checking_switch && (!veneer_mode))
-                       assemblez_3_to(call_vs_zc, veneer_routine(RT__ChPR_VR),
+                       assemblez_call_3_to(veneer_routine(RT__ChPR_VR),
                          AO, ET[ET[below].right].value, temp_var1);
                  else
                  assemblez_2_to(get_prop_zc, AO,
@@ -1929,6 +1941,7 @@ static void generate_code_from(int n, int void_flag)
                          break;
 
                      case METACLASS_SYSF:
+			             /* SD flagged: needs standard call? */
                          assemblez_2_to((version_number==3)?call_zc:call_vs_zc,
                              veneer_routine(Metaclass_VR),
                              ET[ET[below].right].value, Result);
@@ -1999,7 +2012,7 @@ static void generate_code_from(int n, int void_flag)
         case PROPERTY_SETEQUALS_OP:
              if (!void_flag)
              {   if (runtime_error_checking_switch)
-                     assemblez_4_to(call_zc, veneer_routine(RT__ChPS_VR),
+                     assemblez_call_4_to(veneer_routine(RT__ChPS_VR),
                          ET[below].value, ET[ET[below].right].value,
                          ET[ET[ET[below].right].right].value, Result);
                  else
@@ -2013,7 +2026,7 @@ static void generate_code_from(int n, int void_flag)
              }
              else
              {   if (runtime_error_checking_switch && (!veneer_mode))
-                     assemblez_4(call_vn_zc, veneer_routine(RT__ChPS_VR),
+                     assemblez_call_4(veneer_routine(RT__ChPS_VR),
                          ET[below].value, ET[ET[below].right].value,
                          ET[ET[ET[below].right].right].value);
                  else assemblez_3(put_prop_zc, ET[below].value,
@@ -2027,12 +2040,12 @@ static void generate_code_from(int n, int void_flag)
                      ET[ET[ET[below].right].right].value);
                  access_memory_z(storeb_zc, ET[below].value,
                      ET[ET[below].right].value,
-                     temp_var1);
+                     temp_var1, below);
                  write_result_z(Result, temp_var1);
              }
              else access_memory_z(storeb_zc, ET[below].value,
                      ET[ET[below].right].value,
-                     ET[ET[ET[below].right].right].value);
+                     ET[ET[ET[below].right].right].value, below);
              break;
 
         case DARROW_SETEQUALS_OP:
@@ -2041,13 +2054,13 @@ static void generate_code_from(int n, int void_flag)
                      ET[ET[ET[below].right].right].value);
                  access_memory_z(storew_zc, ET[below].value,
                      ET[ET[below].right].value,
-                     temp_var1);
+                     temp_var1, below);
                  write_result_z(Result, temp_var1);
              }
              else
                  access_memory_z(storew_zc, ET[below].value,
                      ET[ET[below].right].value,
-                     ET[ET[ET[below].right].right].value);
+                     ET[ET[ET[below].right].right].value, below);
              break;
 
         case INC_OP:
@@ -2070,73 +2083,73 @@ static void generate_code_from(int n, int void_flag)
         case ARROW_INC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3, below);
              assemblez_inc(temp_var3);
-             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              break;
 
         case ARROW_DEC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3, below);
              assemblez_dec(temp_var3);
-             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              break;
 
         case ARROW_POST_INC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_inc(temp_var3);
-             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3, below);
              break;
 
         case ARROW_POST_DEC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadb_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_dec(temp_var3);
-             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storeb_zc, temp_var1, temp_var2, temp_var3, below);
              break;
 
         case DARROW_INC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3, below);
              assemblez_inc(temp_var3);
-             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              break;
 
         case DARROW_DEC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3, below);
              assemblez_dec(temp_var3);
-             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              break;
 
         case DARROW_POST_INC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_inc(temp_var3);
-             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3, below);
              break;
 
         case DARROW_POST_DEC_OP:
              assemblez_store(temp_var1, ET[below].value);
              assemblez_store(temp_var2, ET[ET[below].right].value);
-             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(loadw_zc, temp_var1, temp_var2, temp_var3, below);
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_dec(temp_var3);
-             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3);
+             access_memory_z(storew_zc, temp_var1, temp_var2, temp_var3, below);
              break;
 
         case PROPERTY_INC_OP:
@@ -2145,7 +2158,7 @@ static void generate_code_from(int n, int void_flag)
              assemblez_2_to(get_prop_zc, temp_var1, temp_var2, temp_var3);
              assemblez_inc(temp_var3);
              if (runtime_error_checking_switch && (!veneer_mode))
-                  assemblez_4(call_vn_zc, veneer_routine(RT__ChPS_VR),
+                  assemblez_call_4(veneer_routine(RT__ChPS_VR),
                          temp_var1, temp_var2, temp_var3);
              else assemblez_3(put_prop_zc, temp_var1, temp_var2, temp_var3);
              if (!void_flag) write_result_z(Result, temp_var3);
@@ -2157,7 +2170,7 @@ static void generate_code_from(int n, int void_flag)
              assemblez_2_to(get_prop_zc, temp_var1, temp_var2, temp_var3);
              assemblez_dec(temp_var3);
              if (runtime_error_checking_switch && (!veneer_mode))
-                  assemblez_4(call_vn_zc, veneer_routine(RT__ChPS_VR),
+                  assemblez_call_4(veneer_routine(RT__ChPS_VR),
                          temp_var1, temp_var2, temp_var3);
              else assemblez_3(put_prop_zc, temp_var1, temp_var2, temp_var3);
              if (!void_flag) write_result_z(Result, temp_var3);
@@ -2170,7 +2183,7 @@ static void generate_code_from(int n, int void_flag)
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_inc(temp_var3);
              if (runtime_error_checking_switch && (!veneer_mode))
-                  assemblez_4(call_vn_zc, veneer_routine(RT__ChPS_VR),
+                  assemblez_call_4(veneer_routine(RT__ChPS_VR),
                          temp_var1, temp_var2, temp_var3);
              else assemblez_3(put_prop_zc, temp_var1, temp_var2, temp_var3);
              break;
@@ -2182,7 +2195,7 @@ static void generate_code_from(int n, int void_flag)
              if (!void_flag) write_result_z(Result, temp_var3);
              assemblez_dec(temp_var3);
              if (runtime_error_checking_switch && (!veneer_mode))
-                  assemblez_4(call_vn_zc, veneer_routine(RT__ChPS_VR),
+                  assemblez_call_4(veneer_routine(RT__ChPS_VR),
                          temp_var1, temp_var2, temp_var3);
              else assemblez_3(put_prop_zc, temp_var1, temp_var2, temp_var3);
              break;
