@@ -1371,11 +1371,11 @@ static void parse_statement_z(int break_label, int continue_label)
                          if (version_number >= 5)
                              assemblez_1(call_1n_zc, AO5);
                          else
-                             assemblez_1_to(call_1n_zc, AO5, temp_var1);
+                             assemblez_1_to(call_zc, AO5, temp_var1);
                      }
                  }
 
-                 if (version_number > 3)
+                 if (version_number > 4)
                  {   assemblez_2_to(aread_zc, AO, AO2, temp_var1);
                  }
                  else assemblez_2(sread_zc, AO, AO2);
