@@ -277,7 +277,8 @@ Global actors_location;             ! Like location, but for the actor
 Global meta;                        ! Verb is a meta-command (such as "save")
 
 Array  multiple_object --> 64;      ! List of multiple parameters
-Global multiflag;                   ! Multiple-object flag
+Global multiflag;                   ! Multiple-object flag passed to actions
+                                    ! Also used to prevent misleading MULTI_PE
 Global toomany_flag;                ! Flag for "multiple match too large"
                                     ! (e.g. if "take all" took over 100 things)
 
@@ -1622,11 +1623,14 @@ Object  InformParser "(Inform Parser)"
     #Endif; ! DEBUG
 
     best_etype = STUCK_PE; nextbest_etype = STUCK_PE;
+    multiflag = false;
 
     ! "best_etype" is the current failure-to-match error - it is by default
     ! the least informative one, "don't understand that sentence".
     ! "nextbest_etype" remembers the best alternative to having to ask a
     ! scope token for an error message (i.e., the best not counting ASKSCOPE_PE).
+    ! multiflag is used here to prevent inappropriate MULTI_PE errors
+    ! in addition to its unrelated duties passing information to action routines
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !
@@ -1718,7 +1722,7 @@ Object  InformParser "(Inform Parser)"
                             while (wn < num_words) {
                                 l=NextWord();
                                 if ( l && (l->#dict_par1) &8 ) {   ! if preposition
-                                    l = Descriptors(false);  ! skip past THE etc
+                                    l = Descriptors();  ! skip past THE etc
                                     if (l~=0) etype=l;  ! don't allow multiple objects
                                     l = NounDomain(actors_location, actor, NOUN_TOKEN);
                                     #Ifdef DEBUG;
@@ -1860,7 +1864,7 @@ Object  InformParser "(Inform Parser)"
 
                 if (parameters >= 1 && results-->2 == 0) {
                     l = ReviseMulti(results-->3);
-                    if (l ~= 0) { etype = l; break; }
+                    if (l ~= 0) { etype = l; results-->0 = action_to_be; break; }
                 }
                 if (parameters >= 2 && results-->3 == 0) {
                     l = ReviseMulti(results-->2);
@@ -2035,8 +2039,17 @@ Object  InformParser "(Inform Parser)"
     if (etype == JUNKAFTER_PE)  L__M(##Miscellany, 41);
     if (etype == TOOFEW_PE)     L__M(##Miscellany, 42, multi_had);
     if (etype == NOTHING_PE) {
-        if (multi_wanted==100)  L__M(##Miscellany, 43);
-        else                    L__M(##Miscellany, 44);
+        if (results-->0 == ##Remove && results-->3 ofclass Object) {
+            noun = results-->3; ! ensure valid for messages
+            if (noun has animate) L__M(##Take, 6, noun);
+            else if (noun hasnt open) L__M(##Take, 9, noun);
+            else if (children(noun)==0) L__M(##Search, 6, noun);
+            else results-->0 = 0;
+            }
+        if (results-->0 ~= ##Remove) {
+            if (multi_wanted==100)  L__M(##Miscellany, 43);
+            else                    L__M(##Miscellany, 44);
+        }
     }
     if (etype == ASKSCOPE_PE) {
         scope_stage = 3;
@@ -2138,7 +2151,7 @@ Constant UNLIT_BIT  =  32;
     indef_nspec_at = 0;
 ];
 
-[ Descriptors allow_multiple  o x flag cto type n;
+[ Descriptors  o x flag cto type n;
     ResetDescriptors();
     if (wn > num_words) return 0;
 
@@ -2177,7 +2190,7 @@ Constant UNLIT_BIT  =  32;
             if (take_all_rule == 1) take_all_rule = 2;
             indef_type = indef_type | PLURAL_BIT;
         }
-        if (allow_plurals && allow_multiple) {
+        if (allow_plurals) {
             n = TryNumber(wn-1);
             if (n == 1) { indef_mode = 1; flag = 1; }
             if (n > 1) {
@@ -2191,7 +2204,6 @@ Constant UNLIT_BIT  =  32;
             wn--;  ! Skip 'of' after these
     }
     wn--;
-    if ((indef_wanted > 0) && (~~allow_multiple)) return MULTI_PE;
     return 0;
 ];
 
@@ -2250,7 +2262,7 @@ Constant UNLIT_BIT  =  32;
 
 [ ParseToken__ given_ttype given_tdata token_n
              token l o i j k and_parity single_object desc_wn many_flag
-             token_allows_multiple;
+             token_allows_multiple prev_indef_wanted;
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !
@@ -2448,7 +2460,7 @@ Constant UNLIT_BIT  =  32;
   .TryAgain;
 
     ! First, we parse any descriptive words (like "the", "five" or "every"):
-    l = Descriptors(token_allows_multiple);
+    l = Descriptors();
     if (l ~= 0) { etype = l; return GPR_FAIL; }
 
   .TryAgain2;
@@ -2478,14 +2490,20 @@ Constant UNLIT_BIT  =  32;
         #Endif; ! DEBUG
         l = NounDomain(actors_location, actor, token);
         if (l == REPARSE_CODE) return l;                  ! Reparse after Q&A
-        if (indef_wanted == 100 && l == 0) l = 1;
+        if (indef_wanted == 100 && l == 0 && number_matched == 0)
+        	l = 1;  ! ReviseMulti if TAKE ALL FROM empty container
+        
+        if (token_allows_multiple && ~~multiflag) {
+            if (best_etype==MULTI_PE) best_etype=STUCK_PE;
+            multiflag = true;
+        } 
         if (l == 0) {
             if (indef_possambig) {
                 ResetDescriptors();
                 wn = desc_wn;
                 jump TryAgain2;
             }
-            if (token_allows_multiple && etype==MULTI_PE) etype=0;
+            if (etype == MULTI_PE or TOOFEW_PE && multiflag) etype = STUCK_PE;
             etype=CantSee();
             jump FailToken;
         } ! Choose best error
@@ -2561,7 +2579,7 @@ Constant UNLIT_BIT  =  32;
                 wn = desc_wn;
                 jump TryAgain2;
             }
-            etype = CantSee(); return GPR_FAIL;            ! Choose best error
+            etype = CantSee(); jump FailToken;            ! Choose best error
         }
 
         ! ...until it produces something not held by the actor.  Then an implicit
@@ -2618,6 +2636,7 @@ Constant UNLIT_BIT  =  32;
         #Endif; ! DEBUG
 
         if (~~token_allows_multiple) {
+            if (multiflag) jump PassToken; ! give UPTO_PE error
             etype=MULTI_PE;
             jump FailToken;
         }
@@ -2670,11 +2689,18 @@ Constant UNLIT_BIT  =  32;
     ! Descriptors)
 
     if (allow_plurals && indef_guess_p == 1) {
+        #Ifdef DEBUG;
+        if (parser_trace >= 4) print "   [Retrying singulars after failure ", etype, "]^";
+        #Endif;
+        prev_indef_wanted = indef_wanted;
         allow_plurals = false;
         wn = desc_wn;
         jump TryAgain;
     }
-    return -1;
+
+    if ((indef_wanted > 0 || prev_indef_wanted > 0) && (~~multiflag)) etype = MULTI_PE;
+ 
+    return GPR_FAIL;
 
 ]; ! end of ParseToken__
 
@@ -6233,9 +6259,8 @@ Array StorageForShortName -> 160 + WORDSIZE;
 ];
 
 [ Defart o i;
-    if (~~o ofclass Object) {print (PSN__) o; return;}
     i = indef_mode; indef_mode = false;
-    if (o has proper) {
+    if ((~~o ofclass Object) || o has proper) {
         indef_mode = NULL; print (PSN__) o; indef_mode = i;
         return;
     }
@@ -6249,9 +6274,8 @@ Array StorageForShortName -> 160 + WORDSIZE;
         return;
     }
     #Endif;
-    if (~~o ofclass Object) {print (PSN__) o; return;}
     i = indef_mode; indef_mode = false;
-    if (o has proper) {
+    if ((~~o ofclass Object) || o has proper) {
         indef_mode = NULL; print (PSN__) o; indef_mode = i;
         return;
     }
