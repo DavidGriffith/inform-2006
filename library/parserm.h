@@ -4514,8 +4514,13 @@ Object  InformLibrary "(Inform Library)"
             j = Initialise();
             last_score = score;
             move player to location;
+
             while (parent(location) ~= 0) location = parent(location);
             real_location = location;
+
+            actor = player; ! resync, because player may have been changed in initialise()
+            actors_location = location;
+
             objectloop (i in player) give i moved ~concealed;
 
             if (j ~= 2) Banner();
