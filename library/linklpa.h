@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   LINKLPA:  Link declarations of common properties and attributes.
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -70,13 +70,6 @@ Attribute pluralname;
 ! ------------------------------------------------------------------------------
 
 Property additive before NULL;
-#Ifdef USE_MODULES;
-    #Iffalse (before == 4);
-    Message error "Please move your Property declarations after the Include ~Parser~ line:
-                   otherwise it will be impossible to USE_MODULES";
-   #Endif;
-#Endif;
-
 Property additive after  NULL;
 Property additive life   NULL;
 
@@ -92,6 +85,13 @@ Property u_to;
 Property d_to;
 Property in_to;
 Property out_to;
+
+#Ifdef USE_MODULES;
+    #Iffalse (7 >= n_to);
+    Message error "Please move your Property declarations after the Include ~Parser~ line:
+                   otherwise it will be impossible to USE_MODULES";
+    #Endif;
+#Endif;
 
 Property door_to;
 Property with_key;
