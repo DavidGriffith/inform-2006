@@ -469,7 +469,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
 
     assembly_operand zero_ao, max_ao, size_ao, en_ao, type_ao, an_ao,
         index_ao;
-    int x, y, byte_flag, read_flag, entry_size;
+    int x, y, byte_flag, read_flag;
 
     if (AO1.marker == ARRAY_MV)
     {   
@@ -1098,7 +1098,7 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
 
 static void compile_conditional_g(condclass *cc,
     assembly_operand AO1, assembly_operand AO2, int label, int flag)
-{   assembly_operand AO3, AO4; 
+{   assembly_operand AO4; 
     int the_zc, error_label = label,
     va_flag = FALSE, va_label;
 
@@ -2429,7 +2429,6 @@ static void generate_code_from(int n, int void_flag)
                else
                  AO = veneer_routine(WV__Pr_VR);
 
-             ThreeArgFunctionCall:
              {
                assembly_operand AO2 = ET[below].value;
                assembly_operand AO3 = ET[ET[below].right].value;
@@ -2696,8 +2695,6 @@ static void generate_code_from(int n, int void_flag)
                  }
                  break;
              }
-
-             GenFunctionCallG:
 
              i = below;
 
