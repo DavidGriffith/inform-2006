@@ -20,7 +20,6 @@ Constant LibRelease      "6/12";
 Constant LIBRARY_VERSION  612;
 Constant Grammar__Version 2;
 
-#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;
 Default COMMENT_CHARACTER '*';
 
 #Ifdef INFIX;
@@ -28,7 +27,9 @@ Default DEBUG 0;
 #Endif; ! INFIX
 
 #Ifndef WORDSIZE;                   ! compiling with Z-code only compiler
+#Ifndef TARGET_ZCODE;
 Constant TARGET_ZCODE;
+#Endif;
 Constant WORDSIZE 2;
 #Endif; ! WORDSIZE
 
@@ -127,4 +128,4 @@ Include "parserm";
 Constant LIBRARY_PARSER;        ! for dependency checking
 
 ! ==============================================================================
-#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;
+
