@@ -1307,7 +1307,9 @@ extern int32 assemble_routine_header(int no_locals,
       /*  function is called, if it's required.                              */
 
       if ((routine_asterisked) || (define_INFIX_switch))
-      {   char fnt[80]; assembly_operand PV, RFA, CON, STP, SLF; int ln, ln2;
+      {   
+          char fnt[MAX_IDENTIFIER_LENGTH + 10]; 
+          assembly_operand PV, RFA, CON, STP, SLF; int ln, ln2;
 
           ln = next_label++;
           ln2 = next_label++;
