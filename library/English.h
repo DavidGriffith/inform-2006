@@ -893,6 +893,7 @@ Constant COMMA__TX      = ", ";
         2:  CSubjectIs__(actor,true); "unable to.";
         3:  "Nothing obvious happens.";
         4:  "That would be less than courteous.";
+        5:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
     }
 ! Push: see Pull
   PushDir: switch (n) {
@@ -1056,6 +1057,7 @@ Constant COMMA__TX      = ", ";
   Wave: switch (n) {
         1:  CSubjectIsnt(actor,true); "holding ", (ThatOrThose) x1, ".";
         2:  CSubjectVerb(actor,false,"look",0,"looks"); "ridiculous waving ", (the) x1, ".";
+        3:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
     }
   WaveHands:CSubjectVerb(actor,false,"wave,",0,"waves,"); "feeling foolish.";
   Wear: switch (n) {

@@ -2446,6 +2446,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 [ PraySub; L__M(##Pray, 1, noun); ];
 
 [ PullSub;
+    if (noun == actor)    return L__M(##Pull, 5, noun);
     if (ObjectIsUntouchable(noun)) return;
     if (noun has static)  return L__M(##Pull, 1, noun);
     if (noun has scenery) return L__M(##Pull, 2, noun);
@@ -2454,6 +2455,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 ];
 
 [ PushSub;
+    if (noun == actor)    return L__M(##Push, 5, noun);
     if (ObjectIsUntouchable(noun)) return;
     if (noun has static)  return L__M(##Push, 1, noun);
     if (noun has scenery) return L__M(##Push, 2, noun);
@@ -2536,6 +2538,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 ];
 
 [ TurnSub;
+    if (noun == actor)    return L__M(##Turn, 5, noun);
     if (ObjectIsUntouchable(noun)) return;
     if (noun has static)  return L__M(##Turn, 1, noun);
     if (noun has scenery) return L__M(##Turn, 2, noun);
@@ -2557,6 +2560,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 ];
 
 [ WaveSub;
+    if (noun == actor) return L__M(##Wave, 3, noun);
     if (noun notin actor && ImplicitTake(noun)) return L__M(##Wave, 1, noun);
     L__M(##Wave, 2 ,noun);
 ];
