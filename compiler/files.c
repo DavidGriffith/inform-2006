@@ -286,6 +286,7 @@ static void output_file_z(void)
     sf_handle = fopen(new_name,"wb");
     if (sf_handle == NULL)
         fatalerror_named("Couldn't open output file", new_name);
+    if (line_trace_level > 0) printf("Writing file \"%s\"\n",new_name);
 
 #ifdef MAC_MPW
     /*  Set the type and creator to Andrew Plotkin's MaxZip, a popular
@@ -486,6 +487,7 @@ static void output_file_g(void)
     sf_handle = fopen(new_name,"wb");
     if (sf_handle == NULL)
         fatalerror_named("Couldn't open output file", new_name);
+    if (line_trace_level > 0) printf("Writing file \"%s\"\n",new_name);
 
 #ifdef MAC_MPW
     /*  Set the type and creator to Andrew Plotkin's MaxZip, a popular
