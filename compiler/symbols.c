@@ -203,6 +203,26 @@ extern int symbol_index(char *p, int hashcode)
     return(no_symbols++);
 }
 
+extern void end_symbol_scope(int k)
+{   
+    /* make the given symbol invisible to symbol_index */
+    int j;
+    j = hash_code_from_string((char *) symbs[k]);
+    if (start_of_list[j] == k)
+    {   start_of_list[j] = next_entry[k];
+        return;
+    }
+    j = start_of_list[j];
+    while (j != -1) 
+    {
+        if (next_entry[j] == k)
+        {   next_entry[j] = next_entry[k];
+            return;
+        }
+        j = next_entry[j];
+    }
+}
+
 /* ------------------------------------------------------------------------- */
 /*   Printing diagnostics                                                    */
 /* ------------------------------------------------------------------------- */
