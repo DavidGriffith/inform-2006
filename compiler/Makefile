@@ -5,10 +5,8 @@ SOURCE = \
 	files.o inform.o lexer.o linker.o memory.o objects.o states.o symbols.o \
 	syntax.o tables.o text.o veneer.o verbs.o
 
-infrmw32: inform_w32
-
-inform_w32: CFLAGS = -mno-cygwin -O2 -DPC_WIN32
-inform_w32: $(SOURCE)
+infrmw32: CFLAGS = -mno-cygwin -O2 -DPC_WIN32
+infrmw32: $(SOURCE)
 	$(CC) -mno-cygwin -s -o $@ $^
 
 inform: CFLAGS = -O2 -DUNIX
@@ -19,4 +17,8 @@ clean:
 	rm -f *.o
 
 get:
-	cvs co inform
+	cvs checkout inform
+
+getftp:
+	wget --timestamping --recursive --passive-ftp ftp://inform63:makers@plover.net/public_html
+
