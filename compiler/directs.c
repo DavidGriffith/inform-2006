@@ -250,7 +250,9 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
     /*   End                                                                 */
     /* --------------------------------------------------------------------- */
 
-    case END_CODE: return(TRUE);
+    case END_CODE: 
+        terminate_file(); 
+        return(FALSE);
 
     case ENDIF_CODE:
         if (ifdef_sp == 0) error("'Endif' without matching 'If...'");
@@ -884,6 +886,24 @@ the first constant definition");
                 break;
         }
         trace_keywords.enabled = FALSE;
+        break;
+
+    /* --------------------------------------------------------------------- */
+    /*   Undef symbol                                                        */
+    /* --------------------------------------------------------------------- */
+
+    case UNDEF_CODE:
+        get_next_token();
+        if (token_type != SYMBOL_TT)
+        {   ebf_error("symbol name", token_text);
+            break;
+        }
+
+        if (sflags[token_value] & UNKNOWN_SFLAG)
+        {   warning("Undefined something not defined anyway.");
+        }
+        end_symbol_scope(token_value);
+        sflags[token_value] |= USED_SFLAG;
         break;
 
     /* --------------------------------------------------------------------- */
