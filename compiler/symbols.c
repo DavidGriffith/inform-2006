@@ -311,17 +311,6 @@ extern void issue_unused_warnings(void)
     }
 }
 
-extern void duplicate_error(void)
-{   char * j;
-    if (token_type == SYMBOL_TT) {
-        if (slines[token_value]>0) j=InputFiles[slines[token_value]/0x10000-1].filename;
-        else j="";
-        printf("> \"%s\" is a previously declared %s at \"%s\" line %d.\n",
-            (char *) symbs[token_value], typename(stypes[token_value]), j, 
-            slines[token_value]%0x10000);
-    }
-}
-
 
 /* ------------------------------------------------------------------------- */
 /*   These are arrays used only during story file (never module) creation,   */
