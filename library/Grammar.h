@@ -536,8 +536,7 @@ Include "infix";
 
 ! ==============================================================================
 
-Constant LIBRARY_GRAMMAR;           ! for dependency checking
-
+#undef LIBRARY_STAGE; Constant LIBRARY_STAGE STAGE_GRAMMAR;
 #Ifdef MASTER_INCLUDE;
 Include MASTER_INCLUDE;             ! inclusions AFTER Grammar.h
 #Endif;
