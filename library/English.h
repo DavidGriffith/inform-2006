@@ -284,6 +284,11 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
     rtrue;
 ];
 
+! ----------------------------------------------------------------------------
+!  LanguageVerbIsDebugging is called by SearchScope.  It should return true 
+!  if word w is a debugging verb which needs all objects to be in scope.
+! ----------------------------------------------------------------------------
+
 #Ifdef DEBUG;
 [ LanguageVerbIsDebugging w;
     if (w == 'purloin' or 'tree' or 'abstract'
@@ -293,11 +298,28 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
 ];
 #Endif;
 
+! ----------------------------------------------------------------------------
+!  LanguageVerbLikesAdverb is called by PrintCommand when printing an UPTO_PE
+!  error or an inference message.  Words which are intransitive verbs, i.e.,
+!  which require a direction name as an adverb ('walk west'), not a noun
+!  ('I only understood you as far as wanting to touch /the/ ground'), should
+!  cause the routine to return true.
+! ----------------------------------------------------------------------------
+
 [ LanguageVerbLikesAdverb w;
     if (w == 'look' or 'go' or 'push' or 'walk')
         rtrue;
     rfalse;
 ];
+
+! ----------------------------------------------------------------------------
+!  LanguageVerbMayBeName is called by NounDomain when dealing with the 
+!  player's reply to a "Which do you mean, the short stick or the long
+!  stick?" prompt from the parser. If the reply is another verb (for example,
+!  LOOK) then then previous ambiguous command is discarded /unless/
+!  it is one of these words which could be both a verb /and/ an
+!  adjective in a 'name' property.
+! ----------------------------------------------------------------------------
 
 [ LanguageVerbMayBeName w;
     if (w == 'long' or 'short' or 'normal'
