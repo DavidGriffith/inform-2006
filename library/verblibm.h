@@ -1226,7 +1226,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     objectloop (i has visited) j++;
     objectloop (i has visited) {
         print (name) i; k++;
-        if (k == j) { L__M(##Places, 2); return;}
+        if (k == j) { L__M(##Places, 2); return; }
         if (k == j-1) print (string) AND__TX;
         else          print (string) COMMA__TX;
     }

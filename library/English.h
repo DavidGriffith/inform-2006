@@ -699,9 +699,9 @@ Constant COMMA__TX      = ", ";
   Order:    print (The) x1;
             if (x1 has pluralname) print " have"; else print " has";
             " better things to do.";
-Places: switch (n) {   
-        1: print "You have visited: ";
-        2: print ".^";
+  Places: switch (n) {
+        1:  print "You have visited: ";
+        2:  print ".^";
     }
   Pray:     "Nothing practical results from your prayer.";
   Prompt:   print "^>";

@@ -1997,7 +1997,7 @@ Object  InformParser "(Inform Parser)"
     if (etype == STUCK_PE) {    L__M(##Miscellany, 27); oops_from = 1; }
     if (etype == UPTO_PE) {     L__M(##Miscellany, 28);
         for (m=0 : m<32 : m++) pattern-->m = pattern2-->m;
-        pcount = pcount2; PrintCommand(0);L__M(##Miscellany, 56);
+        pcount = pcount2; PrintCommand(0); L__M(##Miscellany, 56);
     }
     if (etype == NUMBER_PE)     L__M(##Miscellany, 29);
     if (etype == CANTSEE_PE) {  L__M(##Miscellany, 30); oops_from=saved_oops; }
@@ -6427,26 +6427,29 @@ Array magic_array -->         ! This is so nitfol can do typo correction /
 Object  LibraryExtensions "(Library Extensions)"
   with  RunAll [ prop a1 a2 a3
             obj rval max;
-            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
-                rval = obj.prop(a1, a2, a3);
-                if (rval > max) max = rval;
-            }
+            objectloop (obj in self)
+                if (obj provides prop && obj.prop ofclass Routine) {
+                    rval = obj.prop(a1, a2, a3);
+                    if (rval > max) max = rval;
+                }
             return max;
         ],
         RunUntil [ prop exitval a1 a2 a3
             obj rval;
-            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
-                rval = obj.prop(a1, a2, a3);
-                if (rval == exitval) return rval;
-            }
+            objectloop (obj in self)
+                if (obj provides prop && obj.prop ofclass Routine) {
+                    rval = obj.prop(a1, a2, a3);
+                    if (rval == exitval) return rval;
+                }
             return ~exitval;
         ],
         RunWhile [ prop exitval a1 a2 a3
             obj rval;
-            objectloop (obj in self && obj provides prop && obj.prop ofclass Routine) {
-                rval = obj.prop(a1, a2, a3);
-                if (rval ~= exitval) return rval;
-            }
+            objectloop (obj in self)
+                if (obj provides prop && obj.prop ofclass Routine) {
+                    rval = obj.prop(a1, a2, a3);
+                    if (rval ~= exitval) return rval;
+                }
             return exitval;
         ],
         ext_initialise 0,
