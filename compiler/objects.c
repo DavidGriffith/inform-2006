@@ -36,7 +36,7 @@ static fproptg full_object_g;          /* Equivalent for Glulx. This object
                                           is very small, since the large arrays
                                           are allocated dynamically by the
                                           Glulx compiler                     */
-static char shortname_buffer[256];     /* Text buffer to hold the short name
+static char shortname_buffer[766];     /* Text buffer to hold the short name
                                           (which is read in first, but
                                           written almost last)               */
 static int parent_of_this_obj;
@@ -735,6 +735,7 @@ static int write_property_block_z(char *shortname)
     if (shortname != NULL)
     {   uchar *tmp = translate_text(p+mark+1,shortname);
         i = subtract_pointers(tmp,(p+mark+1));
+        if (i>510) error ("Short name of object exceeded 765 Z-characters");
         p[mark] = i/2;
         mark += i+1;
     }
@@ -1068,7 +1069,8 @@ the names '%s' and '%s' actually refer to the same property",
             if (token_type == SEGMENT_MARKER_TT) { put_token_back(); break; }
 
             if ((!individual_property) && (property_number==1)
-                && (token_type != SQ_TT) && (token_type != DQ_TT)
+                && ((token_type != SQ_TT) || (strlen(token_text) <2 )) 
+                && (token_type != DQ_TT)
                 )
                 warning ("'name' property should only contain dictionary words");
 
@@ -1930,7 +1932,11 @@ extern void make_object(int nearby_flag,
         else
             sprintf(shortname_buffer, "(%d)", no_objects+1);
     }
-    else strcpy(shortname_buffer, textual_name);
+    else
+    {   if (strlen(textual_name)>765)
+            error("Short name of object (in quotes) exceeded 765 characters");
+        strncpy(shortname_buffer, textual_name, 765);
+    }
 
     if (specified_parent != -1)
     {   if (tree_depth > 0)
