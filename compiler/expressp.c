@@ -1469,7 +1469,7 @@ static void func_args_on_stack(int n, int context)
      it's the function address, not a function argument. We also
      skip the treatment for most system functions.) */
 
-  int new, i, pn, fnaddr, opnum;
+  int new, pn, fnaddr, opnum;
 
   ASSERT_GLULX();
 
@@ -1490,7 +1490,7 @@ static void func_args_on_stack(int n, int context)
             && (ET[fnaddr].value.type != SYSFUN_OT
               || ET[fnaddr].value.value == INDIRECT_SYSF
               || ET[fnaddr].value.value == GLK_SYSF))) {
-        if (etoken_num_children(pn) > (opnum == FCALL_OP ? 4:3)) {
+        if (etoken_num_children(pn) > (unsigned int)(opnum == FCALL_OP ? 4:3)) {
           new = ET_used++;
           if (new == MAX_EXPRESSION_NODES)
             memoryerror("MAX_EXPRESSION_NODES9", MAX_EXPRESSION_NODES);
@@ -1595,7 +1595,6 @@ extern assembly_operand parse_expression(int context)
 
     token_data a, b, pop; int i;
     assembly_operand AO;
-    int bareprop_allowed;
 
     superclass_allowed = (context != FORINIT_CONTEXT);
     if (context == FORINIT_CONTEXT) context = VOID_CONTEXT;
