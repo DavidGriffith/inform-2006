@@ -1254,9 +1254,10 @@ typedef struct operator_s
 #define STUB_CODE        32
 #define SYSTEM_CODE      33
 #define TRACE_CODE       34
-#define VERB_CODE        35
-#define VERSION_CODE     36
-#define ZCHARACTER_CODE  37
+#define UNDEF_CODE       35
+#define VERB_CODE        36
+#define VERSION_CODE     37
+#define ZCHARACTER_CODE  38
 
 #define OPENBLOCK_CODE   100
 #define CLOSEBLOCK_CODE  101
@@ -2343,6 +2344,7 @@ extern void report_errors_at_current_line(void);
 extern dbgl get_current_dbgl(void);
 extern dbgl get_error_report_dbgl(void);
 extern int32 get_current_line_start(void);
+extern void terminate_file(void);
 
 extern void put_token_back(void);
 extern void get_next_token(void);
@@ -2462,6 +2464,7 @@ extern char *typename(int type);
 extern int hash_code_from_string(char *p);
 extern int strcmpcis(char *p, char *q);
 extern int symbol_index(char *lexeme_text, int hashcode);
+extern void end_symbol_scope(int k);
 extern void describe_symbol(int k);
 extern void list_symbols(int level);
 extern void assign_marked_symbol(int index, int marker, int32 value, int type);
