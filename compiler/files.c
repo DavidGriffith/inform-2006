@@ -83,7 +83,12 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag, int i
     if (InputFiles[input_file].handle==NULL)
         fatalerror_named("Couldn't open source file", name);
 
-    if (line_trace_level > 0) printf("\nOpening file \"%s\"\n",name);
+    if (line_trace_level > 0) 
+    {
+        printf("Opening file");
+        print_main_line();
+        printf(" \"%s\"\n",name);
+    }
 
     input_file++;
 }
@@ -102,7 +107,7 @@ static void close_sourcefile(int file_number)
 
     InputFiles[file_number-1].handle = NULL;
 
-    if (line_trace_level > 0) printf("\nClosing file\n");
+    if (line_trace_level > 0) printf("Closing file\n");
 }
 
 extern void close_all_source(void)
