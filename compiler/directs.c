@@ -150,7 +150,7 @@ extern int parse_given_directive(void)
             || (!(sflags[i] & (UNKNOWN_SFLAG + REDEFINABLE_SFLAG))))
         {   ebf_error("new constant name", token_text);
             duplicate_error();
-            panic_mode_error_recovery(); break;
+            panic_mode_error_recovery(); put_token_back(); break;
         }
 
         assign_symbol(i, 0, CONSTANT_T);
@@ -211,7 +211,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         get_next_token();
         if (token_type != SYMBOL_TT)
         {   ebf_error("name", token_text);
-            panic_mode_error_recovery(); break;
+            panic_mode_error_recovery(); put_token_back(); break;
         }
 
         i = -1;
@@ -626,7 +626,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         break;
 
     /* --------------------------------------------------------------------- */
-    /*   Replace routine                                                     */
+    /*   Replace routine [routine]                                           */
     /* --------------------------------------------------------------------- */
 
     case REPLACE_CODE:
@@ -657,6 +657,25 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         }
         sflags[token_value] |= REPLACE_SFLAG;
 
+        /* second parameter? */
+        i = token_value;
+        system_functions.enabled = FALSE;
+        get_next_token();
+        if ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))
+        {   put_token_back();
+            break;
+        }
+        if ((token_type != SYMBOL_TT) || ((sflags[token_value] & UNKNOWN_SFLAG) == 0) 
+            || i+1 != token_value)
+        {   ebf_error("';' or new routine name", token_text);
+            if (i+1 < token_value) token_value = i;
+            duplicate_error();
+            panic_mode_error_recovery(); put_token_back();
+            break;
+        }
+        sflags[i] |= ALIASED_SFLAG;
+        /* reserve, but mark in case not defined */
+        assign_symbol(token_value, 0, CONSTANT_T);
         break;
 
     /* --------------------------------------------------------------------- */
