@@ -2297,11 +2297,14 @@ extern char Debugging_Name[];
 extern char Transcript_Name[];
 extern char Language_Name[];
 extern char Charset_Map[];
+extern char Include_Path[];
 
 extern char banner_line[];
 
 extern void select_version(int vn);
 extern void switches(char *, int);
+extern int write_translated_name(char *new_name, char *old_name,
+    char *prefix_path, int start_pos, char *extension);
 extern int translate_in_filename(int last_value, char *new_name, char *old_name,
     int same_directory_flag, int command_line_flag);
 extern void translate_out_filename(char *new_name, char *old_name);

@@ -269,13 +269,45 @@ entered into Zcharacter table", unicode);
     }
 }
 
+static FILE* open_map_file(void)
+{   FILE *charset_file;
+
+    charset_file = fopen(Charset_Map, "r");
+    if (charset_file == NULL)
+    {   char charset_name[PATHLEN];
+        int start = 0;
+
+        do
+        {   start = write_translated_name(
+                charset_name, Charset_Map, Include_Path, start, "");
+            charset_file = fopen(charset_name, "r");
+        } while ((charset_file == NULL) && (start != 0));
+    }
+    return charset_file;
+}
+
+static int read_map_number(char* p)
+{   int base = 10;
+    char* end;
+
+    while (*p!='\0')
+    {
+        if (*p=='$')
+            base = 16;
+        else if (isalnum(*p))
+            return (int)strtoul(p,&end,base);
+        p++;
+    }
+    return 0;
+}
+
 static void read_source_to_iso_file(uchar *uccg)
 {   FILE *charset_file;
     char cs_buff[256];
     char *p;
     int i=0;
 
-    charset_file=fopen(Charset_Map, "r");
+    charset_file=open_map_file();
     if (charset_file==NULL)
         fatalerror_named("Couldn't open character set mapping", Charset_Map);
 
@@ -296,7 +328,10 @@ static void read_source_to_iso_file(uchar *uccg)
                 p = cs_buff;
                 while ((i<256) && (p!=NULL))
                 {
-                    uccg[i++] = (uchar)atoi(p);
+                    uccg[i] = (uchar)read_map_number(p);
+                    if (uccg[i] == 0)
+                        uccg[i] = (uchar)i;
+                    i++;
                     p = strchr(p,',');
                     if (p != NULL)
                         p++;

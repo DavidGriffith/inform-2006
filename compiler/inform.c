@@ -400,7 +400,7 @@ extern void free_arrays(void)
 /* ------------------------------------------------------------------------- */
 
 static char Source_Path[PATHLEN];
-static char Include_Path[PATHLEN];
+       char Include_Path[PATHLEN];
 static char Code_Path[PATHLEN];
 static char Module_Path[PATHLEN];
 static char Temporary_Path[PATHLEN];
@@ -494,9 +494,9 @@ static int contains_separator(char *name)
     return 0;
 }
 
-static int write_translated_name(char *new_name, char *old_name,
-                                 char *prefix_path, int start_pos,
-                                 char *extension)
+int write_translated_name(char *new_name, char *old_name,
+                          char *prefix_path, int start_pos,
+                          char *extension)
 {   int x;
     if (strlen(old_name)+strlen(extension) >= PATHLEN) {
         printf("Fatal error: One of your filenames is longer than %d characters.\n", PATHLEN);
