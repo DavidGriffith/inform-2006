@@ -5441,6 +5441,17 @@ Object  InformLibrary "(Inform Library)"
     }
 ];
 
+#Iftrue (#version_number == 6);
+[ MoveCursorV6 line column  charw;  ! 1-based postion on text grid
+    @get_wind_prop 1 13 -> charw; ! font size
+    charw = charw & $FF;
+    line = 1 + charw*(line-1);
+    column = 1 + charw*(column-1);
+    @set_cursor line column;
+];
+#Endif;
+
+#Ifndef MoveCursor;
 [ MoveCursor line column;  ! 1-based postion on text grid
     if (~~statuswin_current) {
          @set_window 1;
@@ -5448,9 +5459,14 @@ Object  InformLibrary "(Inform Library)"
          else                            style reverse;
     }
     if (line)
+        #Iftrue (#version_number == 6);
+        MoveCursorV6(line, column);
+        #Ifnot;
         @set_cursor line column;
+        #Endif;
     statuswin_current = true;
 ];
+#Endif;
 
 [ MainWindow;
     if (statuswin_current) {
@@ -5461,19 +5477,48 @@ Object  InformLibrary "(Inform Library)"
     statuswin_current = false;
 ];
 
+#Iftrue (#version_number == 6);
+[ ScreenWidth  width charw;
+    @get_wind_prop 1 3 -> width;
+    @get_wind_prop 1 13 -> charw;
+    charw = charw & $FF;
+    return (width+charw-1) / charw;
+];
+#Ifnot;
 [ ScreenWidth;
     return (HDR_SCREENWCHARS->0);
 ];
+#Endif;
 
 [ ScreenHeight;
     return (HDR_SCREENHLINES->0);
 ];
 
+#Iftrue (#version_number == 6);
+[ StatusLineHeight height  wx wy x y charh;
+    ! Split the window. Standard 1.0 interpreters should keep the window 0
+    ! cursor in the same absolute position, but older interpreters,
+    ! including Infocom's don't - they keep the window 0 cursor in the
+    ! same position relative to its origin. We therefore compensate
+    ! manually.
+    @get_wind_prop 0 0 -> wy; @get_wind_prop 0 1 -> wx;
+    @get_wind_prop 0 13 -> charh; @log_shift charh $FFF8 -> charh;
+    @get_wind_prop 0 4 -> y; @get_wind_prop 0 5 -> x;
+    height = height * charh;
+    @split_window height;
+    y = y - height + wy - 1;
+    if (y < 1) y = 1;
+    x = x + wx - 1;
+    @set_cursor y x 0;
+    gg_statuswin_cursize = height;
+];
+#Ifnot;
 [ StatusLineHeight height;
     if (gg_statuswin_cursize ~= height)
         @split_window height;
     gg_statuswin_cursize = height;
 ];
+#Endif;
 
 [ SetColour f b window;
     if (clr_on && f && b) {
@@ -5595,6 +5640,11 @@ Object  InformLibrary "(Inform Library)"
         SetColour(clr_fgstatus, clr_bgstatus, 1, true);
         ClearScreen();
     }
+    #Ifdef TARGET_ZCODE;
+    #Iftrue (#version_number == 6); ! request screen update
+    (0-->8) = (0-->8) | $$00000100;
+    #Endif;
+    #Endif;
 ];
 
 ! ----------------------------------------------------------------------------
@@ -5609,40 +5659,23 @@ Object  InformLibrary "(Inform Library)"
 #IfV5;
 
 #Iftrue (#version_number == 6);
-[ DrawStatusLine width charw height wx wy x y scw mvw;
-   ! Split the window. Standard 1.0 interpreters should keep the window 0
-   ! cursor in the same absolute position, but older interpreters,
-   ! including Infocom's don't - they keep the window 0 cursor in the
-   ! same position relative to its origin. We therefore compensate
-   ! manually.
-   @get_wind_prop 0 0 -> wy; @get_wind_prop 0 1 -> wx;
-   @get_wind_prop 0 13 -> height; @log_shift height $FFF8 -> height;
-   @get_wind_prop 0 4 -> y; @get_wind_prop 0 5 -> x;
-   @split_window height;
-   y = y - height + wy - 1;
-   if (y < 1) y = 1;
-   x = x + wx - 1;
-   @set_cursor y x 0;
-   ! Now clear it. This isn't totally trivial. Our approach is to select the
+[ DrawStatusLine width x charw scw mvw;
+   (0-->8) = (0-->8) &~ $$00000100;
+
+   StatusLineHeight(gg_statuswin_size);
+   ! Now clear the window. This isn't totally trivial. Our approach is to select the
    ! fixed space font, measure its width, and print an appropriate
    ! number of spaces. We round up if the screen isn't a whole number
    ! of characters wide, and rely on window 1 being set to clip by default.
-   @set_window 1;
-   @set_cursor 1 1;
+   MoveCursor(1, 1);
    @set_font 4 -> x;
-   style reverse;
-   @get_wind_prop 1 3 -> width;
-   @get_wind_prop 1 13 -> charw;
-   charw = charw & $FF;
-   spaces (width+charw-1) / charw;
+   width = ScreenWidth();
+   spaces width;
    ! Back to standard font for the display. We use output_stream 3 to
    ! measure the space required, the aim being to get 50 characters
    ! worth of space for the location name.
-   x = 1+charw;
-   @set_cursor 1 x;
+   MoveCursor(1, 2);
    @set_font 1 -> x;
-   @get_wind_prop 1 13 -> charw;
-   charw = charw & $FF;
    if (location == thedark)
        print (name) location;
    else {
@@ -5650,6 +5683,9 @@ Object  InformLibrary "(Inform Library)"
        if (visibility_ceiling == location) print (name) location;
        else                                print (The) visibility_ceiling;
    }
+   @get_wind_prop 1 3 -> width;
+   @get_wind_prop 1 13 -> charw;
+   charw = charw & $FF;
    @output_stream 3 StorageForShortName;
    print (string) SCORE__TX, "00000";
    @output_stream -3; scw = HDR_PIXELSTO3-->0 + charw;
@@ -5673,7 +5709,6 @@ Object  InformLibrary "(Inform Library)"
    }
    ! Reselect roman, as Infocom's interpreters interpreters go funny
    ! if reverse is selected twice.
-   style roman;
    MainWindow();
 ];
 
@@ -5697,6 +5732,7 @@ Object  InformLibrary "(Inform Library)"
 
     StatusLineHeight(gg_statuswin_size);
     MoveCursor(1, 1);
+
     width = ScreenWidth();
     posa = width-26; posb = width-13;
     spaces width;
@@ -5720,15 +5756,19 @@ Object  InformLibrary "(Inform Library)"
     }
     else {
         if (width > 66) {
+            #Ifndef NO_SCORE;
             MoveCursor(1, posa);
             print (string) SCORE__TX, sline1;
+            #Endif;
             MoveCursor(1, posb);
             print (string) MOVES__TX, sline2;
         }
+        #Ifndef NO_SCORE;
         if (width > 53 && width <= 66) {
             MoveCursor(1, posb);
             print sline1, "/", sline2;
         }
+        #Endif;
     }
 
     MainWindow(); ! set_window
