@@ -47,7 +47,7 @@ Include "verblibm";
 
 ! ==============================================================================
 
-#undef LIBRARY_STAGE; Constant LIBRARY_STAGE STAGE_VERBLIB;
+#undef LIBRARY_STAGE; Constant LIBRARY_STAGE AFTER_VERBLIB;
 #Ifdef MASTER_INCLUDE;
 Include MASTER_INCLUDE;             ! inclusions BETWEEN VerbLib and Grammar
 #Endif;

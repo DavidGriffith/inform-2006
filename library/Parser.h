@@ -20,12 +20,12 @@ Constant LibRelease      "6/12";
 Constant LIBRARY_VERSION  612;
 Constant Grammar__Version 2;
 
-Constant STAGE_PREPARSER 10;
-Constant STAGE_PARSER    20;
-Constant STAGE_VERBLIB   30;
-Constant STAGE_GRAMMAR   40;
+Constant BEFORE_PARSER   10;
+Constant AFTER_PARSER    20;
+Constant AFTER_VERBLIB   30;
+Constant AFTER_GRAMMAR   40;
 
-Constant LIBRARY_STAGE STAGE_PREPARSER;
+Constant LIBRARY_STAGE BEFORE_PARSER;
 #Ifdef MASTER_INCLUDE;
 Include MASTER_INCLUDE;             ! inclusions BEFORE Parser.h
 #Endif;
@@ -134,7 +134,7 @@ Include "parserm";
 
 ! ==============================================================================
 
-#undef LIBRARY_STAGE; Constant LIBRARY_STAGE STAGE_PARSER;
+#undef LIBRARY_STAGE; Constant LIBRARY_STAGE AFTER_PARSER;
 #Ifdef MASTER_INCLUDE;
 Include MASTER_INCLUDE;             ! inclusions BETWEEN Parser and VerbLib
 #Endif;
