@@ -946,6 +946,12 @@ extern void terminate_file(void)
     CF->size = -(CF->read_pos);
 }
 
+extern void print_main_line(void)
+{
+    if (File_sp>0) 
+        printf (" from line %d", FileStack[0].LB.source_line);
+}
+
 static int get_next_char_from_pipeline(void)
 {   uchar *p;
 
@@ -1211,13 +1217,13 @@ extern void get_next_token(void)
                         ebf_error("empty rest of line after '\\' in string",
                             chb);
                     }
-                    if (incompatibility_switch)
-                        obsolete_warning("'\\' at end of line");
+                    obsolete_warning("'\\' at end of line");
                 }
             }   while ((tokeniser_grid[d] != EOF_CODE) && (d!='\"'));
             if (EOF_CODE == tokeniser_grid[d]) ebf_error("'\"'", "end of file");
             *(lex_p-1) = 0;
             circle[circle_position].type = DQ_TT;
+            circle[circle_position].value = 0;
             break;
 
         case IDENTIFIER_CODE:    /* Letter or underscore: an identifier */
@@ -1240,7 +1246,7 @@ extern void get_next_token(void)
 
             if (dont_enter_into_symbol_table)
             {   circle[circle_position].type = DQ_TT;
-                circle[circle_position].value = 0;
+                circle[circle_position].value = 1;
                 context |= 4096;
                 if (dont_enter_into_symbol_table == -2)
                     interpret_identifier(circle_position, TRUE);
