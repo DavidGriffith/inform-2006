@@ -553,13 +553,13 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
         if (max_ao.value >= 256) max_ao.type = LONG_CONSTANT_OT;
 
         /* Can't write to the size entry in a string or table */
-        if (((array_types[y] == STRING_ARRAY)
+        /* if (((array_types[y] == STRING_ARRAY)
              || (array_types[y] == TABLE_ARRAY))
             && (!read_flag))
         {   if ((array_types[y] == TABLE_ARRAY) && byte_flag)
                 zero_ao.value = 2;
             else zero_ao.value = 1;
-        }
+        } */
 
         en_ao = zero_ao; en_ao.value = ABOUNDS_RTE;
         switch(oc) { case loadb_zc:  en_ao.value = ABOUNDS_RTE; break;
@@ -892,13 +892,13 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
         max_ao.value++;
 
         /* Can't write to the size entry in a string or table */
-        if (((array_types[y] == STRING_ARRAY)
+        /* if (((array_types[y] == STRING_ARRAY)
              || (array_types[y] == TABLE_ARRAY))
             && (!read_flag))
         {   if ((array_types[y] == TABLE_ARRAY) && data_len == 1)
                 zero_ao.value = 4;
             else zero_ao.value = 1;
-        }
+        } */
 
         en_ao = zero_ao; en_ao.value = ABOUNDS_RTE;
 
