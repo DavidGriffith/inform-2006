@@ -120,7 +120,9 @@ Global gg_statuswin_size = 1;
 #Ifndef sys_statusline_flag;
 Global sys_statusline_flag = 0;     ! non-zero if status line displays time
 #Endif;
-Default START_MOVE 0;               ! Traditionally 0 for Infocom, 1 for Inform
+#Ifndef START_MOVE;
+Constant START_MOVE 0;              ! Traditionally 0 for Infocom, 1 for Inform
+#Endif;
 Global turns = START_MOVE;          ! Number of turns of play so far
 Global the_time = NULL;             ! Current time (in minutes since midnight)
 Global time_rate = 1;               ! How often time is updated
@@ -2828,7 +2830,7 @@ Constant UNLIT_BIT  =  32;
         if (match_classes-->marker > 0) print (the) k; else print (a) k;
 
         if (i < j-1)  print (string) COMMA__TX;
-        if (i == j-1) print (string) OR__TX;
+        if (i == j-1) print (OxfordComma) j, (string) OR__TX;
     }
     L__M(##Miscellany, 57);
 
@@ -3786,7 +3788,7 @@ Constant SCORE__DIVISOR     =   20;
         #Endif; ! DEBUG
         if (parser_one == 0) parser_one = RunRoutines(thing, react_after);
       EACH_TURN_REASON:
-        if (thing.each_turn == 0 or NULL) return;
+        if (thing.&each_turn == 0) return;
         #Ifdef DEBUG;
         if (parser_trace >= 2)
               print "[Considering each_turn for ", (the) thing, "]^";
@@ -4430,7 +4432,7 @@ Constant SCORE__DIVISOR     =   20;
         }
         d++;
         if (d < c-1) print (string) COMMA__TX;
-        if (d == c-1) print (string) AND__TX;
+        if (d == c-1) print (OxfordComma) c, (string) AND__TX;
     }
     if (player ~= selfobj) {
         print "~", (address) ME1__WD, "~ "; L__M(##Pronouns, 2);
@@ -6391,6 +6393,12 @@ Array StorageForShortName -> SHORTNAMEBUF_LEN + WORDSIZE;
 ];
 
 [ EnglishNumber n; LanguageNumber(n); ];
+
+[ OxfordComma n;
+    #Ifdef SERIAL_COMMAS;
+    if (n>2) print ",";
+    #Endif;
+];
 
 [ NumberWord o i n;
     n = LanguageNumbers-->0;
