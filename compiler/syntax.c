@@ -59,6 +59,88 @@ extern void panic_mode_error_recovery(void)
         get_next_token();
 }
 
+/*  Routine used by process_line_directive to make
+    sure each element appears no more than once.      */
+static int once_only(int *flags, int onebit, char *msg)
+{
+    if (*flags & onebit)
+    {
+        error(msg);
+        return 1;
+    }
+    *flags |= onebit;
+    return 0;
+}
+
+/* message text for ebf_error() */
+static char *pld_msg_1 = "filename, line number, or 'additive'";
+
+/* flags used with 'once_only()' */
+#define PLD_NUMBER   0x0001
+#define PLD_DQ       0x0002
+#define PLD_ADDITIVE 0x0004
+
+static void process_line_directive(void)
+{
+    int source_line = 0;
+    char *filename = NULL;
+    int increment = 0;
+    int flags = 0;
+    int preserve = directive_keywords.enabled;
+
+    /* Make sure we recognize 'additive' if we see it. */
+    directive_keywords.enabled = TRUE;
+    while (1)
+    {   switch (token_type)
+        {   case NUMBER_TT:
+                if (once_only(&flags, PLD_NUMBER,
+                        "Multiple line numbers in same directive"))
+                    break;
+                /* save the line number */
+                source_line = token_value;
+                break;
+            case DQ_TT:
+                if (once_only(&flags, PLD_DQ,
+                        "Multiple file names in same directive"))
+                    break;
+                /* save the file name */
+                filename = my_malloc(strlen(token_text)+1, "fake filename");
+                strcpy(filename, token_text);
+                break;
+            case DIR_KEYWORD_TT:
+                switch (token_value)
+                {   case ADDITIVE_DK:
+                        if (once_only(&flags, PLD_ADDITIVE,
+                                "Multiple uses of 'additive' in directive"))
+                            break;
+                        /* keyword 'additive' */
+                        increment = 1;
+                        break;
+                    default:
+                        ebf_error(pld_msg_1, token_text);
+                        break;
+                }
+                break;
+            case SEP_TT:
+                switch (token_value)
+                {   case SEMICOLON_SEP:
+                        /* all done */
+                        declare_alternate_source(filename, source_line, increment);
+                        directive_keywords.enabled = preserve;
+                        return;
+                    default:
+                        ebf_error(pld_msg_1, token_text);
+                        break;
+                }
+                break;
+            default:
+                ebf_error(pld_msg_1, token_text);
+                break;
+        }
+        get_next_token();
+    }
+}
+
 extern void parse_program(char *source)
 {
     lexical_source = source;
@@ -72,6 +154,7 @@ extern int parse_directive(int internal_flag)
 
         Returns: TRUE if program continues, FALSE if end of file reached.    */
 
+    int leading_hash = internal_flag;
     int routine_symbol;
     int is_aliased = FALSE;
 
@@ -81,7 +164,20 @@ extern int parse_directive(int internal_flag)
     if (token_type == EOF_TT) return(FALSE);
 
     if ((token_type == SEP_TT) && (token_value == HASH_SEP))
-        get_next_token();
+    {   get_next_token();
+        leading_hash = TRUE;
+    }
+
+    /*  Line directives operate similarly to the C preprocessor's '#line'
+        directive, except in our case, there isn't a keyword.
+        Instead (for now at least) we recognize them by context:
+            "# NUMBER ..." or "# DOUBLE_QUOTED_STRING ..."                   */
+    if (leading_hash)
+    {   if ((token_type == NUMBER_TT) || (token_type == DQ_TT))
+        {   process_line_directive();
+            return(TRUE);
+        }
+    }
 
     if ((token_type == SEP_TT) && (token_value == OPEN_SQUARE_SEP))
     {   if (internal_flag)
