@@ -913,7 +913,7 @@ typedef struct Sourcefile_s
 } Sourcefile;
 
 static Sourcefile *FileStack;
-static int File_sp;                              /*  Stack pointer           */
+int File_sp;                                     /*  Stack pointer           */
 
 static Sourcefile *CF;                           /*  Top entry on stack      */
 
