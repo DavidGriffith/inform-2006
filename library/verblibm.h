@@ -947,7 +947,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 [ MoveFloatingObjects i k l m address flag;
     if (location == player or nothing) return;
-    objectloop (i) {
+    objectloop (i provides found_in) {
         address = i.&found_in;
         if (address ~= 0 && i hasnt absent && ~~IndirectlyContains(player, i)) {
             if (metaclass(address-->0) == Routine) {
