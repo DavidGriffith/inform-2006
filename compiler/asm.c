@@ -866,6 +866,7 @@ extern void assemblez_instruction(assembly_instruction *AI)
                 long_form = 1; addr = AI->branch_label_number;
                 break;
         }
+        if (addr > 0x7fff) fatalerror("Too many branch points in routine.");
         if (long_form==1)
         {   byteout(branch_on_true*0x80 + addr/256, BRANCH_MV);
             byteout(addr%256, 0);
@@ -1529,7 +1530,7 @@ static void transfer_routine_z(void)
     {   if (zcode_markers[i] == BRANCH_MV)
         {   if (asm_trace_level >= 4)
                 printf("Branch detected at offset %04x\n", pc);
-            j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x3ff;
+            j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x7fff;
             if (asm_trace_level >= 4)
                 printf("To label %d, which is %d from here\n",
                     j, label_offsets[j]-pc);
@@ -1578,11 +1579,13 @@ static void transfer_routine_z(void)
         { case BRANCH_MV:
             long_form = 1; if (zcode_markers[i+1] == DELETED_MV) long_form = 0;
 
-            j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x3ff;
+            j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x7fff;
             branch_on_true = ((zcode_holding_area[i]) & 0x80);
             offset_of_next = new_pc + long_form + 1;
 
             addr = label_offsets[j] - offset_of_next + 2;
+            if (addr<-0x2000 || addr>0x1fff) 
+                fatalerror("Branch out of range: divide the routine up?");
             if (addr<0) addr+=(int32) 0x10000L;
 
             addr=addr&0x3fff;
@@ -1603,6 +1606,8 @@ static void transfer_routine_z(void)
           case LABEL_MV:
             j = 256*zcode_holding_area[i] + zcode_holding_area[i+1];
             addr = label_offsets[j] - new_pc;
+            if (addr<-0x8000 || addr>0x7fff) 
+                fatalerror("Jump out of range: divide the routine up?");
             if (addr<0) addr += (int32) 0x10000L;
             zcode_holding_area[i] = addr/256;
             zcode_holding_area[i+1] = addr%256;
