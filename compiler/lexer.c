@@ -854,7 +854,7 @@ static void new_syntax_line(void)
 /*                                                                           */
 /*   Note that file_load_chars(p, size) loads "size" bytes into buffer "p"   */
 /*   from the current input file.  If the file runs out, then if it was      */
-/*   the last source file 4 EOF characters are placed in the buffer: if it   */
+/*   the last source file 4 NUL characters are placed in the buffer: if it   */
 /*   was only an Include file ending, then a '\n' character is placed there  */
 /*   (essentially to force termination of any comment line) followed by      */
 /*   three harmless spaces.                                                  */
@@ -1150,8 +1150,8 @@ extern void get_next_token(void)
                     }
                     break;
                 }
-            } while (d != EOF);
-            if (d==EOF) ebf_error("'\''", "end of file");
+            } while (tokeniser_grid[d] != EOF_CODE);
+            if (EOF_CODE == tokeniser_grid[d]) ebf_error("'\''", "end of file");
             *(lex_p-1) = 0;
             circle[circle_position].type = SQ_TT;
             break;
@@ -1169,14 +1169,14 @@ extern void get_next_token(void)
                 {   lex_p--;
                     while (*(lex_p-1) == ' ') lex_p--;
                     if (*(lex_p-1) != '^') *lex_p++ = ' ';
-                    while ((lookahead != EOF) &&
+                    while ((tokeniser_grid[lookahead] != EOF_CODE) &&
                           (tokeniser_grid[lookahead] == WHITESPACE_CODE))
                     (*get_next_char)();
                 }
                 else if (d == '\\')
                 {   int newline_passed = FALSE;
                     lex_p--;
-                    while ((lookahead != EOF) &&
+                    while ((tokeniser_grid[lookahead] != EOF_CODE) &&
                           (tokeniser_grid[lookahead] == WHITESPACE_CODE))
                         if ((d = (*get_next_char)()) == '\n')
                             newline_passed = TRUE;
@@ -1188,8 +1188,8 @@ extern void get_next_token(void)
                             chb);
                     }
                 }
-            }   while ((d != EOF) && (d!='\"'));
-            if (d==EOF) ebf_error("'\"'", "end of file");
+            }   while ((tokeniser_grid[d] != EOF_CODE) && (d!='\"'));
+            if (EOF_CODE == tokeniser_grid[d]) ebf_error("'\"'", "end of file");
             *(lex_p-1) = 0;
             circle[circle_position].type = DQ_TT;
             break;
