@@ -1386,14 +1386,43 @@ extern int32 assemble_routine_header(int no_locals,
 
       next_label = 0; next_sequence_point = 0; last_label = -1;
 
-      if (define_INFIX_switch) {
-        if (embedded_flag) {
-        }
-        else {
-            i = no_named_routines++;
-            named_routine_symbols[i] = the_symbol;
-        }
+      if ((routine_asterisked) || (define_INFIX_switch))
+      {   char fnt[80]; assembly_operand PV, CON, SLF; int ln2;
+
+          ln2 = next_label++;
+          if (define_INFIX_switch)
+          {
+            if (embedded_flag)
+            {   SLF.value = MAX_LOCAL_VARIABLES+4; SLF.type = GLOBALVAR_OT; SLF.marker = 0;
+                CON.value = 8; CON.type = BYTECONSTANT_OT; CON.marker = 0;
+            }
+            else
+            {   i = no_named_routines++;
+                  named_routine_symbols[i] = the_symbol;
+                CON.value = i; CON.type = CONSTANT_OT; CON.marker = 0;
+                SLF.value = routine_flags_array_SC;
+                SLF.type = CONSTANT_OT; SLF.marker = INCON_MV;
+            }
+            assembleg_3(aloadbit_gc, SLF, CON, stack_pointer);
+            assembleg_1_branch(jz_gc, stack_pointer, ln2);
+          }
+          CON.marker = STRING_MV; CON.type = CONSTANT_OT;
+          sprintf(fnt, "[ %s(", name);
+          CON.value  = compile_string(fnt, FALSE, FALSE);
+          assembleg_1(streamstr_gc, CON);
+          for (i=1; (i<=7)&&(i<=no_locals); i++)
+          {   sprintf(fnt, "%s%s = ", (i==1)?"":", ", variable_name(i));
+              CON.value  = compile_string(fnt, FALSE, FALSE);
+              assembleg_1(streamstr_gc, CON);
+              PV.type = LOCALVAR_OT; PV.value = i; PV.marker = 0;
+              assembleg_1(streamnum_gc, PV);
+          }
+          sprintf(fnt, ") ]^");
+          CON.value  = compile_string(fnt, FALSE, FALSE);
+          assembleg_1(streamstr_gc, CON);
+          assemble_label_no(ln2);
       }
+
     }
 
     return rv;
