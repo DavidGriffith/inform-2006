@@ -199,11 +199,14 @@ Global x_scope_count;               ! Used in printing a list of everything
 
 ! five for colour control
 ! see http://www.inform-fiction.org/patches/L61007.html
+! To enable colour define a constant or Global:
+! Global clr_on;                      ! has colour been enabled by the player?
+#ifdef clr_on;
 Global clr_fg = 1;                  ! foreground colour
 Global clr_bg = 1;                  ! background colour
 Global clr_fgstatus = 1;            ! foreground colour of statusline
 Global clr_bgstatus = 1;            ! background colour of statusline
-Global clr_on;                      ! has colour been enabled by the player?
+#endif;
 Global statuswin_current;           ! if writing to top window
 
 Constant CLR_DEFAULT 1;
@@ -436,7 +439,7 @@ Global bestguess_score;             ! What did the best-guess object score?
 
 #Ifdef TARGET_ZCODE;
 
-Constant INPUT_BUFFER_LEN = 120;    ! Length of buffer array (although we leave an extra byte
+Constant INPUT_BUFFER_LEN = 122;    ! Length of buffer array (although we leave an extra byte
                                     ! to allow for interpreter bugs)
 
 Array  buffer    -> 123;            ! Buffer for parsing main line of input
@@ -568,7 +571,7 @@ Object  selfobj "(self object)"
         parse_name 0,
         orders 0,
         number 0,
-        before_implicit NULL,
+        before_implicit [;Take: return 2;],
   has   concealed animate proper transparent;
 
 ! ============================================================================
@@ -1044,7 +1047,7 @@ Object  InformParser "(Inform Parser)"
     ! disastrous if it did:
 
     #Ifdef TARGET_ZCODE;
-    a_buffer->0 = INPUT_BUFFER_LEN;
+    a_buffer->0 = INPUT_BUFFER_LEN-WORDSIZE;
     a_table->0 = 15;  ! Allow to split input into this many words
     #Endif; ! TARGET_
 
@@ -1056,11 +1059,7 @@ Object  InformParser "(Inform Parser)"
     DrawStatusLine();
     #Endif; ! V5
     KeyboardPrimitive(a_buffer, a_table);
-    #Ifdef TARGET_ZCODE;
-    nw = a_table->1;
-    #Ifnot; ! TARGET_GLULX
-    nw = a_table-->0;
-    #Endif; ! TARGET_
+    nw = NumberWords(a_table);
 
     ! If the line was blank, get a fresh line
     if (nw == 0) {
@@ -1199,11 +1198,7 @@ Object  InformParser "(Inform Parser)"
             a_buffer->i = a_buffer->(i-x2+w2);
 
         ! ...increasing buffer size accordingly.
-        #Ifdef TARGET_ZCODE;
-        a_buffer->1 = (a_buffer->1) + (x2-w2);
-        #Ifnot; ! TARGET_GLULX
-        a_buffer-->0 = (a_buffer-->0) + (x2-w2);
-        #Endif; ! TARGET_
+        SetKeyBufLength(GetKeyBufLength(a_buffer) + (x2-w2), a_buffer);
     }
 
     ! Write the correction in:
@@ -1211,11 +1206,7 @@ Object  InformParser "(Inform Parser)"
     for (i=0 : i<x2 : i++) a_buffer->(i+w) = buffer2->(i+x1);
 
     Tokenise__(a_buffer, a_table);
-    #Ifdef TARGET_ZCODE;
-    nw = a_table->1;
-    #Ifnot; ! TARGET_GLULX
-    nw = a_table-->0;
-    #Endif; ! TARGET_
+    nw=NumberWords(a_table);
 
     return nw;
 ]; ! end of Keyboard
@@ -1241,7 +1232,7 @@ Object  InformParser "(Inform Parser)"
 ! ----------------------------------------------------------------------------
 
 [ Parser__parse  results   syntax line num_lines line_address i j k
-                           token l m;
+                           token l m line_etype;
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !
@@ -1276,11 +1267,7 @@ Object  InformParser "(Inform Parser)"
     ! Initially assume the command is aimed at the player, and the verb
     ! is the first word
 
-    #Ifdef TARGET_ZCODE;
-    num_words = parse->1;
-    #Ifnot; ! TARGET_GLULX
-    num_words = parse-->0;
-    #Endif; ! TARGET_
+    num_words = NumberWords();
     wn = 1;
 
     #Ifdef LanguageToInformese;
@@ -1292,11 +1279,7 @@ Object  InformParser "(Inform Parser)"
     #Endif; ! LanguageToInformese
 
     BeforeParsing();
-    #Ifdef TARGET_ZCODE;
-    num_words = parse->1;
-    #Ifnot; ! TARGET_GLULX
-    num_words = parse-->0;
-    #Endif; ! TARGET_
+    num_words = NumberWords();
 
     k=0;
     #Ifdef DEBUG;
@@ -1304,11 +1287,7 @@ Object  InformParser "(Inform Parser)"
         print "[ ";
         for (i=0 : i<num_words : i++) {
 
-            #Ifdef TARGET_ZCODE;
-            j = parse-->(i*2 + 1);
-            #Ifnot; ! TARGET_GLULX
-            j = parse-->(i*3 + 1);
-            #Endif; ! TARGET_
+            j = WordValue(i+1);
             k = WordAddress(i+1);
             l = WordLength(i+1);
             print "~"; for (m=0 : m<l : m++) print (char) k->m; print "~ ";
@@ -1363,18 +1342,27 @@ Object  InformParser "(Inform Parser)"
             L__M(##Miscellany, 20);
             jump ReType;
         }
-        #Ifdef TARGET_ZCODE;
-        if (buffer3->1 == 0) {
+        if (GetKeyBufLength(buffer3) == 0) {
             L__M(##Miscellany, 21);
             jump ReType;
         }
-        #Ifnot; ! TARGET_GLULX
-        if (buffer3-->0 == 0) {
-            L__M(##Miscellany, 21);
-            jump ReType;
+
+        if (WordAddress(verb_wordnum) == buffer + WORDSIZE) { ! not held back
+            ! splice rest of buffer onto end of buffer3
+            i = GetKeyBufLength(buffer3);
+            while (buffer3 -> (i + WORDSIZE - 1) == ' ' or '.')
+                i--;
+            j = i - WordLength(verb_wordnum);  ! amount to move buffer up by
+            if (j > 0) {
+                for (m=INPUT_BUFFER_LEN-1 : m>=WORDSIZE+j : m--)
+                    buffer->m = buffer->(m-j);
+                SetKeyBufLength(GetKeyBufLength()+j);
+                }
+            for (m=WORDSIZE : m<WORDSIZE+i : m++) buffer->m = buffer3->m;
+            if (j < 0) for (:m<WORDSIZE+i-j : m++) buffer->m = ' ';
         }
-        #Endif; ! TARGET_
-        for (i=0 : i<INPUT_BUFFER_LEN : i++) buffer->i = buffer3->i;
+        else
+            for (i=0 : i<INPUT_BUFFER_LEN : i++) buffer->i = buffer3->i;
         jump ReParse;
     }
 
@@ -1736,10 +1724,11 @@ Object  InformParser "(Inform Parser)"
 
         not_holding = 0;
         inferfrom = 0;
+        inferword = 0;
         parameters = 0;
         nsns = 0; special_word = 0; special_number = 0;
         multiple_object-->0 = 0;
-        etype = STUCK_PE;
+        etype = STUCK_PE; line_etype = 100;
         wn = verb_wordnum+1;
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1812,7 +1801,10 @@ Object  InformParser "(Inform Parser)"
                 #Endif; ! DEBUG
 
                 if (l == REPARSE_CODE) jump ReParse;
-                if (l == false) break;
+                if (l == false) {
+                    if (etype < line_etype) line_etype = etype;
+                    if (etype == STUCK_PE || wn >= num_words) break;
+                }
             }
             else {
 
@@ -1824,9 +1816,10 @@ Object  InformParser "(Inform Parser)"
                 ! However, if the superfluous text begins with a comma or "then" then
                 ! take that to be the start of another instruction
 
+                if (line_etype < 100) break;
                 if (wn <= num_words) {
                     l = NextWord();
-                    if (l == THEN1__WD or THEN2__WD or THEN3__WD or comma_word) {
+                    if (l == THEN1__WD or THEN2__WD or THEN3__WD or comma_word or AND1__WD) {
                         held_back_mode = 1; hb_wn = wn-1;
                     }
                     else {
@@ -1937,6 +1930,7 @@ Object  InformParser "(Inform Parser)"
         ! The line has failed to match.
         ! We continue the outer "for" loop, trying the next line in the grammar.
 
+        if (line_etype < 100) etype = line_etype;
         if (etype > best_etype) best_etype = etype;
         if (etype ~= ASKSCOPE_PE && etype > nextbest_etype) nextbest_etype = etype;
 
@@ -2068,7 +2062,7 @@ Object  InformParser "(Inform Parser)"
     if (wn > num_words) rtrue;
 
     i = NextWord();
-    if (i == THEN1__WD or THEN2__WD or THEN3__WD or comma_word) {
+    if (i == THEN1__WD or THEN2__WD or THEN3__WD or comma_word or AND1__WD) {
         if (wn > num_words) {
            held_back_mode = false;
            return;
@@ -2472,6 +2466,7 @@ Constant UNLIT_BIT  =  32;
         #Endif; ! DEBUG
         l = NounDomain(actors_location, actor, token);
         if (l == REPARSE_CODE) return l;                  ! Reparse after Q&A
+
         if (indef_wanted == 100 && l == 0 && number_matched == 0)
             l = 1;  ! ReviseMulti if TAKE ALL FROM empty container
 
@@ -2485,8 +2480,8 @@ Constant UNLIT_BIT  =  32;
                 wn = desc_wn;
                 jump TryAgain2;
             }
-            if (etype == MULTI_PE or TOOFEW_PE && multiflag) etype = STUCK_PE;
-            etype=CantSee();
+            if (etype ~=TOOFEW_PE && (multiflag || etype ~= MULTI_PE))
+                etype = CantSee();
             jump FailToken;
         } ! Choose best error
 
@@ -2617,6 +2612,12 @@ Constant UNLIT_BIT  =  32;
         if (parser_trace >= 3) print "  [Read connective '", (address) o, "']^";
         #Endif; ! DEBUG
 
+        k = NextWord();
+        if (k ~= AND1__WD) wn--;  ! allow Oxford commas in input
+        if (k > 0 && k->#dict_par1 & $$10000001 == 1) { 
+            wn--; ! player meant 'THEN'
+            jump PassToken;
+        }
         if (~~token_allows_multiple) {
             if (multiflag) jump PassToken; ! give UPTO_PE error
             etype=MULTI_PE;
@@ -2775,6 +2776,8 @@ Constant UNLIT_BIT  =  32;
 
     number_of_classes = 0;
 
+    if (match_length == 0 && indef_mode && indef_wanted ~= 100)
+        number_matched = 0;  ! ask question for 'take three'
     if (number_matched == 1) i = match_list-->0;
     if (number_matched > 1) {
         i = Adjudicate(context);
@@ -2829,7 +2832,7 @@ Constant UNLIT_BIT  =  32;
 
   .WhichOne;
     #Ifdef TARGET_ZCODE;
-    for (i=2 : i<INPUT_BUFFER_LEN : i++) buffer2->i = ' ';
+    for (i=WORDSIZE : i<INPUT_BUFFER_LEN : i++) buffer2->i = ' ';
     #Endif; ! TARGET_ZCODE
     answer_words=Keyboard(buffer2, parse2);
 
@@ -2881,22 +2884,12 @@ Constant UNLIT_BIT  =  32;
     ! becomes "take music red button".  The parser will thus have three
     ! words to work from next time, not two.)
 
-    #Ifdef TARGET_ZCODE;
-    k = WordAddress(match_from) - buffer; l=buffer2->1+1;
-    for (j=buffer + buffer->0 - 1 : j>=buffer+k+l : j--) j->0 = 0->(j-l);
-    for (i=0 : i<l : i++) buffer->(k+i) = buffer2->(2+i);
-    buffer->(k+l-1) = ' ';
-    buffer->1 = buffer->1 + l;
-    if (buffer->1 >= (buffer->0 - 1)) buffer->1 = buffer->0;
-    #Ifnot; ! TARGET_GLULX
     k = WordAddress(match_from) - buffer;
-    l = (buffer2-->0) + 1;
-    for (j=buffer+INPUT_BUFFER_LEN-1 : j>=buffer+k+l : j--) j->0 = j->(-l);
+    l = GetKeyBufLength(buffer2) +1;
+    for (j=buffer + INPUT_BUFFER_LEN - 1 : j>=buffer+k+l : j--) j->0 = j->(-l);
     for (i=0 : i<l : i++) buffer->(k+i) = buffer2->(WORDSIZE+i);
     buffer->(k+l-1) = ' ';
-    buffer-->0 = buffer-->0 + l;
-    if (buffer-->0 > (INPUT_BUFFER_LEN-WORDSIZE)) buffer-->0 = (INPUT_BUFFER_LEN-WORDSIZE);
-    #Endif; ! TARGET_
+    SetKeyBufLength(GetKeyBufLength() + l);
 
     ! Having reconstructed the input, we warn the parser accordingly
     ! and get out.
@@ -2909,6 +2902,7 @@ Constant UNLIT_BIT  =  32;
 
   .Incomplete;
 
+    if (best_etype == NOTHING_PE && pattern-->1 == 0) rfalse; ! for DROP when empty-handed
     if (context == CREATURE_TOKEN) L__M(##Miscellany, 48);
     else                           L__M(##Miscellany, 49);
 
@@ -2942,12 +2936,9 @@ Constant UNLIT_BIT  =  32;
     if (inferfrom ~= 0) {
         for (j=inferfrom : j<pcount : j++) {
             if (pattern-->j == PATTERN_NULL) continue;
-            #Ifdef TARGET_ZCODE;
-            i = 2+buffer->1; (buffer->1)++; buffer->(i++) = ' ';
-            #Ifnot; ! TARGET_GLULX
-            i = WORDSIZE + buffer-->0;
-            (buffer-->0)++; buffer->(i++) = ' ';
-            #Endif; ! TARGET_
+            i = WORDSIZE + GetKeyBufLength();
+            SetKeyBufLength(i-WORDSIZE + 1);
+            buffer->(i++) = ' ';
 
             #Ifdef DEBUG;
             if (parser_trace >= 5) print "[Gluing in inference with pattern code ", pattern-->j, "]^";
@@ -2961,6 +2952,9 @@ Constant UNLIT_BIT  =  32;
             ! (This is imperfect, but it's very seldom needed anyway.)
 
             if (pattern-->j >= 2 && pattern-->j < REPARSE_CODE) {
+                ! was the inference made from some noun words?
+                ! In which case, we can infer again.
+                if (WordValue(NumberWords())->#dict_par1 & 128) continue;
                 PronounNotice(pattern-->j);
                 for (k=1 : k<=LanguagePronouns-->0 : k=k+3)
                     if (pattern-->j == LanguagePronouns-->(k+2)) {
@@ -2989,33 +2983,24 @@ Constant UNLIT_BIT  =  32;
                 @output_stream -3;
                 k = k-->0;
                 for (l=i : l<i+k : l++) buffer->l = buffer->(l+2);
-                i = i + k; buffer->1 = i-2;
                 #Ifnot; ! TARGET_GLULX
                 k = PrintAnyToArray(buffer+i, INPUT_BUFFER_LEN-i, parse2-->1);
-                i = i + k; buffer-->0 = i - WORDSIZE;
                 #Endif; ! TARGET_
+                i = i + k; SetKeyBufLength(i-WORDSIZE);
             }
         }
     }
 
     ! (2) we must glue the newly-typed text onto the end.
 
-    #Ifdef TARGET_ZCODE;
-    i = 2+buffer->1; (buffer->1)++; buffer->(i++) = ' ';
-    for (j=0 : j<buffer2->1 : i++,j++) {
-        buffer->i = buffer2->(j+2);
-        (buffer->1)++;
-        if (buffer->1 == INPUT_BUFFER_LEN) break;
-    }
-    #Ifnot; ! TARGET_GLULX
-    i = WORDSIZE + buffer-->0;
-    (buffer-->0)++; buffer->(i++) = ' ';
-    for (j=0 : j<buffer2-->0 : i++,j++) {
+    i = WORDSIZE + GetKeyBufLength();
+    buffer->(i++) = ' ';
+    SetKeyBufLength(GetKeyBufLength()+1);
+    for (j=0 : j<GetKeyBufLength(buffer2) : i++,j++) {
         buffer->i = buffer2->(j+WORDSIZE);
-        (buffer-->0)++;
-        if (buffer-->0 == INPUT_BUFFER_LEN) break;
+        SetKeyBufLength(GetKeyBufLength()+1);
+        if (i-WORDSIZE == INPUT_BUFFER_LEN-1) break;
     }
-    #Endif; ! TARGET_
 
     ! (3) we fill up the buffer with spaces, which is unnecessary, but may
     !     help incorrectly-written interpreters to cope.
@@ -3027,6 +3012,8 @@ Constant UNLIT_BIT  =  32;
     return REPARSE_CODE;
 
 ]; ! end of NounDomain
+
+
 
 ! ----------------------------------------------------------------------------
 !  The Adjudicate routine tries to see if there is an obvious choice, when
@@ -3139,18 +3126,6 @@ Constant SCORE__DIVISOR = 20;
     ScoreMatchL(context);
     if (number_matched == 0) return -1;
 
-    if (indef_mode == 0) {
-        !  Is there now a single highest-scoring object?
-        i = SingleBestGuess();
-        if (i >= 0) {
-
-            #Ifdef DEBUG;
-            if (parser_trace >= 4) print "   Single best-scoring object returned.]^";
-            #Endif; ! DEBUG
-            return i;
-        }
-    }
-
     if (indef_mode == 1 && indef_type & PLURAL_BIT ~= 0) {
         if (context ~= MULTI_TOKEN or MULTIHELD_TOKEN or MULTIEXCEPT_TOKEN
                      or MULTIINSIDE_TOKEN) {
@@ -3228,6 +3203,20 @@ Constant SCORE__DIVISOR = 20;
     }
     #Endif; ! DEBUG
 
+    if (n == 1) dont_infer = true;
+
+    if (indef_mode == 0) {
+        !  Is there now a single highest-scoring object?
+        i = SingleBestGuess();
+        if (i >= 0) {
+
+            #Ifdef DEBUG;
+            if (parser_trace >= 4) print "   Single best-scoring object returned.]^";
+            #Endif; ! DEBUG
+            return i;
+        }
+    }
+
     if (indef_mode == 0) {
         if (n > 1) {
             k = -1;
@@ -3261,7 +3250,6 @@ Constant SCORE__DIVISOR = 20;
     !  most recently acquired, or if the player has none of them, then
     !  the one most recently put where it is.
 
-    if (n == 1) dont_infer = true;
     return BestGuess();
 
 ]; ! Adjudicate
@@ -3335,7 +3323,9 @@ Constant SCORE__DIVISOR = 20;
       indef_type, ", satisfying ", threshold, " requirements:^";
     #Endif; ! DEBUG
 
-    a_s = SCORE__NEXTBESTLOC; l_s = SCORE__BESTLOC;
+    if (action_to_be ~= ##Take)
+        a_s = SCORE__NEXTBESTLOC;
+    l_s = SCORE__BESTLOC;
     if (context == HELD_TOKEN or MULTIHELD_TOKEN or MULTIEXCEPT_TOKEN) {
         a_s = SCORE__BESTLOC; l_s = SCORE__NEXTBESTLOC;
     }
@@ -3529,7 +3519,7 @@ Constant SCORE__DIVISOR = 20;
         i = pattern-->k;
         if (i == PATTERN_NULL) continue;
         if (spacing_flag) print (char) ' ';
-        if (i ==0 ) { print (string) THOSET__TX; jump TokenPrinted; }
+        if (i == 0) { print (string) THOSET__TX; jump TokenPrinted; }
         if (i == 1) { print (string) THAT__TX;   jump TokenPrinted; }
         if (i >= REPARSE_CODE)
             print (address) No__Dword(i-REPARSE_CODE);
@@ -3580,7 +3570,6 @@ Constant SCORE__DIVISOR = 20;
         if (i has visited && Refers(i,wn) == 1) e = SCENERY_PE;
     }
     wn++;
-    if (etype > e) return etype;
     return e;
 ];
 
@@ -4112,25 +4101,12 @@ Constant SCORE__DIVISOR = 20;
     rfalse;
 ];
 
-#Ifdef TARGET_ZCODE;
-
-[ DictionaryLookup b l i;
-    for (i=0 : i<l : i++) buffer2->(2+i) = b->i;
-    buffer2->1 = l;
-    Tokenise__(buffer2,parse2);
-    return parse2-->1;
-];
-
-#Ifnot; ! TARGET_GLULX
-
 [ DictionaryLookup b l i;
     for (i=0 : i<l : i++) buffer2->(WORDSIZE+i) = b->i;
-    buffer2-->0 = l;
+    SetKeyBufLength(l, buffer2);
     Tokenise__(buffer2,parse2);
     return parse2-->1;
 ];
-
-#Endif; ! TARGET_
 
 ! ----------------------------------------------------------------------------
 !  NounWord (which takes no arguments) returns:
@@ -4185,9 +4161,31 @@ Constant SCORE__DIVISOR = 20;
     return NextWord();
 ];
 
-[ WordAddress wordnum; return buffer + parse->(wordnum*4+1); ];
+[ WordAddress wordnum p b;
+    if (p==0) p=parse;
+    if (b==0) b=buffer;
+    return b + p->(wordnum*4+1); ];
 
-[ WordLength wordnum; return parse->(wordnum*4); ];
+[ WordLength wordnum p;
+    if (p==0) p=parse;
+    return p->(wordnum*4); ];
+
+[ WordValue wordnum p;
+    if (p==0) p=parse;
+    return p-->(wordnum*2-1); ];
+
+[ NumberWords p;
+    if (p==0) p=parse;
+    return p->1; ];
+
+[ GetKeyBufLength b;
+    if (b==0) b=buffer;
+    return b->1;];
+
+[ SetKeyBufLength n b;
+    if (b==0) b=buffer;
+    if (n > INPUT_BUFFER_LEN-WORDSIZE) n=INPUT_BUFFER_LEN-WORDSIZE;
+    b->1 = n;];
 
 #Ifnot; ! TARGET_GLULX
 
@@ -4208,9 +4206,31 @@ Constant SCORE__DIVISOR = 20;
     return NextWord();
 ];
 
-[ WordAddress wordnum; return buffer + parse-->(wordnum*3); ];
+[ WordAddress wordnum p b;
+    if (p==0) p=parse;
+    if (b==0) b=buffer;
+    return b + p-->(wordnum*3); ];
 
-[ WordLength wordnum; return parse-->(wordnum*3-1); ];
+[ WordLength wordnum p;
+    if (p==0) p=parse;
+    return p-->(wordnum*3-1); ];
+
+[ WordValue wordnum p;
+    if (p==0) p=parse;
+    return p-->(wordnum*3-2); ];
+
+[ NumberWords p;
+    if (p==0) p=parse;
+    return p-->0; ];
+
+[ GetKeyBufLength b;
+    if (b==0) b=buffer;
+    return b-->0;];
+
+[ SetKeyBufLength n b;
+    if (b==0) b=buffer;
+    if (n > INPUT_BUFFER_LEN-WORDSIZE) n=INPUT_BUFFER_LEN-WORDSIZE;
+    b-->0 = n;];
 
 #Endif; ! TARGET_
 
@@ -4238,12 +4258,7 @@ Constant SCORE__DIVISOR = 20;
     j = NumberWord(j);
     if (j >= 1) return j;
 
-    #Ifdef TARGET_ZCODE;
-    i = wordnum*4+1; j = parse->i; num = j+buffer; len = parse->(i-1);
-    #Ifnot; ! TARGET_GLULX
-    i = wordnum*3; j = parse-->i; num = j+buffer; len = parse-->(i-1);
-    #Endif; ! TARGET_
-
+    num = WordAddress(wordnum); len = WordLength(wordnum);
     tot=ParseNumber(num, len);
     if (tot ~= 0) return tot;
 
@@ -5476,9 +5491,13 @@ Object  InformLibrary "(Inform Library)"
 #Ifndef MoveCursor;
 [ MoveCursor line column;  ! 1-based postion on text grid
     if (~~statuswin_current) {
-         @set_window 1;
-         if (clr_on && clr_bgstatus > 1) @set_colour clr_fgstatus clr_bgstatus;
-         else                            style reverse;
+        @set_window 1;
+        #ifdef clr_on;
+        if (clr_on && clr_bgstatus > 1)
+            @set_colour clr_fgstatus clr_bgstatus;
+        else
+        #endif;
+            style reverse;
     }
     if (line == 0) {
         line = 1;
@@ -5489,14 +5508,18 @@ Object  InformLibrary "(Inform Library)"
     #Ifnot;
     @set_cursor line column;
     #Endif;
-statuswin_current = true;
+    statuswin_current = true;
 ];
 #Endif;
 
 [ MainWindow;
     if (statuswin_current) {
-        if (clr_on && clr_bgstatus > 1) @set_colour clr_fg clr_bg;
-        else                            style roman;
+        #ifdef clr_on;
+        if (clr_on && clr_bgstatus > 1)
+            @set_colour clr_fg clr_bg;
+        else
+        #endif;
+            style roman;
         @set_window 0;
         }
     statuswin_current = false;
@@ -5507,6 +5530,7 @@ statuswin_current = true;
     @get_wind_prop 1 3 -> width;
     @get_wind_prop 1 13 -> charw;
     charw = charw & $FF;
+    if (charw == 0) return width;
     return (width+charw-1) / charw;
 ];
 #Ifnot;
@@ -5545,8 +5569,9 @@ statuswin_current = true;
 ];
 #Endif;
 
+#ifdef clr_on;
 [ SetColour f b window;
-    if (clr_on && f && b) {
+    if (f && b) {
         if (window == 0) {  ! if setting both together, set reverse
             clr_fgstatus = b;
             clr_bgstatus = f;
@@ -5559,12 +5584,15 @@ statuswin_current = true;
             clr_fg = f;
             clr_bg = b;
         }
-        if (statuswin_current)
-            @set_colour clr_fgstatus clr_bgstatus;
-        else
-            @set_colour clr_fg clr_bg;
+        if (clr_on) {
+            if (statuswin_current)
+                @set_colour clr_fgstatus clr_bgstatus;
+            else
+                @set_colour clr_fg clr_bg;
+        }
     }
 ];
+#endif;
 
 
 #Ifnot; ! TARGET_GLULX
@@ -5615,36 +5643,39 @@ statuswin_current = true;
     return gg_arguments-->0;
 ];
 
+#Ifdef clr_on;
 [ SetColour f b window doclear  i fwd bwd swin;
-    if (clr_on && f && b) {
+    if (f && b) {
         if (window) swin = 5-window; ! 4 for TextGrid, 3 for TextBuffer
 
-        fwd = MakeColourWord(f);
-        bwd = MakeColourWord(b);
-        for (i=0 : i<=10: i++) {
-            if (f == CLR_DEFAULT || b == CLR_DEFAULT) {  ! remove style hints
-                glk($00B1, swin, i, 7);
-                glk($00B1, swin, i, 8);
+        if (clr_on) {
+            fwd = MakeColourWord(f);
+            bwd = MakeColourWord(b);
+            for (i=0 : i<=10: i++) {
+                if (f == CLR_DEFAULT || b == CLR_DEFAULT) {  ! remove style hints
+                    glk($00B1, swin, i, 7);
+                    glk($00B1, swin, i, 8);
+                }
+                else {
+                    glk($00B0, swin, i, 7, fwd);
+                    glk($00B0, swin, i, 8, bwd);
+                }
             }
-            else {
-                glk($00B0, swin, i, 7, fwd);
-                glk($00B0, swin, i, 8, bwd);
+
+            ! Now re-open the windows to apply the hints
+            if (gg_statuswin) glk($0024, gg_statuswin, 0); ! close_window
+
+            if (doclear || ( window ~= 1 && (clr_fg ~= f || clr_bg ~= b) ) ) {
+                glk($0024, gg_mainwin, 0);
+                gg_mainwin = glk($0023, 0, 0, 0, 3, GG_MAINWIN_ROCK); ! window_open
+                if (gg_scriptstr ~= 0)
+                    glk($002D, gg_mainwin, gg_scriptstr); ! window_set_echo_stream
             }
+
+            gg_statuswin = glk($0023, gg_mainwin, $12, gg_statuswin_cursize,
+               4, GG_STATUSWIN_ROCK); ! window_open
+            if (statuswin_current && gg_statuswin) MoveCursor(); else MainWindow();
         }
-
-        ! Now re-open the windows to apply the hints
-        if (gg_statuswin) glk($0024, gg_statuswin, 0); ! close_window
-
-        if (doclear || ( window ~= 1 && (clr_fg ~= f || clr_bg ~= b) ) ) {
-            glk($0024, gg_mainwin, 0);
-            gg_mainwin = glk($0023, 0, 0, 0, 3, GG_MAINWIN_ROCK); ! window_open
-            if (gg_scriptstr ~= 0)
-                glk($002D, gg_mainwin, gg_scriptstr); ! window_set_echo_stream
-        }
-
-        gg_statuswin = glk($0023, gg_mainwin, $12, gg_statuswin_cursize,
-           4, GG_STATUSWIN_ROCK); ! window_open
-        if (statuswin_current && gg_statuswin) MoveCursor(); else MainWindow();
 
         if (window ~= 2) {
             clr_fgstatus = f;
@@ -5657,17 +5688,22 @@ statuswin_current = true;
     }
 ];
 #Endif;
+#Endif;
+
+#Stub SetColour 4;
 
 [ SetClr f b w;
     SetColour (f, b, w);
 ];
 
 [ RestoreColours;    ! L61007
+    #ifdef clr_on;
     if (clr_on) { ! check colour has been used
         SetColour(clr_fg, clr_bg, 2); ! make sure both sets of variables are restored
         SetColour(clr_fgstatus, clr_bgstatus, 1, true);
         ClearScreen();
     }
+    #endif;
     #Ifdef TARGET_ZCODE;
     #Iftrue (#version_number == 6); ! request screen update
     (0-->8) = (0-->8) | $$00000100;
