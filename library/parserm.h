@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   PARSERM:  Core of parser.
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -2866,8 +2866,7 @@ Constant UNLIT_BIT  =  32;
     #Endif; ! LanguageIsVerb
     if (first_word ~= 0) {
         j = first_word->#dict_par1;
-        if ((0 ~= j&1) && (first_word ~= 'long' or 'short' or 'normal'
-                                      or 'brief' or 'full' or 'verbose')) {
+        if ((0 ~= j&1) && ~~LanguageVerbMayBeName(first_word)) {
             CopyBuffer(buffer, buffer2);
             return REPARSE_CODE;
         }
@@ -3534,8 +3533,8 @@ Constant SCORE__DIVISOR = 20;
         if (i >= REPARSE_CODE)
             print (address) No__Dword(i-REPARSE_CODE);
         else
-            if (i in compass)
-                print (address) (i.&name-->1); ! the direction name
+            if (i in compass && LanguageVerbLikesAdverb(verb_word))
+                LanguageDirection (i.door_dir); ! the direction name as adverb
             else
                 print (the) i;
       .TokenPrinted;
@@ -3691,8 +3690,7 @@ Constant SCORE__DIVISOR = 20;
 
     #Ifdef DEBUG;
     if (scope_reason == PARSING_REASON
-        && verb_word == 'purloin' or 'tree' or 'abstract'
-                     or 'gonear' or 'scope' or 'showobj') {
+        && LanguageVerbIsDebugging(verb_word)) {
 
         #Ifdef TARGET_ZCODE;
         for (i=selfobj : i<=top_object : i++)
@@ -4908,13 +4906,14 @@ Object  InformLibrary "(Inform Library)"
 ];
 
 [ NoteObjectAcquisitions i;
-    objectloop (i in player && i hasnt moved) {
-        give i moved;
-        if (i has scored) {
-            score = score + OBJECT_SCORE;
-            things_score = things_score + OBJECT_SCORE;
+    objectloop (i in player)
+        if (i hasnt moved) {
+            give i moved;
+            if (i has scored) {
+                score = score + OBJECT_SCORE;
+                things_score = things_score + OBJECT_SCORE;
+            }
         }
-    }
 ];
 
 ! ----------------------------------------------------------------------------
@@ -5478,13 +5477,16 @@ Object  InformLibrary "(Inform Library)"
          if (clr_on && clr_bgstatus > 1) @set_colour clr_fgstatus clr_bgstatus;
          else                            style reverse;
     }
-    if (line)
-        #Iftrue (#version_number == 6);
-        MoveCursorV6(line, column);
-        #Ifnot;
-        @set_cursor line column;
-        #Endif;
-    statuswin_current = true;
+    if (line == 0) {
+        line = 1;
+        column = 1;
+    }
+    #Iftrue (#version_number == 6);
+    MoveCursorV6(line, column);
+    #Ifnot;
+    @set_cursor line column;
+    #Endif;
+statuswin_current = true;
 ];
 #Endif;
 
@@ -5578,9 +5580,12 @@ Object  InformLibrary "(Inform Library)"
 [ MoveCursor line column;  ! 0-based postion on text grid
     if (gg_statuswin) {
         glk($002F, gg_statuswin); ! set_window
-        if (line)
-            glk($002B, gg_statuswin, column-1, line-1); ! window_move_cursor
     }
+    if (line == 0) {
+        line = 1;
+        column = 1;
+    }
+    glk($002B, gg_statuswin, column-1, line-1); ! window_move_cursor
     statuswin_current=1;
 ];
 
