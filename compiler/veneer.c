@@ -40,11 +40,7 @@ extern void compile_initial_routine(void)
 
         sequence_point_follows = FALSE;
 
-        if (version_number > 3)
-            assemblez_1_to(call_vs_zc, AO, temp_var1);
-        else
-            assemblez_1_to(call_zc, AO, temp_var1);
-
+        assemblez_call_1(AO);
         assemblez_0(quit_zc);
 
     }
@@ -534,7 +530,13 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
                       property                                               */
 
         "RT__Err",
+        /* for array access errors (crime == 28 to 31) under version 3
+           obj       => index into the array,
+           id        => size of the array,
+           temp_var3 => type of the array,
+           temp_var4 => name of the array */
         "crime obj id size p q;\
+         #IfV3; size=temp_var3; p=temp_var4; #Endif;\
          print \"^[** Programming error: \";\
          if (crime<0) jump RErr;\
          if (crime==1) { print \"class \"; @print_obj obj;\
@@ -556,7 +558,9 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
          \" in the\"; switch(size&7){0,1:q=0; 2:print \" string\";\
          q=1; 3:print \" table\";q=1; 4:print \" buffer\";q=WORDSIZE;} \
          if(size&16) print\" (->)\"; if(size&8) print\" (-->)\";\
-         \" array ~\", (string) #array_names_offset-->p,\
+         if(size&128) {if ((p->-1)&$7F>$40) p=(p->-1)&$3F; else p=p->-2-(p->-1&$80);\
+         print\" property ~\", (property) p; id--;}\
+         else print \" array ~\", (string) #array_names_offset-->p;\
          \"~, which has entries \", q, \" up to \",id,\" **]\"; }\
          if (crime >= 24 && crime <=27) { if (crime<=25) print \"read\";\
          else print \"write\"; print \" outside memory using \";\
@@ -609,8 +613,8 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
         "addr top;\
          if (addr==0 or -1) rfalse;\
          top = addr;\
-         #IfV5; #iftrue (#version_number == 6) || (#version_number == 7);\
-         @log_shift addr $FFFF -> top; #Endif; #Endif;\
+         #iftrue (#version_number == 6) || (#version_number == 7);\
+         @log_shift addr $FFFF -> top; #Endif;\
          if (Unsigned__Compare(top, $001A-->0) >= 0) rfalse;\
          if (addr>=1 && addr<=(#largest_object-255)) rtrue;\
          #iftrue #oddeven_packing;\
@@ -858,6 +862,46 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
          if (a==$0010) f=1;\
          if (f==0) return RT__Err(27);",
         "@storew base offset val; ]", "", "", "", ""
+    },
+    {   /*  RT__ChLDPrB:  check at run-time that it's safe to load a byte
+                          property and return the byte */
+
+        "RT__ChLDPrB",
+        "base offset a val;\
+         if (~~base) return RT__Err(24);\
+         if ((base->-1)&$7F > $40) a=2; else {a=(base->-1)&63; if (a==0) a=64;}\
+         if (offset>=0 && offset<a) {@loadb base offset -> val;return val;}",
+        "RT__Err(28,offset,a,128,base);]","", "", "", ""
+    },
+    {   /*  RT__ChLDPrW:  check at run-time that it's safe to load a word
+                          property and return the word */
+
+        "RT__ChLDPrW",
+        "base offset a val;\
+         if (~~base) return RT__Err(25);\
+         if ((base->-1)&$7F > $40) a=2; else {a=(base->-1)&63; if (a==0) a=64;}\
+         if (offset>=0 && offset<a/2) {@loadw base offset -> val;return val;}",
+        "RT__Err(29,offset,a/2,128,base);]","", "", "", ""
+    },
+    {   /*  RT__ChSTPrB:  check at run-time that it's safe to store a byte
+                          property and store it */
+
+        "RT__ChSTPrB",
+        "base offset val a;\
+         if (~~base) return RT__Err(26);\
+         if ((base->-1)&$7F > $40) a=2; else {a=(base->-1)&63; if (a==0) a=64;}\
+         if (offset>=0 && offset<a) {@storeb base offset val; return;}",
+        "RT__Err(30,offset,a,128,base);]","", "", "", ""
+    },
+    {   /*  RT__ChSTPrW:  check at run-time that it's safe to store a word
+                          property and store it */
+
+        "RT__ChSTPrW",
+        "base offset val a;\
+         if (~~base) return RT__Err(27);\
+         if (base) {if ((base->-1)&$7F > $40) a=2; else {a=(base->-1)&63; if (a==0) a=64;}\
+         if (offset>=0 && offset<a/2) {@storew base offset val; return;}}",
+        "RT__Err(31,offset,a/2,128,base);]","", "", "", ""
     },
     {   /*  RT__ChPrintC:  check at run-time that it's safe to print (char)
                         and do so */
@@ -1762,6 +1806,72 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
     },
 
     {
+        /*  RT__ChLDPrB: Check at run-time that it's safe to load a byte
+            and return the byte.
+        */
+        "RT__ChLDPrB",
+        "base offset a b val;\
+           a=base+offset;\
+           @getmemsize b;\
+           if (Unsigned__Compare(a, b) >= 0)\
+             return RT__Err(24);\
+           @aloadb base offset val;\
+           return val;\
+         ]", "", "", "", "", ""
+    },
+
+    {
+        /*  RT__ChLDPrW: Check at run-time that it's safe to load a word
+            and return the word
+        */
+        "RT__ChLDPrW",
+        "base offset a b val;\
+           a=base+WORDSIZE*offset;\
+           @getmemsize b;\
+           if (Unsigned__Compare(a, b) >= 0)\
+             return RT__Err(25);\
+           @aload base offset val;\
+           return val;\
+         ]", "", "", "", "", ""
+    },
+
+    {
+        /*  RT__ChSTPrB: Check at run-time that it's safe to store a byte
+            and store it
+        */
+        "RT__ChSTPrB",
+        "base offset val a b;\
+           a=base+offset;\
+           @getmemsize b;\
+           if (Unsigned__Compare(a, b) >= 0) jump ChSTB_Fail;\
+           @aload 0 2 b;\
+           if (Unsigned__Compare(a, b) < 0) jump ChSTB_Fail;\
+           @astoreb base offset val;\
+           return;\
+         .ChSTB_Fail;\
+           return RT__Err(26);\
+         ]", "", "", "", "", ""
+    },
+
+    {
+        /*  RT__ChSTPrW: Check at run-time that it's safe to store a word
+            and store it
+        */
+        "RT__ChSTPrW",
+        "base offset val a b;\
+           a=base+WORDSIZE*offset;\
+           @getmemsize b;\
+           if (Unsigned__Compare(a, b) >= 0) jump ChSTW_Fail;\
+           @aload 0 2 b;\
+           if (Unsigned__Compare(a, b) < 0) jump ChSTW_Fail;\
+           @astore base offset val;\
+           return;\
+         .ChSTW_Fail;\
+           return RT__Err(27);\
+         ]", "", "", "", "", ""
+    },
+
+    {
       /*  RT__ChPrintC: Check at run-time that it's safe to print (char)
             and do so.
       */
@@ -1970,6 +2080,10 @@ static void mark_as_needed_z(int code)
             case RT__ChG_VR:
             case RT__ChGt_VR:
             case RT__ChPR_VR:
+            case RT__ChLDPrB_VR:
+            case RT__ChLDPrW_VR:
+            case RT__ChSTPrB_VR:
+            case RT__ChSTPrW_VR:
                 mark_as_needed_z(RT__Err_VR);
                 return;
             case RT__ChPS_VR:
