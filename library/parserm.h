@@ -1384,7 +1384,8 @@ Object  InformParser "(Inform Parser)"
         for (i=0 : i<INPUT_BUFFER_LEN : i++) buffer3->i = buffer->i;
 
     if (usual_grammar_after == 0) {
-        i = RunRoutines(actor, grammar);
+        j = verb_wordnum;
+        i = RunRoutines(actor, grammar); 
         #Ifdef DEBUG;
         if (parser_trace >= 2 && actor.grammar ~= 0 or NULL)
             print " [Grammar property returned ", i, "]^";
@@ -1395,7 +1396,7 @@ Object  InformParser "(Inform Parser)"
             (UnsignedCompare(i, dict_start) < 0 ||
              UnsignedCompare(i, dict_end) >= 0 ||
              (i - dict_start) % dict_entry_size ~= 0)) {
-            usual_grammar_after = verb_wordnum;
+            usual_grammar_after = j;
             i=-i;
         }
 
@@ -4481,7 +4482,7 @@ Object  InformLibrary "(Inform Library)"
             dict_start = HDR_DICTIONARY-->0;
             dict_entry_size = dict_start->(dict_start->0 + 1);
             dict_start = dict_start + dict_start->0 + 4;
-            dict_end = (dict_start - 2)-->0 * dict_entry_size;
+            dict_end = dict_start + (dict_start - 2)-->0 * dict_entry_size;
             #Ifdef DEBUG;
             if (dict_start > 0 && dict_end < 0 &&
               ((-dict_start) - dict_end) % dict_entry_size == 0)
@@ -5197,11 +5198,13 @@ Object  InformLibrary "(Inform Library)"
 
 #Ifdef TARGET_ZCODE;
 
-[ DebugParameter w x n l;
-    x = HDR_DICTIONARY-->0; x = x+(x->0)+1; l = x->0; n = (x+1)-->0; x = w-(x+3);
+[ DebugParameter w;
     print w;
     if (w >= 1 && w <= top_object) print " (", (name) w, ")";
-    if (x%l == 0 && (x/l) < n) print " ('", (address) w, "')";
+    if (UnsignedCompare(w, dict_start) >= 0 &&
+            UnsignedCompare(w, dict_end) < 0 &&
+            (w - dict_start) % dict_entry_size == 0)
+        print " ('", (address) w, "')";
 ];
 
 [ DebugAction a anames;
