@@ -1804,7 +1804,7 @@ Object  InformParser "(Inform Parser)"
                 AnalyseToken(token);
 
                 if (action_to_be == ##AskTo && found_ttype == ELEMENTARY_TT &&
-                    found_tdata == TOPIC_TOKEN)
+                    found_tdata == TOPIC_TOKEN && line_etype == 100)
                 {
                     l=inputobjs-->2;
                     wn--;
@@ -4347,9 +4347,9 @@ Constant SCORE__DIVISOR     =   20;
     if (len == 2) mul=10;
     if (len == 1) mul=1;
 
-    tot = 0; c = 0; len = len-1;
+    tot = 0; c = 0; 
 
-    for (c=0 : c<=len : c++) {
+    for (c=0 : c<len : c++) {
         digit=num->c;
         if (digit == '0') { d = 0; jump digok; }
         if (digit == '1') { d = 1; jump digok; }
@@ -4365,7 +4365,7 @@ Constant SCORE__DIVISOR     =   20;
      .digok;
         tot = tot+mul*d; mul = mul/10;
     }
-    if (len > 3) tot=10000;
+    if (len > 4) tot=10000;
     return tot;
 ];
 
@@ -6301,7 +6301,7 @@ Array StorageForShortName -> WORDSIZE + SHORTNAMEBUF_LEN;
     PrintCapitalised(a, b, 0, 1, 1);
 ];
 
-[ Cap str nocaps;
+[ CapitRule str nocaps;
     if (nocaps) print (string) str;
     else        PrintCapitalised(str);
 ];
@@ -6310,7 +6310,7 @@ Array StorageForShortName -> WORDSIZE + SHORTNAMEBUF_LEN;
     if (o provides articles) {
         artval=(o.&articles)-->(acode+short_name_case*LanguageCases);
         if (capitalise)
-            print (Cap) artval, " ";
+            print (CapitRule) artval, " ";
         else
             print (string) artval, " ";
         if (pluralise) return;
@@ -6360,7 +6360,7 @@ Array StorageForShortName -> WORDSIZE + SHORTNAMEBUF_LEN;
     }
     #Endif; ! TARGET_
 
-    Cap (artform-->acode, ~~capitalise); ! print article
+    CapitRule (artform-->acode, ~~capitalise); ! print article
     if (pluralise) return;
     print (PSN__) o;
 ];
