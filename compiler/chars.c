@@ -304,6 +304,7 @@ static int read_map_number(char* p)
 static void read_source_to_iso_file(uchar *uccg)
 {   FILE *charset_file;
     char cs_buff[256];
+    char c;
     char *p;
     int i=0;
 
@@ -328,9 +329,12 @@ static void read_source_to_iso_file(uchar *uccg)
                 p = cs_buff;
                 while ((i<256) && (p!=NULL))
                 {
-                    uccg[i] = (uchar)read_map_number(p);
-                    if (uccg[i] == 0)
-                        uccg[i] = (uchar)i;
+                    c = (uchar)read_map_number(p);
+                    if (c != 0)             /* 0:  leave mapping unchanged */
+                        if (c == 1)
+                            uccg[i] = '?';  /* 1:  char not in ISO 8895-N */
+                        else
+                            uccg[i] = c;    /* >1: map to this ISO 8895-N value */
                     i++;
                     p = strchr(p,',');
                     if (p != NULL)
@@ -365,55 +369,54 @@ static void make_source_to_iso_grid(void)
 
     for (n=0; n<0x100; n++) uccg[n] = (char) n;
 
+    source_to_iso_grid[0] = (char) 0;
+    for (n=1; n<32; n++) source_to_iso_grid[n] = '?';
+    source_to_iso_grid[10] = '\n';
+    source_to_iso_grid[12] = '\n';
+    source_to_iso_grid[13] = '\n';
+    source_to_iso_grid[127] = '?';
+    source_to_iso_grid[TAB_CHARACTER] = ' ';
+
+    for (n=0x80; n<0xa0; n++) source_to_iso_grid[n] = '?';
+    source_to_iso_grid[0xa0] = ' ';
+    source_to_iso_grid[0xad] = '-';
+
+    switch(character_set_setting)
+    {   case 0:
+            for (n=0xa0; n<0x100; n++)
+                 source_to_iso_grid[n] = '?';
+            break;
+        case 6:  /* Arabic */
+            for (n=0xa0; n<0xc1; n++)
+                switch(n)
+                {   case 0xa0: case 0xa4: case 0xac: case 0xad:
+                    case 0xbb: case 0xbf: break;
+                    default: source_to_iso_grid[n] = '?';
+                }
+            for (n=0xdb; n<0xe0; n++)
+                 source_to_iso_grid[n] = '?';
+            for (n=0xf3; n<0x100; n++)
+                 source_to_iso_grid[n] = '?';
+            break;
+        case 7:  /* Greek */
+            source_to_iso_grid[0xa4] = '?';
+            source_to_iso_grid[0xa5] = '?';
+            source_to_iso_grid[0xaa] = '?';
+            source_to_iso_grid[0xae] = '?';
+            source_to_iso_grid[0xd2] = '?';
+            source_to_iso_grid[0xff] = '?';
+            break;
+        case 8:  /* Hebrew */
+            source_to_iso_grid[0xa1] = '?';
+            for (n=0xbf; n<0xdf; n++)
+                 source_to_iso_grid[n] = '?';
+            for (n=0xfb; n<0x100; n++)
+                 source_to_iso_grid[n] = '?';
+            break;
+    }
+
     if (Charset_Map[0] != '\0')
         read_source_to_iso_file(uccg);
-    else
-    {   source_to_iso_grid[0] = (char) 0;
-        for (n=1; n<32; n++) source_to_iso_grid[n] = '?';
-        source_to_iso_grid[10] = '\n';
-        source_to_iso_grid[12] = '\n';
-        source_to_iso_grid[13] = '\n';
-        source_to_iso_grid[127] = '?';
-        source_to_iso_grid[TAB_CHARACTER] = ' ';
-
-        for (n=0x80; n<0xa0; n++) source_to_iso_grid[n] = '?';
-        source_to_iso_grid[0xa0] = ' ';
-        source_to_iso_grid[0xad] = '-';
-
-        switch(character_set_setting)
-        {   case 0:
-                for (n=0xa0; n<0x100; n++)
-                     source_to_iso_grid[n] = '?';
-                break;
-            case 6:  /* Arabic */
-                for (n=0xa0; n<0xc1; n++)
-                    switch(n)
-                    {   case 0xa0: case 0xa4: case 0xac: case 0xad:
-                        case 0xbb: case 0xbf: break;
-                        default: source_to_iso_grid[n] = '?';
-                    }
-                for (n=0xdb; n<0xe0; n++)
-                     source_to_iso_grid[n] = '?';
-                for (n=0xf3; n<0x100; n++)
-                     source_to_iso_grid[n] = '?';
-                break;
-            case 7:  /* Greek */
-                source_to_iso_grid[0xa4] = '?';
-                source_to_iso_grid[0xa5] = '?';
-                source_to_iso_grid[0xaa] = '?';
-                source_to_iso_grid[0xae] = '?';
-                source_to_iso_grid[0xd2] = '?';
-                source_to_iso_grid[0xff] = '?';
-                break;
-            case 8:  /* Hebrew */
-                source_to_iso_grid[0xa1] = '?';
-                for (n=0xbf; n<0xdf; n++)
-                     source_to_iso_grid[n] = '?';
-                for (n=0xfb; n<0x100; n++)
-                     source_to_iso_grid[n] = '?';
-                break;
-        }
-    }
 }
 
 /* ------------------------------------------------------------------------- */
