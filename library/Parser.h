@@ -15,7 +15,7 @@ System_file;
 
 ! ------------------------------------------------------------------------------
 
-Constant LibSerial  = "040101";
+Constant LibSerial  = "140101";
 Constant LibRelease = "6/11 second beta";
 
 Constant Grammar__Version = 2;
