@@ -159,7 +159,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
         "obj; print \"The \", obj; ]", "", "", "", "", ""
     },
     {   "CInDefArt",
-        "obj; print \"A \", obj; ]", "", "", "", "", ""
+        "obj; InDefArt(obj); ]", "", "", "", "", ""
     },
     {   "PrintShortName",
         "obj; switch(metaclass(obj))\
@@ -243,10 +243,8 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
          if (obj < 1 || obj > #largest_object-255)\
          {   switch(Z__Region(obj))\
              { 2: if (id == call)\
-                   { s = sender; sender = self; self = obj;\
-                     #ifdef action;sw__var=action;#endif;\
-                     x = indirect(obj, a, b, c, d, e, f);\
-                     self = sender; sender = s; return x; }\
+                   { x = indirect(obj, a, b, c, d, e, f);\
+                     return x; }\
                    jump Call__Error;",
               "3: if (id == print) { @print_paddr obj; rtrue; }\
                    if (id == print_to_array)\
@@ -376,6 +374,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
          if (identifier<64 && identifier>0) return obj.&identifier;\
          if (identifier & $8000 ~= 0)\
          {   cla = #classes_table-->(identifier & $ff);\
+             if (cla > #largest_object-255 || cla < 1 || cla notin Class) rfalse;\
              if (cla.&3 == 0) rfalse;\
              if (~~(obj ofclass cla)) rfalse;\
              identifier = (identifier & $7f00) / $100;\
@@ -936,7 +935,7 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
         "obj; print \"The \", obj; ]", "", "", "", "", ""
     },
     {   "CInDefArt",
-        "obj; print \"A \", obj; ]", "", "", "", "", ""
+        "obj; InDefArt(obj); ]", "", "", "", "", ""
     },
     {   "PrintShortName",
         "obj q; switch(metaclass(obj))\
@@ -1028,10 +1027,7 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
            zr = Z__Region(obj);\
            if (zr == 2) {\
              if (id == call) {\
-               s = sender; sender = self; self = obj;\
-               #ifdef action; sw__var=action; #endif;\
                @call obj _vararg_count z;\
-               self = sender; sender = s;\
                return z;\
              }\
              jump Call__Error;\
