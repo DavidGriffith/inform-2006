@@ -183,7 +183,8 @@ static void message(int style, char *s)
 /* ------------------------------------------------------------------------- */
 
 extern void error(char *s)
-{   if (no_errors == MAX_ERRORS)
+{   if (dont_enter_into_symbol_table <= -2) return;
+    if (no_errors == MAX_ERRORS)
         fatalerror("Too many errors: giving up");
     errors[no_errors] = no_syntax_lines;
     message(1,s);
@@ -309,7 +310,10 @@ extern void obsolete_warning(char *s1)
     if (obsolete_switch || nowarnings_switch)
     {   no_suppressed_warnings++; return; }
     sprintf(error_message_buff, "Obsolete usage: %s",s1);
-    message(2,error_message_buff);
+    if (incompatibility_switch) 
+        error(error_message_buff);
+    else 
+        message(2,error_message_buff);
 }
 
 /* ------------------------------------------------------------------------- */
