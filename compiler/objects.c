@@ -1733,7 +1733,7 @@ inconvenience, please contact the author.");
         if ((token_type == SEP_TT) && (token_value == OPENB_SEP))
         {   assembly_operand AO;
             AO = parse_expression(CONSTANT_CONTEXT);
-            if (module_switch && (AO.marker != 0))
+            if (AO.marker != 0)
             {   error("Duplicate-number not known at compile time");
                 n=0;
             }
