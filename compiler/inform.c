@@ -411,6 +411,7 @@ static char current_source_path[PATHLEN];
        char Transcript_Name[PATHLEN];
        char Language_Name[PATHLEN];
        char Charset_Map[PATHLEN];
+       char Translation_Name[PATHLEN];
 static char ICL_Path[PATHLEN];
 
 static void set_path_value(char *path, char *value)
@@ -428,6 +429,7 @@ Module_Path or ICL_Path variables. Other paths are for output only.", FN_ALT);
             }
             if ((path != Debugging_Name) && (path != Transcript_Name)
                  && (path != Language_Name) && (path != Charset_Map)
+                 && (path != Translation_Name)
                  && (i>0) && (isalnum(path[i-1]))) path[i++] = FN_SEP;
             path[i++] = value[j++];
             if (value[j-1] == 0) return;
@@ -453,6 +455,7 @@ static void set_default_paths(void)
     set_path_value(Transcript_Name, Transcript_File);
     set_path_value(Language_Name,   "English");
     set_path_value(Charset_Map,     "");
+    set_path_value(Translation_Name,Translation_File);
 }
 
 static void set_path_command(char *command)
@@ -479,6 +482,7 @@ static void set_path_command(char *command)
         if (strcmp(pathname, "transcript_name")==0) path_to_set=Transcript_Name;
         if (strcmp(pathname, "language_name")==0) path_to_set=Language_Name;
         if (strcmp(pathname, "charset_map")==0) path_to_set=Charset_Map;
+        if (strcmp(pathname, "translation_name")==0) path_to_set=Translation_Name;
 
         if (path_to_set == NULL)
         {   printf("No such path setting as \"%s\"\n", pathname);
@@ -801,14 +805,15 @@ Inform translates plain filenames (such as \"xyzzy\") into full pathnames\n\
    \".\" then Inform uses no file extension at all (removing the \".\").\n\n");
 #endif
 
-    printf("Names of four individual files can also be set using the same\n\
+    printf("Names of five individual files can also be set using the same\n\
   + command notation (though they aren't really pathnames).  These are:\n\n\
       transcript_name  (text written by -r switch): now \"%s\"\n\
       debugging_name   (data written by -k switch): now \"%s\"\n\
       language_name    (library file defining natural language of game):\n\
                        now \"%s\"\n\
-      charset_map      (file for character set mapping): now \"%s\"\n\n",
-    Transcript_Name, Debugging_Name, Language_Name, Charset_Map);
+      charset_map      (file for character set mapping): now \"%s\"\n\n\
+      translation_name (compiler and veneer messages): now \"%s\"\n\n",
+    Transcript_Name, Debugging_Name, Language_Name, Charset_Map, Translation_Name);
 
     translate_in_filename(0, new_name, "rezrov", 0, 1);
     printf("Examples: 1. \"inform rezrov\"\n\
@@ -1429,50 +1434,47 @@ static void execute_icl_command(char *p);
 
 static int execute_icl_header(char *argname)
 {
-  FILE *command_file;
-  char cli_buff[256], fw[256];
-  int line = 0;
-  int errcount = 0;
-  int i;
-  char filename[PATHLEN];
-  int x = 0;
+    FILE *command_file;
+    char cli_buff[256], fw[256];
+    int line = 0;
+    int errcount = 0;
+    char *i;
+    char filename[PATHLEN];
+    int x = 0;
 
-  do
+    do
     {   x = translate_in_filename(x, filename, argname, 0, 1);
         command_file = fopen(filename,"r");
     } while ((command_file == NULL) && (x != 0));
-  if (!command_file) {
+    if (!command_file) {
     /* Fail silently. The regular compiler will try to open the file
        again, and report the problem. */
-    return 0;
-  }
-
-  while (feof(command_file)==0) {
-    if (fgets(cli_buff,256,command_file)==0) break;
-    line++;
-    if (!(cli_buff[0] == '!' && cli_buff[1] == '%'))
-      break;
-    i = copy_icl_word(cli_buff+2, fw, 256);
-    if (icl_command(fw)) {
-      execute_icl_command(fw);
-      copy_icl_word(cli_buff+2 + i, fw, 256);
-      if ((fw[0] != 0) && (fw[0] != '!')) {
-        icl_header_error(filename, line);
-        errcount++;
-        printf("expected comment or nothing but found '%s'\n", fw);
-      }
+        return 0;
     }
-    else {
-      if (fw[0]!=0) {
-        icl_header_error(filename, line);
-        errcount++;
-        printf("Expected command or comment but found '%s'\n", fw);
-      }
-    }
-  }
-  fclose(command_file);
 
-  return (errcount==0)?0:1;
+    while (feof(command_file)==0) {
+        if (file_read_line(cli_buff,256,command_file)==0) break;
+        line++;
+        if (!(cli_buff[0] == '!' && cli_buff[1] == '%'))
+            break;
+        i = cli_buff+2;
+        while (i[0] != 0) {
+            i += copy_icl_word(i, fw, 256);
+            if (icl_command(fw)) {
+                execute_icl_command(fw);
+            }
+            else {
+                if (fw[0]!=0) {
+                    icl_header_error(filename, line);
+                    errcount++;
+                    printf("Expected command or comment but found '%s'\n", fw);
+                }
+            }
+        }
+    }
+    fclose(command_file);
+
+    return (errcount==0)?0:1;
 }
 
 
@@ -1482,7 +1484,7 @@ static void run_icl_file(char *filename, FILE *command_file)
     printf("[Running ICL file '%s']\n", filename);
 
     while (feof(command_file)==0)
-    {   if (fgets(cli_buff,256,command_file)==0) break;
+    {   if (file_read_line(cli_buff,256,command_file)==0) break;
         line++;
         i = copy_icl_word(cli_buff, fw, 256);
         if (icl_command(fw))
