@@ -41,8 +41,10 @@ int put_strings_in_low_memory,         /* When TRUE, put static strings in
                                           with ASCII character n, or -1
                                           if none of the abbreviations do    */
 int no_abbreviations;                  /* No of abbreviations defined so far */
-uchar *abbreviations_at;                 /* Memory to hold the text of any
+uchar *abbreviations_at;               /* Memory to hold the text of any
                                           abbreviation strings declared      */
+uchar *abbreviations_gl;               /* Memory to hold the Glulx encoded
+                                          text of abbreviations              */
 /* ------------------------------------------------------------------------- */
 /*   Glulx string compression storage                                        */
 /* ------------------------------------------------------------------------- */
@@ -134,6 +136,11 @@ static void make_abbrevs_lookup(void)
                     abbrev_values[k]=l;
                     l=abbrev_quality[j]; abbrev_quality[j]=abbrev_quality[k];
                     abbrev_quality[k]=l;
+                    if (glulx_mode && compression_switch) {
+                      p1=(char *)abbreviations_gl+j*MAX_ABBREV_LENGTH;
+                      p2=(char *)abbreviations_gl+k*MAX_ABBREV_LENGTH;
+                      strcpy(p,p1); strcpy(p1,p2); strcpy(p2,p);
+                    }
                     bubble_sort = TRUE;
                 }
             }
@@ -182,13 +189,30 @@ static int try_abbreviations_from(unsigned char *text, int i, int from)
 }
 
 extern void make_abbreviation(char *text)
-{
+{ int ats = 0; char *p1, *p2;
+
     strcpy((char *)abbreviations_at
             + no_abbreviations*MAX_ABBREV_LENGTH, text);
+    p1 = strings_holding_area;
 
     is_abbreviation = TRUE;
     abbrev_values[no_abbreviations] = compile_string(text, TRUE, TRUE);
     is_abbreviation = FALSE;
+
+    if (glulx_mode && compression_switch) {
+      /* Copy the translated text, but, since abbreviations are */
+      /* printed literally in Glulx, convert '@@' to just '@'   */
+      p2 = (char *)abbreviations_gl + no_abbreviations*MAX_ABBREV_LENGTH;
+      while (*p1 != '\0') {
+        if (*p1 == '@') {
+          ats++; if (ats == 2) {
+            ats = 0; p1++; continue;
+          }
+        } else ats = 0;
+        *p2++ = *p1++;
+      }
+      *p1 = '\0';
+    }
 
     /*   The quality is the number of Z-chars saved by using this            */
     /*   abbreviation: note that it takes 2 Z-chars to print it.             */
@@ -1006,7 +1030,7 @@ static void compress_makebits(int entnum, int depth, int prevbit,
     compression_table_size += 2;
     break;
   case 3:
-    cx = (char *)abbreviations_at + ent->u.val*MAX_ABBREV_LENGTH;
+    cx = (char *)abbreviations_gl + ent->u.val*MAX_ABBREV_LENGTH;
     compression_table_size += (1 + 1 + strlen(cx));
     break;
   case 9:
@@ -1071,7 +1095,9 @@ static void optimise_pass(void)
             t1=(int) (time(0));
             for (j=0; j<tlbtab[i].occurrences; j++)
             {   for (j2=0; j2<tlbtab[i].occurrences; j2++) grandflags[j2]=1;
-                nl=2; noflags=tlbtab[i].occurrences;
+                nl=2;
+                if (tlbtab[i].text[2] == 0) nl--;
+                noflags=tlbtab[i].occurrences;
                 while ((noflags>=2)&&(nl<=62))
                 {   nl++;
                     for (j2=0; j2<nl; j2++)
@@ -1163,32 +1189,7 @@ extern void optimise_abbreviations(void)
 
     bestyet=my_calloc(sizeof(optab), 256, "bestyet");
     bestyet2=my_calloc(sizeof(optab), 64, "bestyet2");
-
-    bestyet2[0].text[0]='.';
-    bestyet2[0].text[1]=' ';
-    bestyet2[0].text[2]=0;
-
-    bestyet2[1].text[0]=',';
-    bestyet2[1].text[1]=' ';
-    bestyet2[1].text[2]=0;
-
-    for (i=0; all_text+i<all_text_top; i++)
-    {
-        if ((all_text[i]=='.') && (all_text[i+1]==' ') && (all_text[i+2]==' '))
-        {   all_text[i]='\n'; all_text[i+1]='\n'; all_text[i+2]='\n';
-            bestyet2[0].popularity++;
-        }
-
-        if ((all_text[i]=='.') && (all_text[i+1]==' '))
-        {   all_text[i]='\n'; all_text[i+1]='\n';
-            bestyet2[0].popularity++;
-        }
-
-        if ((all_text[i]==',') && (all_text[i+1]==' '))
-        {   all_text[i]='\n'; all_text[i+1]='\n';
-            bestyet2[1].popularity++;
-        }
-    }
+    selected=0;
 
     MAX_GTABLE=subtract_pointers(all_text_top,all_text)+1;
     grandtable=my_calloc(4*sizeof(int32), MAX_GTABLE/4, "grandtable");
@@ -1197,6 +1198,9 @@ extern void optimise_abbreviations(void)
     {   test.text[0]=all_text[i];
         test.text[1]=all_text[i+1];
         test.text[2]=all_text[i+2];
+        if (selected==0 && 
+            (iso_to_alphabet_grid[test.text[0]]>=26) && test.text[0]!='~')
+            test.text[2]=0;
         test.text[3]=0;
         if ((test.text[0]=='\n')||(test.text[1]=='\n')||(test.text[2]=='\n'))
             goto DontKeep;
@@ -1217,9 +1221,9 @@ extern void optimise_abbreviations(void)
                 }
             }
 #endif
-            if ((all_text[i]==all_text[j])
-                 && (all_text[i+1]==all_text[j+1])
-                 && (all_text[i+2]==all_text[j+2]))
+            if ((test.text[0]==all_text[j])
+                 && (test.text[1]==all_text[j+1])
+                 && (test.text[2]==0 || test.text[2]==all_text[j+2]))
                  {   grandtable[t+test.occurrences]=j;
                      test.occurrences++;
                      if (t+test.occurrences==MAX_GTABLE)
@@ -1255,7 +1259,7 @@ extern void optimise_abbreviations(void)
                 tlbtab[i].occurrences);
     */
 
-    for (i=0; i<64; i++) bestyet2[i].length=0; selected=2;
+    for (i=0; i<64; i++) bestyet2[i].length=0; 
     available=256;
     while ((available>0)&&(selected<64))
     {   printf("Pass %d\n", ++pass_no);
@@ -1302,7 +1306,9 @@ extern void optimise_abbreviations(void)
                 test.text[3]=0;
 
                 for (i=0; i<no_occs; i++)
-                    if (strcmp(test.text,tlbtab[i].text)==0)
+                    if ((test.text[0]==tlbtab[i].text[0])
+                            && (test.text[1]==tlbtab[i].text[1])
+                            && (tlbtab[i].text[2]==0 || test.text[2]==tlbtab[i].text[2]))
                         break;
 
                 for (j=0; j<tlbtab[i].occurrences; j++)
@@ -2081,6 +2087,8 @@ extern void text_allocate_arrays(void)
           "huffman entities");
         hufflist = my_calloc(sizeof(huffentity_t *), MAX_CHARACTER_SET,
           "huffman node list");
+        abbreviations_gl = my_malloc(MAX_ABBREVS*MAX_ABBREV_LENGTH,
+          "abbrev glulx text");
       }
       compressed_offsets = my_calloc(sizeof(int32), MAX_NUM_STATIC_STRINGS,
         "static strings index table");
@@ -2092,6 +2100,7 @@ extern void text_free_arrays(void)
     my_free(&strings_holding_area, "static strings holding area");
     my_free(&low_strings, "low (abbreviation) strings");
     my_free(&abbreviations_at, "abbreviations");
+    my_free(&abbreviations_gl, "abbrev glulx text");
     my_free(&abbrev_values,    "abbrev values");
     my_free(&abbrev_quality,   "abbrev quality");
     my_free(&abbrev_freqs,     "abbrev freqs");
