@@ -1590,7 +1590,7 @@ static void transfer_routine_z(void)
             offset_of_next = new_pc + long_form + 1;
 
             addr = label_offsets[j] - offset_of_next + 2;
-            if (addr<-0x8000 || addr>0x7fff) 
+            if (addr<-0x8000 || addr>0x7fff)
                 fatalerror("Branch out of range: divide the routine up?");
             if (addr<0) addr+=(int32) 0x10000L;
 
