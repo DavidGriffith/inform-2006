@@ -48,11 +48,11 @@ void record_token_string(int token_id, char* text)
     strcpy(cs_next->textvalue,text);
 
     if(cs_oldest==NULL) 
-        cs_oldest=cs_youngest=cs_next; /*first element, so oldest and youngest*/
+        cs_oldest=cs_youngest=cs_next; /* First element, so oldest and youngest */
     else 
     {
-        cs_youngest->child=cs_next; /*point old youngest to new youngest*/
-        cs_youngest=cs_next; /*reset youngest pointer*/
+        cs_youngest->child=cs_next; /* Point old youngest to new youngest */
+        cs_youngest=cs_next; /* Reset youngest pointer */
     }
 }
 char* retrieve_token_string(int token_id){
@@ -165,7 +165,7 @@ extern int parse_given_directive(void)
         if (!((token_type == SEP_TT) && (token_value == SETEQUALS_SEP)))
             put_token_back();
 
-        /*save off the untranslated string value here; we may need these during compilation (particularly #include directives)*/
+        /* Save off the untranslated string value here; we may need these during compilation (particularly #include directives) */
         if(token_type==DQ_TT) record_token_string(i,token_text); 
         
         {   assembly_operand AO = parse_expression(CONSTANT_CONTEXT);
@@ -459,13 +459,13 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
 
     case INCLUDE_CODE:
         get_next_token(); 
-        /*check for errors*/
+        /* Check for errors*/
         if (token_type != DQ_TT && token_type != SYMBOL_TT)
         {   ebf_error("filename as constant or in double-quotes", token_text);
             panic_mode_error_recovery(); 
             return FALSE;
         }
-        /*assign value to name (lookuping value of constant if necessary)*/
+        /* Assign value to name (lookuping value of constant if necessary)*/
         if (token_type == SYMBOL_TT)
         {   name = retrieve_token_string(token_value);
 			if(name==NULL)
@@ -478,24 +478,24 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         }
         else name = token_text;
         
-        /*more error checks*/
+        /* More error checks*/
         get_next_token();
-        if (!((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))) /*ensure followed by semicolon*/
+        if (!((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))) /* Ensure followed by semicolon*/
             ebf_error("semicolon ';' after Include filename", token_text);
 
-        if(strlen(name)==0) ebf_error("filename is empty", token_text);/*ensure not empty*/
+        if(strlen(name)==0) ebf_error("filename is empty", token_text);/* Ensure not empty*/
         
-        if (strcmp(name, "language__") == 0) /* one special case */
+        if (strcmp(name, "language__") == 0) /* One special case */
             load_sourcefile(Language_Name, 0, 0);
         else 
-        {    /*detect include options, and separate from filename */
+        {    /* Detect include options, and separate from filename */
             int suppress_warning=0, local_dir_only=0, offset=0;
             char c0=name[0], c1=name[1];
             if (c0 == '>' || c1 == '>') local_dir_only=1; 
             if (c0 == '?' || c1 == '?') suppress_warning=1; 
             offset=suppress_warning+local_dir_only;
-            if(offset == 1 && c0 == c1) offset=2; /* handle ">>file.h" or "??file.h" */
-            /*import file*/
+            if(offset == 1 && c0 == c1) offset=2; /* Handle ">>file.h" or "??file.h" */
+            /* Import file*/
             load_sourcefile(name+offset, local_dir_only, suppress_warning);
         }
         return FALSE;
