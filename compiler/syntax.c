@@ -148,7 +148,45 @@ extern int parse_directive(int internal_flag)
         return TRUE;
     }
 
-    return !(parse_given_directive());
+    return (!parse_given_directive());
+}
+
+extern void get_next_token_not_directive(void)
+{
+    int s1 = directives.enabled;
+    int s2 = segment_markers.enabled;
+    int s3 = statements.enabled;
+    int not_directive = FALSE;
+
+    while (TRUE)
+    {
+        get_next_token();
+        if ((token_type != SEP_TT) || (token_value != HASH_SEP) || not_directive)
+            return;
+        directives.enabled = TRUE;
+        segment_markers.enabled = FALSE;
+        statements.enabled = FALSE;
+        conditions.enabled = FALSE;
+        local_variables.enabled = FALSE;
+        system_functions.enabled = FALSE;
+
+        get_next_token();
+
+        if (token_type == DIRECTIVE_TT)
+            parse_given_directive();
+        else
+        {
+            put_token_back(); put_token_back(); put_token_back();
+            not_directive = TRUE;
+        }
+        directive_keywords.enabled = FALSE;
+        directives.enabled = s1;
+        segment_markers.enabled = s2;
+        statements.enabled = 
+            conditions.enabled = 
+            local_variables.enabled = 
+            system_functions.enabled = s3;
+    }
 }
 
 static int switch_sign(void)
