@@ -35,32 +35,30 @@ Class   CompassDirection
 Object Compass "compass" has concealed;
 
 #Ifndef WITHOUT_DIRECTIONS;
-CompassDirection -> n_obj "north"
-                    with door_dir n_to, name 'n//' 'north';
-CompassDirection -> s_obj "south"
-                    with door_dir s_to, name 's//' 'south';
-CompassDirection -> e_obj "east"
-                    with door_dir e_to, name 'e//' 'east';
-CompassDirection -> w_obj "west"
-                    with door_dir w_to, name 'w//' 'west';
-CompassDirection -> ne_obj "northeast"
-                    with door_dir ne_to, name 'ne' 'northeast';
-CompassDirection -> nw_obj "northwest"
-                    with door_dir nw_to, name 'nw' 'northwest';
-CompassDirection -> se_obj "southeast"
-                    with door_dir se_to, name 'se' 'southeast';
-CompassDirection -> sw_obj "southwest"
-                    with door_dir sw_to, name 'sw' 'southwest';
-CompassDirection -> u_obj "up above"
-                    with door_dir u_to, name 'u//' 'up' 'ceiling' 'above' 'sky';
-CompassDirection -> d_obj "ground"
-                    with door_dir d_to, name 'd//' 'down' 'floor' 'below' 'ground';
+CompassDirection -> n_obj  with short_name "north",     door_dir n_to,
+                                name 'n//' 'north';
+CompassDirection -> s_obj  with short_name "south",     door_dir s_to,
+                                name 's//' 'south';
+CompassDirection -> e_obj  with short_name "east",      door_dir e_to,
+                                name 'e//' 'east';
+CompassDirection -> w_obj  with short_name "west",      door_dir w_to,
+                                name 'w//' 'west';
+CompassDirection -> ne_obj with short_name "northeast", door_dir ne_to,
+                                name 'ne'  'northeast';
+CompassDirection -> nw_obj with short_name "northwest", door_dir nw_to,
+                                name 'nw'  'northwest';
+CompassDirection -> se_obj with short_name "southeast", door_dir se_to,
+                                name 'se'  'southeast';
+CompassDirection -> sw_obj with short_name "southwest", door_dir sw_to,
+                                name 'sw'  'southwest';
+CompassDirection -> u_obj  with short_name "up above",  door_dir u_to,
+                                name 'u//' 'up' 'ceiling' 'above' 'sky';
+CompassDirection -> d_obj  with short_name "ground",    door_dir d_to,
+                                name 'd//' 'down' 'floor' 'below' 'ground';
 #endif; ! WITHOUT_DIRECTIONS
 
-CompassDirection -> in_obj "inside"
-                    with door_dir in_to, name 'in' 'inside';
-CompassDirection -> out_obj "outside"
-                    with door_dir out_to, name 'out' 'outside';
+CompassDirection -> in_obj  with short_name "inside",  door_dir in_to;
+CompassDirection -> out_obj with short_name "outside", door_dir out_to;
 
 ! ------------------------------------------------------------------------------
 !   Part II.   Vocabulary
@@ -284,10 +282,43 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
     rtrue;
 ];
 
-! ----------------------------------------------------------------------------
+#Ifdef TARGET_ZCODE;
+
+[ LowerCase c;    ! for ZSCII matching ISO 8859-1
+   switch (c) {
+     'A' to 'Z':                            c = c + 32;
+     202, 204, 212, 214, 221:               c--;
+     217, 218:                              c = c - 2;
+     158 to 160, 167 to 168, 208 to 210:    c = c - 3;
+     186 to 190, 196 to 200:                c = c - 5;
+     175 to 180:                            c = c - 6;
+   }
+   return c;
+];
+
+[ UpperCase c;    ! for ZSCII matching ISO 8859-1
+   switch (c) {
+     'a' to 'z':                            c = c - 32;
+     201, 203, 211, 213, 220:               c++;
+     215, 216:                              c = c + 2;
+     155 to 157, 164 to 165, 205 to 207:    c = c + 3;
+     181 to 185, 191 to 195:                c = c + 5;
+     169 to 174:                            c = c + 6;
+   }
+   return c;
+];
+
+#Ifnot; ! TARGET_GLULX
+
+[ LowerCase c; return glk($00A0, c); ];
+[ UpperCase c; return glk($00A1, c); ];
+
+#Endif; ! TARGET_
+
+! ------------------------------------------------------------------------------
 !  LanguageVerbIsDebugging is called by SearchScope.  It should return true
 !  if word w is a debugging verb which needs all objects to be in scope.
-! ----------------------------------------------------------------------------
+! ------------------------------------------------------------------------------
 
 #Ifdef DEBUG;
 [ LanguageVerbIsDebugging w;
@@ -298,13 +329,13 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
 ];
 #Endif;
 
-! ----------------------------------------------------------------------------
+! ------------------------------------------------------------------------------
 !  LanguageVerbLikesAdverb is called by PrintCommand when printing an UPTO_PE
 !  error or an inference message.  Words which are intransitive verbs, i.e.,
 !  which require a direction name as an adverb ('walk west'), not a noun
 !  ('I only understood you as far as wanting to touch /the/ ground'), should
 !  cause the routine to return true.
-! ----------------------------------------------------------------------------
+! ------------------------------------------------------------------------------
 
 [ LanguageVerbLikesAdverb w;
     if (w == 'look' or 'go' or 'push' or 'walk')
@@ -312,14 +343,13 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
     rfalse;
 ];
 
-! ----------------------------------------------------------------------------
-!  LanguageVerbMayBeName is called by NounDomain when dealing with the
-!  player's reply to a "Which do you mean, the short stick or the long
-!  stick?" prompt from the parser. If the reply is another verb (for example,
-!  LOOK) then then previous ambiguous command is discarded /unless/
-!  it is one of these words which could be both a verb /and/ an
-!  adjective in a 'name' property.
-! ----------------------------------------------------------------------------
+! ------------------------------------------------------------------------------
+!  LanguageVerbMayBeName is called by NounDomain when dealing with the player's
+!  reply to a "Which do you mean, the short stick or the long stick?" prompt
+!  from the parser. If the reply is another verb (for example, LOOK) then
+!  previous ambiguous command is discarded /unless/ it is one of these words
+!  which could be both a verb /and/ an adjective in a 'name' property.
+! ------------------------------------------------------------------------------
 
 [ LanguageVerbMayBeName w;
     if (w == 'long' or 'short' or 'normal'
@@ -411,7 +441,7 @@ Constant COMMA__TX      = ", ";
     print "That's";
 ];
 
-[ LanguageLM n x1;
+[ LanguageLM n x1 x2;
   Answer,Ask:
             "There is no reply.";
 ! Ask:      see Answer
@@ -424,6 +454,7 @@ Constant COMMA__TX      = ", ";
         1:  print_ret (ctheyreorthats) x1, " not something you can close.";
         2:  print_ret (ctheyreorthats) x1, " already closed.";
         3:  "You close ", (the) x1, ".";
+        4:  "(first closing ", (the) x1, ")";
     }
   CommandsOff: switch (n) {
         1: "[Command recording off.]";
@@ -512,6 +543,9 @@ Constant COMMA__TX      = ", ";
         4:  print "But you aren't ";
             if (x1 has supporter) print "on "; else print "in ";
             print_ret (the) x1, ".";
+        5:  print "(first getting ";
+            if (x1 has supporter) print "off "; else print "out of ";
+            print_ret (the) x1, ")";
     }
   Fill:     "But there's no water here to carry.";
   FullScore: switch (n) {
@@ -550,7 +584,10 @@ Constant COMMA__TX      = ", ";
         6:  "(first taking ", (itorthem) x1, " off)^";
         7:  "There is no more room in ", (the) x1, ".";
         8:  "Done.";
-        9:  "You put ", (the) x1, " into ", (the) second, ".";
+        9:  "You put ", (the) x1, " into ", (the) x2, ".";
+        10: print (The) x1, " is too big to fit ";
+            if (x2 has supporter) print "on "; else print "in ";
+            print_ret (the) x2, ".";
     }
   Inv: switch (n) {
         1:  "You are carrying nothing.";
@@ -587,11 +624,17 @@ Constant COMMA__TX      = ", ";
         21: print " (in ";
         22: print ", inside ";
     }
-  LMode1:   " is now in its normal ~brief~ printing mode, which gives long descriptions
+  LMode1:   print " is now in its ";
+            if (initial_lookmode == 1) print "normal ";
+            "~brief~ printing mode, which gives long descriptions
              of places never before visited and short descriptions otherwise.";
-  LMode2:   " is now in its ~verbose~ mode, which always gives long descriptions
+  LMode2:   print " is now in its ";
+            if (initial_lookmode ~= 1 or 3) print "normal ";
+            "~verbose~ mode, which always gives long descriptions
              of locations (even if you've been there before).";
-  LMode3:   " is now in its ~superbrief~ mode, which always gives short descriptions
+  LMode3:   print " is now in its ";
+            if (initial_lookmode == 3) print "normal ";
+            "~superbrief~ mode, which always gives short descriptions
              of locations (even if you haven't been there before).";
   Lock: switch (n) {
         1:  if (x1 has pluralname) print "They don't "; else print "That doesn't ";
@@ -666,7 +709,7 @@ Constant COMMA__TX      = ", ";
         23: "You seem to want to talk to someone, but I can't see whom.";
         24: "You can't talk to ", (the) x1, ".";
         25: "To talk to someone, try ~someone, hello~ or some such.";
-        26: "(first taking ", (the) not_holding, ")";
+        26: "(first taking ", (the) x1, ")";
         27: "I didn't understand that sentence.";
         28: print "I only understood you as far as wanting to ";
         29: "I didn't understand that number.";
@@ -675,7 +718,7 @@ Constant COMMA__TX      = ", ";
         32: "You aren't holding that!";
         33: "You can't use multiple objects with that verb.";
         34: "You can only use multiple objects once on a line.";
-        35: "I'm not sure what ~", (address) pronoun_word, "~ refers to.";
+        35: "I'm not sure what ~", (address) x1, "~ refers to.";
         36: "You excepted something not included anyway!";
         37: "You can only do that to something animate.";
             #Ifdef DIALECT_US;
@@ -684,8 +727,7 @@ Constant COMMA__TX      = ", ";
         38: "That's not a verb I recognise.";
             #Endif;
         39: "That's not something you need to refer to in the course of this game.";
-        40: "You can't see ~", (address) pronoun_word, "~ (", (the) pronoun_obj,
-            ") at the moment.";
+        40: "You can't see ~", (address) x1, "~ (", (the) x2, ") at the moment.";
         41: "I didn't understand the way that finished.";
         42: if (x1 == 0) print "None"; else print "Only ", (number) x1;
             print " of those ";
@@ -697,10 +739,10 @@ Constant COMMA__TX      = ", ";
         46: print "Which do you mean, ";
         47: "Sorry, you can only have one item here. Which exactly?";
         48: print "Whom do you want";
-            if (actor ~= player) print " ", (the) actor;
+            if (x1 ~= player) print " ", (the) x1;
             print " to "; PrintCommand(); print "?^";
         49: print "What do you want";
-            if (actor ~= player) print " ", (the) actor;
+            if (x1 ~= player) print " ", (the) x1;
             print " to "; PrintCommand(); print "?^";
         50: print "Your score has just gone ";
             if (x1 > 0) print "up"; else { x1 = -x1; print "down"; }
@@ -713,6 +755,9 @@ Constant COMMA__TX      = ", ";
         55: "[Comment NOT recorded.]";
         56: print ".^";
         57: print "?^";
+        58: print "(first taking ", (the) x1;
+            if (x2 has supporter) print " off "; else print " out of ";
+            print_ret (the) x2, ")";
     }
   No,Yes:   "That was a rhetorical question.";
   NotifyOff:
@@ -739,6 +784,8 @@ Constant COMMA__TX      = ", ";
             if (WriteListFrom(child(x1), ENGLISH_BIT+TERSE_BIT+CONCEAL_BIT) == 0) "nothing.";
             ".";
         5:  "You open ", (the) x1, ".";
+        6:  "(first opening ", (the) x1, ")";
+        7:  "(first unlocking and opening ", (the) x1, ")";
     }
   Order:    print (The) x1;
             if (x1 has pluralname) print " have"; else print " has";
@@ -778,7 +825,7 @@ Constant COMMA__TX      = ", ";
         5:  "(first taking ", (itorthem) x1, " off)^";
         6:  "There is no more room on ", (the) x1, ".";
         7:  "Done.";
-        8:  "You put ", (the) x1, " on ", (the) second, ".";
+        8:  "You put ", (the) x1, " on ", (the) x2, ".";
     }
   Quit: switch (n) {
         1:  print "Please answer yes or no.";
@@ -885,7 +932,7 @@ Constant COMMA__TX      = ", ";
         11: if (x1 has pluralname) print "They're "; else print "That's ";
             "fixed in place.";
         12: "You're carrying too many things already.";
-        13: "(putting ", (the) x1, " into ", (the) SACK_OBJECT, " to make room)";
+        13: "(putting ", (the) x1, " into ", (the) x2, " to make room)";
     }
   Taste:    "You taste nothing unexpected.";
   Tell: switch (n) {
@@ -911,6 +958,7 @@ Constant COMMA__TX      = ", ";
         3:  if (x1 has pluralname) print "Those don't "; else print "That doesn't ";
             "seem to fit the lock.";
         4:  "You unlock ", (the) x1, ".";
+        5:  "(first unlocking ", (the) x1, ")";
     }
   VagueGo:  "You'll have to say which compass direction to go in.";
   Verify: switch (n) {

@@ -15,10 +15,14 @@ System_file;
 
 ! ------------------------------------------------------------------------------
 
-Constant LibSerial       "040227";
+Constant LibSerial       "040506";
 Constant LibRelease      "6/12";
 Constant LIBRARY_VERSION  612;
 Constant Grammar__Version 2;
+
+#Ifdef MASTER_INCLUDE;
+Include MASTER_INCLUDE;             ! inclusions BEFORE Parser.h
+#Endif;
 
 Default COMMENT_CHARACTER '*';
 
@@ -27,9 +31,7 @@ Default DEBUG 0;
 #Endif; ! INFIX
 
 #Ifndef WORDSIZE;                   ! compiling with Z-code only compiler
-#Ifndef TARGET_ZCODE;
-Constant TARGET_ZCODE;
-#Endif;
+Default TARGET_ZCODE 0;
 Constant WORDSIZE 2;
 #Endif; ! WORDSIZE
 
@@ -105,6 +107,7 @@ Fake_Action ListMiscellany;
 Fake_Action Miscellany;
 Fake_Action Prompt;
 Fake_Action NotUnderstood;
+Fake_Action GoneFrom;
 
 #Ifdef NO_PLACES;
 Fake_Action Places;
@@ -125,7 +128,10 @@ Include "parserm";
 
 ! ==============================================================================
 
-Constant LIBRARY_PARSER;        ! for dependency checking
+Constant LIBRARY_PARSER;            ! for dependency checking
+
+#Ifdef MASTER_INCLUDE;
+Include MASTER_INCLUDE;             ! inclusions BETWEEN Parser and VerbLib
+#Endif;
 
 ! ==============================================================================
-
