@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   ENGLISH:  Language Definition File
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040101
+!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -51,9 +51,9 @@ CompassDirection -> se_obj "southeast"
                     with door_dir se_to, name 'se' 'southeast';
 CompassDirection -> sw_obj "southwest"
                     with door_dir sw_to, name 'sw' 'southwest';
-CompassDirection -> u_obj "above"
+CompassDirection -> u_obj "up above"
                     with door_dir u_to, name 'u//' 'up' 'ceiling' 'above' 'sky';
-CompassDirection -> d_obj "below"
+CompassDirection -> d_obj "ground"
                     with door_dir d_to, name 'd//' 'down' 'floor' 'below' 'ground';
 #endif; ! WITHOUT_DIRECTIONS
 
@@ -282,6 +282,28 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
       default: rfalse;
     }
     rtrue;
+];
+
+#Ifdef DEBUG;
+[ LanguageVerbIsDebugging w;
+    if (w == 'purloin' or 'tree' or 'abstract'
+                       or 'gonear' or 'scope' or 'showobj')
+        rtrue;
+    rfalse;
+];
+#Endif;
+
+[ LanguageVerbLikesAdverb w;
+    if (w == 'look' or 'go' or 'push' or 'walk')
+        rtrue;
+    rfalse;
+];
+
+[ LanguageVerbMayBeName w;
+    if (w == 'long' or 'short' or 'normal'
+                    or 'brief' or 'full' or 'verbose')
+        rtrue;
+    rfalse;
 ];
 
 Constant NKEY__TX       = "N = next subject";
