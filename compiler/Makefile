@@ -16,9 +16,6 @@ inform: $(SOURCE)
 clean:
 	rm -f *.o
 
-get:
-	cvs checkout inform
-
 getftp:
 	wget --timestamping --recursive --passive-ftp ftp://inform63:makers@plover.net/public_html
 
