@@ -1449,11 +1449,12 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
         "addr tb endmem;\
            if (addr<36) rfalse;\
            @getmemsize endmem;\
-           if (Unsigned__Compare(addr, endmem) >= 0) rfalse;\
+           @jgeu addr endmem?outrange;\
            tb=addr->0;\
            if (tb >= $E0) return 3;\
            if (tb >= $C0) return 2;\
            if (tb >= $70 && tb <= $7F && addr >= (0-->2)) return 1;\
+           .outrange;\
            rfalse;\
          ]", "", "", "", "", ""
     },
@@ -1496,6 +1497,7 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
         */
         "CP__Tab",
         "obj id otab max res;\
+           if (Z__Region(obj)~=1) {RT__Err(23, obj); rfalse;}\
            otab = obj-->4;\
            if (otab == 0) return 0;\
            max = otab-->0;\
@@ -2067,6 +2069,7 @@ static void mark_as_needed_g(int code)
             case Z__Region_VR:
                 mark_as_needed_g(Unsigned__Compare_VR);
                 return;
+            case CP__Tab_VR:
             case Metaclass_VR:
                 mark_as_needed_g(Z__Region_VR);
                 return;
