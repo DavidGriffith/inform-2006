@@ -837,7 +837,11 @@ static void reached_new_line(void)
 }
 
 static void new_syntax_line(void)
-{   if (source_to_analyse != NULL) forerrors_pointer = 0;
+{   if (source_to_analyse != NULL) {
+        forerrors_pointer = 1;
+        forerrors_buff[0] = current;
+        CurrentLB->source_line++;
+    }
     report_errors_at_current_line();
 }
 
@@ -1008,7 +1012,7 @@ static int get_next_char_from_string(void)
     CurrentLB->chars_read++;
     if (forerrors_pointer < 511)
         forerrors_buff[forerrors_pointer++] = current;
-    if (current == '\n') reached_new_line();
+
     return(current);
 }
 
