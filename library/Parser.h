@@ -15,10 +15,10 @@ System_file;
 
 ! ------------------------------------------------------------------------------
 
-Constant LibSerial  = "140101";
-Constant LibRelease = "6/11 second beta";
-
-Constant Grammar__Version = 2;
+Constant LibSerial       "140101";
+Constant LibRelease      "6/11 second beta";
+Constant LIBRARY_VERSION  611;
+Constant Grammar__Version 2;
 
 Default COMMENT_CHARACTER '*';
 
