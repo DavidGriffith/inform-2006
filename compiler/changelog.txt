@@ -1,3 +1,9 @@
+031221 change max path length to 512 on Linux (pathlen.patch) (CK)
+031221 removed all MSVC level 2 warnings (banewarn.patch) (CK)
+031221 added OS X header section (baneosx.patch) (CK)
+031221 fixed crashes in short name>255 and div constant folding (CK)
+031221 removed property errors for equalities and function calls (CK)
+031221 restricted array warnings to non-systemfiles (CK)
 031214 made MAX_SOURCE_FILES a dynamic memory setting (AP)
 031207 uploaded matching C62127.patch and fclose.patch (CK)
 031207 applied tidying.patch to remove unused code and

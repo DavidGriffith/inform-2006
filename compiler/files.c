@@ -40,7 +40,7 @@ static int filename_storage_left;
 /* ------------------------------------------------------------------------- */
 
 FILE *Temp1_fp=NULL, *Temp2_fp=NULL,  *Temp3_fp=NULL;
-char Temp1_Name[128], Temp2_Name[128], Temp3_Name[128];
+char Temp1_Name[PATHLEN], Temp2_Name[PATHLEN], Temp3_Name[PATHLEN];
 
 /* ------------------------------------------------------------------------- */
 /*   Opening and closing source code files                                   */
@@ -51,7 +51,7 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag)
     /*  Meaning: open a new file of Inform source.  (The lexer picks up on
         this by noticing that input_file has increased.)                     */
 
-    char name[128]; int x = 0; FILE *handle;
+    char name[PATHLEN]; int x = 0; FILE *handle;
 
     if (input_file == MAX_SOURCE_FILES)
         memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);
@@ -62,7 +62,7 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag)
         handle = fopen(name,"r");
     } while ((handle == NULL) && (x != 0));
 
-    if (filename_storage_left <= strlen(name))
+    if (filename_storage_left <= (int)strlen(name))
         memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);
 
     filename_storage_left -= strlen(name)+1;
@@ -260,7 +260,7 @@ static void output_compression(int entnum, int32 *size)
 }
 
 static void output_file_z(void)
-{   FILE *fin; char new_name[128];
+{   FILE *fin; char new_name[PATHLEN];
     int32 length, blanks=0, size, i, j;
 
     ASSERT_ZCODE();
@@ -458,7 +458,7 @@ static void output_file_z(void)
     }
 
 #ifdef ARCHIMEDES
-    {   char settype_command[128];
+    {   char settype_command[PATHLEN];
         sprintf(settype_command, "settype %s %s",
             new_name, riscos_file_type());
         system(settype_command);
@@ -473,8 +473,8 @@ static void output_file_z(void)
 }
 
 static void output_file_g(void)
-{   FILE *fin; char new_name[128];
-    int32 length, blanks=0, size, i, j;
+{   FILE *fin; char new_name[PATHLEN];
+    int32 size, i, j;
 
     ASSERT_GLULX();
 
@@ -861,7 +861,7 @@ static void output_file_g(void)
     fclose(sf_handle);
 
 #ifdef ARCHIMEDES
-    {   char settype_command[128];
+    {   char settype_command[PATHLEN];
         sprintf(settype_command, "settype %s %s",
             new_name, riscos_file_type());
         system(settype_command);
@@ -930,7 +930,7 @@ extern void close_transcript_file(void)
     transcript_open = FALSE;
 
 #ifdef ARCHIMEDES
-    {   char settype_command[128];
+    {   char settype_command[PATHLEN];
         sprintf(settype_command, "settype %s text",
             Transcript_Name);
         system(settype_command);
