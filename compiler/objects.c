@@ -557,7 +557,7 @@ static void property_inheritance_g(void)
       On exit, full_object contains the final state of the properties to
       be written. */
 
-  int i, j, k, kmax, class, num_props,
+  int i, j, k, class, num_props,
     prop_number, prop_length, prop_flags, prop_in_current_defn;
   int32 mark, prop_addr;
   uchar *cpb, *pe;
