@@ -437,7 +437,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
         if (c_style & ENGLISH_BIT ~= 0) {
             if (senc == 1) print (string) AND__TX;
-            if (senc > 1) print ", ";
+            if (senc > 1) print (string) COMMA__TX;
         }
      .Omit_FL2;
     }
@@ -526,7 +526,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
         if (c_style & ENGLISH_BIT ~= 0) {
             if (i == senc-1) print (string) AND__TX;
-            if (i < senc-1) print ", ";
+            if (i < senc-1) print (string) COMMA__TX;
         }
 
   .Omit_FL;
@@ -544,7 +544,7 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
         if (flag) {
             if (c_style & ENGLISH_BIT) {
                 if (sentencepos == -1) print (string) AND__TX;
-                if (sentencepos <  -1) print ", ";
+                if (sentencepos <  -1) print (string) COMMA__TX;
             }
             if (c_style & NEWLINE_BIT) new_line;
         }
@@ -1222,13 +1222,13 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 [ NotifyOffSub; notify_mode = 0; L__M(##NotifyOff); ];
 
 [ Places1Sub i j k;
-    L__M(##Places);
+    L__M(##Places, 1);
     objectloop (i has visited) j++;
     objectloop (i has visited) {
         print (name) i; k++;
-        if (k == j) ".";
+        if (k == j) { L__M(##Places, 2); return;}
         if (k == j-1) print (string) AND__TX;
-        else          print ", ";
+        else          print (string) COMMA__TX;
     }
 ];
 
@@ -1336,10 +1336,10 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     if (inventory_style == 0) return InvTallSub();
 
     L__M(##Inv, 2);
-    if (inventory_style & NEWLINE_BIT ~= 0) print ":^"; else print " ";
+    if (inventory_style & NEWLINE_BIT ~= 0) L__M(##Inv, 3); else print " ";
 
     WriteListFrom(child(player), inventory_style, 1);
-    if (inventory_style & ENGLISH_BIT ~= 0) print ".^";
+    if (inventory_style & ENGLISH_BIT ~= 0) L__M(##Inv, 4);
 
     #Ifndef MANUAL_PRONOUNS;
     objectloop (x in player) PronounNotice(x);
@@ -1347,7 +1347,6 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
     x = 0; ! To prevent a "not used" error
     AfterRoutines();
 ];
-
 ! ----------------------------------------------------------------------------
 !   The object tree and determining the possibility of moves
 ! ----------------------------------------------------------------------------

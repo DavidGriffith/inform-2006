@@ -317,6 +317,8 @@ Constant ARE2__TX       = "are ";
 Constant AND__TX        = " and ";
 Constant WHOM__TX       = "whom ";
 Constant WHICH__TX      = "which ";
+Constant COMMA__TX      = ", ";
+
 
 [ ThatorThose obj;      ! Used in the accusative
     if (obj == player)            { print "you"; return; }
@@ -509,6 +511,8 @@ Constant WHICH__TX      = "which ";
   Inv: switch (n) {
         1:  "You are carrying nothing.";
         2:  print "You are carrying";
+        3:  print ":^";
+        4:  print ".^";
     }
   Jump:     "You jump on the spot, fruitlessly.";
   JumpOver,Tie:
@@ -663,6 +667,8 @@ Constant WHICH__TX      = "which ";
         53: "^[Please press SPACE.]";
         54: "[Comment recorded.]";
         55: "[Comment NOT recorded.]";
+        56: print ".^";
+        57: print "?^";
     }
   No,Yes:   "That was a rhetorical question.";
   NotifyOff:
@@ -693,7 +699,10 @@ Constant WHICH__TX      = "which ";
   Order:    print (The) x1;
             if (x1 has pluralname) print " have"; else print " has";
             " better things to do.";
-  Places:   print "You have visited: ";
+Places: switch (n) {   
+        1: print "You have visited: ";
+        2: print ".^";
+    }
   Pray:     "Nothing practical results from your prayer.";
   Prompt:   print "^>";
   Pronouns: switch (n) {
@@ -701,6 +710,7 @@ Constant WHICH__TX      = "which ";
         2:  print "means ";
         3:  print "is unset";
         4:  "no pronouns are known to the game.";
+        5:  ".";
     }
   Pull,Push,Turn: switch (n) {
         1:  if (x1 has pluralname) print "Those are "; else print "It is ";
