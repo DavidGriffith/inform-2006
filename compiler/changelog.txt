@@ -1,3 +1,4 @@
+031229 removed 2 lines in expressc that warned on obj.prop->i (CK)
 031221 change max path length to 512 on Linux (pathlen.patch) (CK)
 031221 removed all MSVC level 2 warnings (banewarn.patch) (CK)
 031221 added OS X header section (baneosx.patch) (CK)

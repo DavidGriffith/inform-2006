@@ -1686,8 +1686,6 @@ static void generate_code_from(int n, int void_flag)
                  assemblez_2_to(get_prop_addr_zc, AO,
                      ET[ET[below].right].value, temp_var1);
                  if (!void_flag) write_result_z(Result, temp_var1);
-                 if ((above != -1) && (ET[above].operator_number == ARROW_OP))
-                     warning("Byte entry operator '->' used on word common property data");
              }
              break;
 
