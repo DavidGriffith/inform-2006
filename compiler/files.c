@@ -69,12 +69,6 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag)
     strcpy(filename_storage_p, name);
     InputFiles[input_file].filename = filename_storage_p;
 
-    for (x=0; x < input_file; x++)
-    {   if (!strcmp(InputFiles[x].filename, InputFiles[input_file].filename))
-            warning_named("Module included more than once",
-                        InputFiles[x].filename);
-    }
-
     filename_storage_p += strlen(name)+1;
 
     if (debugfile_switch)
