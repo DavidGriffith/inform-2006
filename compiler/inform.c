@@ -811,7 +811,7 @@ Inform translates plain filenames (such as \"xyzzy\") into full pathnames\n\
       debugging_name   (data written by -k switch): now \"%s\"\n\
       language_name    (library file defining natural language of game):\n\
                        now \"%s\"\n\
-      charset_map      (file for character set mapping): now \"%s\"\n\n\
+      charset_map      (file for character set mapping): now \"%s\"\n\
       translation_name (compiler and veneer messages): now \"%s\"\n\n",
     Transcript_Name, Debugging_Name, Language_Name, Charset_Map, Translation_Name);
 
