@@ -298,25 +298,12 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         flag = FALSE;
 
       DefCondition:
-        get_next_token();
-        if (token_type != SYMBOL_TT)
-        {   ebf_error("symbol name", token_text);
-            break;
-        }
-
-        if ((token_text[0] == 'V')
-            && (token_text[1] == 'N')
-            && (token_text[2] == '_')
-            && (strlen(token_text)==7))
-        {   i = atoi(token_text+3);
-            if (VNUMBER < i) flag = (flag)?FALSE:TRUE;
-            goto HashIfCondition;
-        }
-
-        if (sflags[token_value] & UNKNOWN_SFLAG) flag = (flag)?FALSE:TRUE;
-        else sflags[token_value] |= USED_SFLAG;
+        {
+        assembly_operand AO;
+        AO = parse_expression(IFDEF_CONTEXT);
+        if (AO.value == 0) flag = !flag;
         goto HashIfCondition;
-
+        }
     case IFNOT_CODE:
         if (ifdef_sp == 0)
             error("'Ifnot' without matching 'If...'");
@@ -324,10 +311,12 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         if (!(ifdef_stack[ifdef_sp-1]))
             error("Second 'Ifnot' for the same 'If...' condition");
         else
-        {   dont_enter_into_symbol_table = -2; n = 1;
+        {   n = 1;
             directives.enabled = TRUE;
             do
-            {   get_next_token();
+            {   dont_enter_into_symbol_table = -2;
+                get_next_token();
+                dont_enter_into_symbol_table = FALSE;
                 if (token_type == EOF_TT)
                 {   error("End of file reached in code 'If...'d out");
                     directives.enabled = FALSE;
@@ -354,17 +343,18 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
                 }
             } while (n > 0);
             ifdef_sp--;
-            dont_enter_into_symbol_table = FALSE;
             directives.enabled = FALSE;
         }
         break;
 
     case IFV3_CODE:
         flag = FALSE; if (version_number == 3) flag = TRUE;
+        obsolete_warning("use #iftrue (#version_number==3)");
         goto HashIfCondition;
 
     case IFV5_CODE:
         flag = TRUE; if (version_number == 3) flag = FALSE;
+        obsolete_warning("use #iffalse (#version_number==3)");
         goto HashIfCondition;
 
     case IFTRUE_CODE:
@@ -399,10 +389,12 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         if (flag)
         {   ifdef_stack[ifdef_sp++] = TRUE; return FALSE; }
         else
-        {   dont_enter_into_symbol_table = -2; n = 1;
+        {   n = 1;
             directives.enabled = TRUE;
             do
-            {   get_next_token();
+            {   dont_enter_into_symbol_table = -2;
+                get_next_token();
+                dont_enter_into_symbol_table = FALSE;
                 if (token_type == EOF_TT)
                 {   error("End of file reached in code 'If...'d out");
                     directives.enabled = FALSE;
@@ -429,7 +421,6 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
                 }
             } while (n > 0);
             directives.enabled = FALSE;
-            dont_enter_into_symbol_table = FALSE;
         }
         break;
 
