@@ -328,6 +328,13 @@ static void register_verb(char *English_verb, int number)
     English_verb_list_top += English_verb_list_top[0];
 }
 
+static int token_quoted(void)
+{
+    if (incompatibility_switch && (token_type == DQ_TT))
+        ebf_error("single-quoted string", "double-quoted string");
+    return ((token_type == DQ_TT) || (token_type == SQ_TT));
+}
+
 static int get_verb(void)
 {
     /*  Look at the last-read token: if it's the name of an English verb
@@ -336,7 +343,7 @@ static int get_verb(void)
 
     int j;
 
-    if ((token_type == DQ_TT) || (token_type == SQ_TT))
+    if (token_quoted())
     {   j = find_or_renumber_verb(token_text, NULL);
         if (j==-1)
             error_named("There is no previous grammar for the verb",
@@ -452,7 +459,7 @@ into Inform, so suggest rewriting grammar using general parsing routines");
         }
         else last_was_slash = FALSE;
 
-        if ((token_type == DQ_TT) || (token_type == SQ_TT))
+        if (token_quoted())
         {    if (grammar_version_number == 1)
                  bytecode = make_adjective(token_text);
              else
@@ -667,7 +674,7 @@ extern void make_verb(void)
         get_next_token();
     }
 
-    while ((token_type == DQ_TT) || (token_type == SQ_TT))
+    while (token_quoted())
     {   English_verbs_given[no_given++] = token_text;
         get_next_token();
     }
@@ -738,7 +745,7 @@ extern void extend_verb(void)
         if (no_Inform_verbs == MAX_VERBS)
             memoryerror("MAX_VERBS", MAX_VERBS);
         while (get_next_token(),
-               ((token_type == DQ_TT) || (token_type == SQ_TT)))
+               token_quoted())
         {   Inform_verb = get_verb();
             if (Inform_verb == -1) return;
             if ((l!=-1) && (Inform_verb!=l))
