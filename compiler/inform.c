@@ -1309,7 +1309,7 @@ extern void switches(char *p, int cmode)
                   {   case '0': s=2; optimise_setting=0; break;
                       case '1': s=2; optimise_setting=1; break;
                       case '2': s=2; optimise_setting=2; break;
-                      default:  optimise_setting=-2*state; break;
+                      default:  optimise_setting=state?2:0; break;
                   }
                   break;
 #ifdef ARCHIMEDES
