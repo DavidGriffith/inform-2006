@@ -18,7 +18,9 @@ int no_routines,                   /* Number of routines compiled so far     */
     no_named_routines,             /* Number not embedded in objects         */
     no_locals,                     /* Number of locals in current routine    */
     no_termcs;                     /* Number of terminating characters       */
+    no_sepcs;                      /* Number of separating characters        */
 int terminating_characters[32];
+uchar separating_characters[32];
 
 int32 routine_starts_line;         /* Source code line on which the current
                                       routine starts.  (Useful for reporting
@@ -28,8 +30,6 @@ int32 routine_starts_line;         /* Source code line on which the current
 static int constant_made_yet;      /* Have any constants been defined yet?   */
 
 static int ifdef_stack[32], ifdef_sp;
-static int *ifdef_file_stack, ifdef_depth;
-
 
 /* ========================================================================= */
 /* Because of the limited use for string constant values during compilation, */
@@ -254,7 +254,6 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
 
     case END_CODE:
         terminate_file();
-        ifdef_sp=ifdef_file_stack[File_sp-1];
         return(FALSE);
 
     case ENDIF_CODE:
@@ -466,13 +465,13 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         /* Assign value to name (lookuping value of constant if necessary)*/
         if (token_type == SYMBOL_TT)
         {   name = retrieve_token_string(token_value);
-            if(name==NULL)
-            {
-                ebf_error("string-type constant", token_text);
-                panic_mode_error_recovery(); 
-                return FALSE;
-            }
-            sflags[token_value] |= USED_SFLAG;
+			if(name==NULL)
+			{
+				ebf_error("string-type constant", token_text);
+				panic_mode_error_recovery(); 
+				return FALSE;
+			}
+			sflags[token_value] |= USED_SFLAG;
         }
         else name = token_text;
         
@@ -496,7 +495,6 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
             /* Import file*/
             load_sourcefile(name+offset, local_dir_only, suppress_warning);
         }
-        ifdef_file_stack[File_sp]=ifdef_sp;
         return FALSE;
 
     /* --------------------------------------------------------------------- */
@@ -1015,8 +1013,22 @@ the first constant definition");
                     }
                     put_token_back();
                     break;
+                case SPECIAL_DK:
+                    if (no_sepcs != -1)
+                        error("No more than one 'Zcharacter special' directive is allowed");
+                    no_sepcs = 0;
+                    get_next_token();
+                    if (token_type == DQ_TT)
+                    {   no_sepcs = strlen(token_text);
+                        if (no_sepcs > 30) no_sepcs = 30;
+                        strncpy((char *)separating_characters, token_text, no_sepcs);
+                    }
+                    else
+                        while (token_type == NUMBER_TT)
+                            separating_characters[no_sepcs++] = token_value;
+                    break;
                 default:
-                    ebf_error("'table', 'terminating', a string or a constant",
+                    ebf_error("'table', 'terminating', 'special', a string or a constant",
                         token_text);
             }
                 break;
@@ -1051,19 +1063,18 @@ extern void directs_begin_pass(void)
     no_named_routines = 0;
     no_locals = 0;
     no_termcs = 0;
+    no_sepcs = -1;
     constant_made_yet = FALSE;
     ifdef_sp = 0;
 }
 
 extern void directs_allocate_arrays(void)
 {
-    ifdef_file_stack = my_calloc(sizeof(int), MAX_INCLUSION_DEPTH+1, "ifdef_file_stack int");
 }
 
 extern void directs_free_arrays(void)
 {
     free_constant_string_list();
-    my_free(ifdef_file_stack, "ifdef_file_stack int");
 }
 
 /* ========================================================================= */
