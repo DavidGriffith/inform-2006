@@ -153,7 +153,7 @@ extern void make_property(void)
         if (no_properties==((version_number==3)?32:64))
         {   if (version_number==3)
                 error("All 30 properties already declared (compile as \
-Advanced game to get an extra 62)");
+Advanced game to get an extra 32)");
             else
                 error("All 62 properties already declared");
             panic_mode_error_recovery(); put_token_back(); return;
@@ -1134,8 +1134,8 @@ static void properties_segment_z(int this_segment)
                 else
                 {   char already_error[128];
                     sprintf(already_error,
-                        "\"%s\" is a name already in use (with type %s) \
-and may not be used as a property name too",
+                        tx("\"%s\" is a name already in use (with type %s) \
+and may not be used as a property name too"),
                         token_text, typename(stypes[token_value]));
                     error(already_error);
                     return;
@@ -1187,8 +1187,8 @@ not 'private':", token_text);
             if (svals[defined_this_segment[i]] == svals[token_value])
             {   char error_b[128];
                 sprintf(error_b,
-                    "Property given twice in the same declaration, because \
-the names '%s' and '%s' actually refer to the same property",
+                    tx("Property given twice in the same declaration, because \
+the names '%s' and '%s' actually refer to the same property"),
                     (char *) symbs[defined_this_segment[i]],
                     (char *) symbs[token_value]);
                 error(error_b);
@@ -1988,7 +1988,7 @@ extern void make_object(int nearby_flag,
 
     if ((token_type == SEP_TT) && (token_value == ARROW_SEP))
     {   if (nearby_flag)
-          error("The syntax '->' is only used as an alternative to 'Nearby'");
+          error("The syntax '->' is only used as a replacement for 'Nearby'");
 
         while ((token_type == SEP_TT) && (token_value == ARROW_SEP))
         {   tree_depth++;
