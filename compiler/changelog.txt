@@ -1,4 +1,12 @@
 031229 removed 2 lines in expressc that warned on obj.prop->i (CK)
+031227 removed unnecessary local variables from assembleg_instruction()
+       in asm.c (DK)
+031227 removed unnecessary argument from write_property_block_g()
+       in objects.c (DK)
+031227 tidied variable declarations in construct_storyfile_g()
+       in tables.c (DK)
+031225 changed the multiple inclusion warning to only occur on
+       recursive inclusion (files.c and lexer.c) (DK)
 031221 change max path length to 512 on Linux (pathlen.patch) (CK)
 031221 removed all MSVC level 2 warnings (banewarn.patch) (CK)
 031221 added OS X header section (baneosx.patch) (CK)
@@ -55,3 +63,4 @@
        C62122 applied.  see inform-comp.patch and fixes-comp.txt. (CK)
 030928 Style statement added to Glulx Inform, glulx-style-patch.txt
 030928 Modified verbs.c for Extend/Verb synonym issue C62126, M Coyne
+
