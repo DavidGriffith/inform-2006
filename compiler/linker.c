@@ -524,8 +524,8 @@ void link_module(char *given_filename)
     if (vn != 64 + version_number)
     {   char ebuff[100];
         sprintf(ebuff,
-           "module compiled as Version %d (so it can't link\
- into this V%d game):", vn-64, version_number);
+           tx("module compiled as Version %d (so it can't link\
+ into this V%d game):"), vn-64, version_number);
         error_named(ebuff, filename);
         fclose(fin); return;
     }

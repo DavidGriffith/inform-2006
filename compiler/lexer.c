@@ -981,7 +981,7 @@ extern void terminate_file(void)
 extern void print_main_line(void)
 {
     if (File_sp>0) 
-        printf (" from line %d", FileStack[0].LB.source_line);
+        printf (tx(" from line %d"), FileStack[0].LB.source_line);
 }
 
 static int get_next_char_from_pipeline(void)
@@ -1254,6 +1254,8 @@ extern void get_next_token(void)
             }   while ((tokeniser_grid[d] != EOF_CODE) && (d!='\"'));
             if (EOF_CODE == tokeniser_grid[d]) ebf_error("'\"'", "end of file");
             *(lex_p-1) = 0;
+            if (veneer_mode)
+                circle[circle_position].text = tx(circle[circle_position].text);
             circle[circle_position].type = DQ_TT;
             circle[circle_position].value = 0;
             break;
@@ -1271,7 +1273,7 @@ extern void get_next_token(void)
             if (n > MAX_IDENTIFIER_LENGTH)
             {   char bad_length[100];
                 sprintf(bad_length,
-                    "Name exceeds the maximum length of %d characters:",
+                    tx("Name exceeds the maximum length of %d characters:"),
                          MAX_IDENTIFIER_LENGTH);
                 error_named(bad_length, circle[circle_position].text);
             }
