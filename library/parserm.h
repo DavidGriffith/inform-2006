@@ -1075,14 +1075,14 @@ Object  InformParser "(Inform Parser)"
     if (w == OOPS1__WD or OOPS2__WD or OOPS3__WD) jump DoOops;
 
     if (a_buffer->WORDSIZE == COMMENT_CHARACTER) {
-        #Ifdef TARGET_ZCODE; 
+        #Ifdef TARGET_ZCODE;
         if ((HDR_GAMEFLAGS-->0) & 1 || xcommsdir)
                                            L__M(##Miscellany, 54);
-        else                               L__M(##Miscellany, 55); 
-        #Ifnot; ! TARGET_GLULX 
-        if (gg_scriptstr || gg_commandstr) L__M(##Miscellany, 54); 
-        else                               L__M(##Miscellany, 55); 
-        #Endif; ! TARGET_ 
+        else                               L__M(##Miscellany, 55);
+        #Ifnot; ! TARGET_GLULX
+        if (gg_scriptstr || gg_commandstr) L__M(##Miscellany, 54);
+        else                               L__M(##Miscellany, 55);
+        #Endif; ! TARGET_
 
         jump FreshInput;
     }
@@ -4470,7 +4470,7 @@ Object  InformLibrary "(Inform Library)"
   with  play [ i j k l;
 
             #Ifdef TARGET_ZCODE;
-            standard_interpreter = $32-->0;
+            standard_interpreter = HDR_TERPSTANDARD-->0;
             transcript_mode = ((HDR_GAMEFLAGS-->0) & 1);
             sys_statusline_flag = ( (HDR_TERPFLAGS->0) & 2 ) / 2;
             #Ifnot; ! TARGET_GLULX
@@ -4730,68 +4730,19 @@ Object  InformLibrary "(Inform Library)"
 
         ], ! end of 'play' property
 
-        end_turn_sequence [ i j;
-
-            turns++;
-            if (the_time ~= NULL) {
-                if (time_rate >= 0) the_time=the_time+time_rate;
-                else {
-                    time_step--;
-                    if (time_step == 0) {
-                        the_time++;
-                        time_step = -time_rate;
-                    }
-                }
-                the_time=the_time % 1440;
-            }
-
-            #Ifdef DEBUG;
-            if (debug_flag & 4 ~= 0) {
-                for (i=0 : i<active_timers : i++) {
-                    j = the_timers-->i;
-                    if (j ~= 0) {
-                        print (name) (j&~WORD_HIGHBIT), ": ";
-                        if (j & WORD_HIGHBIT) print "daemon";
-                        else
-                            print "timer with ", j.time_left, " turns to go";
-                        new_line;
-                    }
-                }
-            }
-            #Endif; ! DEBUG
-
-            for (i=0 : i<active_timers : i++) {
-                if (deadflag) return;
-                j = the_timers-->i;
-                if (j ~= 0) {
-                    if (j & WORD_HIGHBIT) RunRoutines(j&~WORD_HIGHBIT, daemon);
-                    else {
-                        if (j.time_left == 0) {
-                            StopTimer(j);
-                            RunRoutines(j, time_out);
-                        }
-                        else
-                            j.time_left = j.time_left-1;
-                    }
-                }
-            }
+        end_turn_sequence [;
+            AdvanceWorldClock();
             if (deadflag) return;
-
-            scope_reason = EACH_TURN_REASON; verb_word = 0;
-            DoScopeAction(location);
-            SearchScope(ScopeCeiling(player), player, 0);
-            scope_reason=PARSING_REASON;
+            RunTimersAndDaemons();
             if (deadflag) return;
-
+            RunEachTurnProperties();
+            if (deadflag) return;
             TimePasses();
             if (deadflag) return;
-
             AdjustLight();
             if (deadflag) return;
-
             NoteObjectAcquisitions();
-
-        ], ! end of 'end_turn_sequence' property
+        ],
 
         begin_action [ a n s source   sa sn ss;
             sa = action; sn = noun; ss = second;
@@ -4811,6 +4762,61 @@ Object  InformLibrary "(Inform Library)"
             action = sa; noun = sn; second = ss;
         ],
   has   proper;
+
+[ AdvanceWorldClock;
+    turns++;
+    if (the_time ~= NULL) {
+        if (time_rate >= 0) the_time=the_time+time_rate;
+        else {
+            time_step--;
+            if (time_step == 0) {
+                the_time++;
+                time_step = -time_rate;
+            }
+        }
+        the_time = the_time % 1440;
+    }
+];
+
+[ RunTimersAndDaemons i j;
+    #Ifdef DEBUG;
+    if (debug_flag & 4 ~= 0) {
+        for (i=0 : i<active_timers : i++) {
+            j = the_timers-->i;
+            if (j ~= 0) {
+                print (name) (j&~WORD_HIGHBIT), ": ";
+                if (j & WORD_HIGHBIT) print "daemon";
+                else
+                    print "timer with ", j.time_left, " turns to go";
+                new_line;
+            }
+        }
+    }
+    #Endif; ! DEBUG
+
+    for (i=0 : i<active_timers : i++) {
+        if (deadflag) return;
+        j = the_timers-->i;
+        if (j ~= 0) {
+            if (j & WORD_HIGHBIT) RunRoutines(j&~WORD_HIGHBIT, daemon);
+            else {
+                if (j.time_left == 0) {
+                    StopTimer(j);
+                    RunRoutines(j, time_out);
+                }
+                else
+                    j.time_left = j.time_left-1;
+            }
+        }
+    }
+];
+
+[ RunEachTurnProperties;
+    scope_reason = EACH_TURN_REASON; verb_word = 0;
+    DoScopeAction(location);
+    SearchScope(ScopeCeiling(player), player, 0);
+    scope_reason = PARSING_REASON;
+];
 
 #Ifdef TARGET_ZCODE;
 
