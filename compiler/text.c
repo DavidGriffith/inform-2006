@@ -193,7 +193,7 @@ extern void make_abbreviation(char *text)
 
     strcpy((char *)abbreviations_at
             + no_abbreviations*MAX_ABBREV_LENGTH, text);
-    p1 = strings_holding_area;
+    p1 = (char *)strings_holding_area;
 
     is_abbreviation = TRUE;
     abbrev_values[no_abbreviations] = compile_string(text, TRUE, TRUE);
