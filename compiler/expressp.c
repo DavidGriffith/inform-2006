@@ -50,6 +50,7 @@ static token_data current_token, previous_token, heldback_token;
 static void function_call_triggered(void);
 
 static int comma_allowed, arrow_allowed, superclass_allowed,
+           bare_prop_allowed,
            array_init_ambiguity, action_ambiguity,
 
            etoken_count, inserting_token, bracket_level;
@@ -938,29 +939,28 @@ static void emit_token(token_data t)
     }
 
     /* pseudo-typecheck in 6.30 */
-    if ((!veneer_mode) && (!is_systemfile()) )
-        for (i = 1; i <= arity; i++)
-        {
-            o1 = emitter_stack[emitter_sp - i];
-            if (is_property_t(o1.symtype)) {
-                if ((t.value == FCALL_OP) 
-                    && ((emitter_stack[emitter_sp - arity].symflags & INSF_SFLAG) 
-                    || (t.symflags & STAR_SFLAG)) )
-                    continue;  /* call to RunRoutines() etc */
-                switch(t.value) 
-                {
-                /*case SETEQUALS_OP: case OR_OP: */
+    for (i = 1; i <= arity; i++)
+    {
+        o1 = emitter_stack[emitter_sp - i];
+        if (is_property_t(o1.symtype) ) {
+            switch(t.value) 
+            {
+                case FCALL_OP:
+                case SETEQUALS_OP: case NOTEQUAL_OP: 
+                case CONDEQUALS_OP: 
                 case PROVIDES_OP: case NOTPROVIDES_OP:
                 case PROP_ADD_OP: case PROP_NUM_OP:
                 case SUPERCLASS_OP:
                 case MPROP_ADD_OP: case MESSAGE_OP:
                 case PROPERTY_OP:
-                    if (i == 1) break;
+                    if (i < arity) break;
+                case GE_OP: case LE_OP:
+                    if ((i < arity) && (o1.symflags & STAR_SFLAG)) break;
                 default:
                     warning("Property name in expression is not qualified by object");
-                }
-            } /* if (is_property_t */
-        }
+            }
+        } /* if (is_property_t */
+    }
 
     switch(arity)
     {   case 1:
@@ -1007,6 +1007,7 @@ static void emit_token(token_data t)
                     case REMAINDER_OP:
                         if (ov2 == 0)
                           error("Division of constant by zero");
+                        else
                         if (t.value == DIVIDE_OP) {
                           if (ov2 < 0) {
                             ov1 = -ov1;
@@ -1562,6 +1563,9 @@ extern assembly_operand parse_expression(int context)
                                 used for e.g.
                                    <Insert button (random(pocket1, pocket2))>
 
+            RETURN_Q_CONTEXT    like QUANTITY_CONTEXT, but a single property
+                                name does not generate a warning
+
             ASSEMBLY_CONTEXT    a quantity which cannot use the '->' operator
                                 (needed for assembly language to indicate
                                 store destinations)
@@ -1591,12 +1595,14 @@ extern assembly_operand parse_expression(int context)
 
     token_data a, b, pop; int i;
     assembly_operand AO;
+    int bareprop_allowed;
 
     superclass_allowed = (context != FORINIT_CONTEXT);
     if (context == FORINIT_CONTEXT) context = VOID_CONTEXT;
 
     comma_allowed = (context == VOID_CONTEXT);
     arrow_allowed = (context != ASSEMBLY_CONTEXT);
+    bare_prop_allowed = (context == RETURN_Q_CONTEXT);
     array_init_ambiguity = ((context == ARRAY_CONTEXT) ||
         (context == ASSEMBLY_CONTEXT));
 
@@ -1604,6 +1610,7 @@ extern assembly_operand parse_expression(int context)
 
     if (context == ASSEMBLY_CONTEXT) context = QUANTITY_CONTEXT;
     if (context == ACTION_Q_CONTEXT) context = QUANTITY_CONTEXT;
+    if (context == RETURN_Q_CONTEXT) context = QUANTITY_CONTEXT;
     if (context == ARRAY_CONTEXT) context = CONSTANT_CONTEXT;
 
     etoken_count = 0;
@@ -1666,9 +1673,9 @@ extern assembly_operand parse_expression(int context)
                 ET[AO.value].up = -1;
             }
             else {
-                if ((!veneer_mode) && is_property_t(AO.symtype) && (arrow_allowed)
-                      && ((AO.symflags & STAR_SFLAG) == 0)) /* direction properties also used as constants */
-                    warning("Bare property name found. \"obj.prop\" intended?");
+                if ((context != CONSTANT_CONTEXT) && is_property_t(AO.symtype) 
+                    && (arrow_allowed) && (!bare_prop_allowed))
+                    warning("Bare property name found. \"self.prop\" intended?");
             }
 
             check_conditions(AO, context);
