@@ -800,6 +800,8 @@ typedef struct ErrorPosition_s
     char *source;
     int  line_number;
     int  main_flag;
+    char *fakename;
+    int  fake_number;
 } ErrorPosition;
 
 /*  A memory block can hold at most 640K:  */
@@ -1654,7 +1656,7 @@ typedef struct operator_s
 /*   (must correspond to entries in the table in "veneer.c")                 */
 /* ------------------------------------------------------------------------- */
 
-#define VENEER_ROUTINES 48
+#define VENEER_ROUTINES 52
 
 #define Box__Routine_VR    0
 
@@ -1698,17 +1700,21 @@ typedef struct operator_s
 #define RT__ChLDW_VR      36
 #define RT__ChSTB_VR      37
 #define RT__ChSTW_VR      38
-#define RT__ChPrintC_VR   39
-#define RT__ChPrintA_VR   40
-#define RT__ChPrintS_VR   41
-#define RT__ChPrintO_VR   42
+#define RT__ChLDPrB_VR    39
+#define RT__ChLDPrW_VR    40
+#define RT__ChSTPrB_VR    41
+#define RT__ChSTPrW_VR    42
+#define RT__ChPrintC_VR   43
+#define RT__ChPrintA_VR   44
+#define RT__ChPrintS_VR   45
+#define RT__ChPrintO_VR   46
 
 /* Glulx-only veneer routines */
-#define OB__Move_VR       43
-#define OB__Remove_VR     44
-#define Print__Addr_VR    45
-#define Glk__Wrap_VR      46
-#define Dynam__String_VR  47
+#define OB__Move_VR       47
+#define OB__Remove_VR     48
+#define Print__Addr_VR    49
+#define Glk__Wrap_VR      50
+#define Dynam__String_VR  51
 
 /* ------------------------------------------------------------------------- */
 /*   Run-time-error numbers (must correspond with RT__Err code in veneer)    */
@@ -2074,6 +2080,17 @@ extern void assemblez_inc(assembly_operand o1);
 extern void assemblez_dec(assembly_operand o1);
 extern void assemblez_store(assembly_operand o1, assembly_operand o2);
 extern void assemblez_jump(int n);
+extern void assemblez_call_1(assembly_operand o1);
+extern void assemblez_call_1_to(assembly_operand o1, assembly_operand st);
+extern void assemblez_call_2(assembly_operand o1, assembly_operand o2);
+extern void assemblez_call_3(assembly_operand o1, assembly_operand o2, 
+  assembly_operand o3);
+extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2, 
+  assembly_operand o3, assembly_operand st);
+extern void assemblez_call_4(assembly_operand o1, assembly_operand o2, 
+  assembly_operand o3, assembly_operand o4);
+extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2, 
+  assembly_operand o3, assembly_operand o4, assembly_operand st);
 
 extern void assembleg_0(int internal_number);
 extern void assembleg_1(int internal_number, assembly_operand o1);
@@ -2344,6 +2361,7 @@ extern void describe_token(token_data t);
 extern void construct_local_variable_tables(void);
 extern void declare_systemfile(void);
 extern int  is_systemfile(void);
+extern void declare_alternate_source(char *name, int line, int flag);
 extern void report_errors_at_current_line(void);
 extern dbgl get_current_dbgl(void);
 extern dbgl get_error_report_dbgl(void);
