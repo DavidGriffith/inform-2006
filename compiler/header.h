@@ -68,7 +68,7 @@
 /*   out a block of definitions like those below.)                           */
 /* ------------------------------------------------------------------------- */
 
-#define UNIX
+/* #define UNIX */
 
 /* ------------------------------------------------------------------------- */
 /*   The first task is to include the ANSI header files, and typedef         */
@@ -119,7 +119,7 @@
 /*   PROMPT_INPUT        - prompt input (don't use Unix-style command line)  */
 /*   TIME_UNAVAILABLE    - don't use ANSI time routines to work out today's  */
 /*                         date                                              */
-/*   CHAR_IS_SIGNED      - if on your compiler the type "char" is signed     */
+/*   CHAR_IS_UNSIGNED    - if on your compiler the type "char" is unsigned   */
 /*                         by default, you must define this                  */
 /*                                                                           */
 /*   3. An estimate of the typical amount of memory likely to be free        */
@@ -192,13 +192,10 @@
 #ifdef AMIGA
 /* 1 */
 #define MACHINE_STRING   "Amiga"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #define __USE_SYSBASE
 #include <proto/exec.h>
@@ -217,11 +214,13 @@ static int32 unique_task_id(void)
 /* 1 */
 #define MACHINE_STRING   "RISC OS"
 /* 2 */
+#define CHAR_IS_UNSIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '.'
 #define STANDARD_DIRECTORIES
+#define NO_FILE_EXTENSIONS
 #define Source_Directory "inform"
 #define ICL_Directory "ICL"
 /* 5 */
@@ -236,13 +235,10 @@ static int32 unique_task_id(void)
 #ifdef ATARIST
 /* 1 */
 #define MACHINE_STRING   "Atari ST"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #ifndef TOSFS
 #define Temporary_Directory "/tmp"
@@ -260,8 +256,6 @@ static int32 unique_task_id(void)
 #ifdef BEOS
 /* 1 */
 #define MACHINE_STRING   "BeOS"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
@@ -276,13 +270,10 @@ static int32 unique_task_id(void)
 #ifdef LINUX
 /* 1 */
 #define MACHINE_STRING   "Linux"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
-#define DEFAULT_MEMORY_SIZE LARGE_SIZE
+#define DEFAULT_MEMORY_SIZE HUGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #define Temporary_Directory "/tmp"
 #define PATHLEN 512
@@ -302,7 +293,6 @@ static int32 unique_task_id(void)
 #define MACHINE_STRING   "Macintosh"
 #endif
 /* 2 */
-#define CHAR_IS_SIGNED
 #ifdef MAC_FACE
 #define EXTERNAL_SHELL
 #endif
@@ -315,7 +305,6 @@ static int32 unique_task_id(void)
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP           ':'
-#define FILE_EXTENSIONS
 #ifdef MAC_MPW
 #define Include_Extension ".h"
 #endif
@@ -334,11 +323,12 @@ static int32 unique_task_id(void)
 #ifdef OS2
 /* 1 */
 #define MACHINE_STRING   "OS/2"
+/* 2 */
+#define CHAR_IS_UNSIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 #endif
 /* ------------------------------------------------------------------------- */
 /*   OSX block                                                              */
@@ -346,13 +336,10 @@ static int32 unique_task_id(void)
 #ifdef OSX
 /* 1 */
 #define MACHINE_STRING   "Mac OS X"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #define Temporary_Directory "/tmp"
 #define INCLUDE_TASK_ID
@@ -378,7 +365,6 @@ static int32 unique_task_id(void)
 #define MACHINE_STRING   "PC"
 /* 2 */
 #define USE_TEMPORARY_FILES
-#define CHAR_IS_SIGNED
 /* 3 */
 #ifdef PC_QUICKC
 #define DEFAULT_MEMORY_SIZE SMALL_SIZE
@@ -387,7 +373,6 @@ static int32 unique_task_id(void)
 #endif
 /* 4 */
 #define FN_SEP '\\'
-#define FILE_EXTENSIONS
 /* 6 */
 #define DEFAULT_ERROR_FORMAT 1
 #endif
@@ -397,13 +382,10 @@ static int32 unique_task_id(void)
 #ifdef PC_WIN32
 /* 1 */
 #define MACHINE_STRING   "PC/Win32"
-/* 2 */
-#define CHAR_IS_SIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE HUGE_SIZE
 /* 4 */
 #define FN_SEP '\\'
-#define FILE_EXTENSIONS
 /* 6 */
 #define DEFAULT_ERROR_FORMAT 1
 #endif
@@ -414,13 +396,11 @@ static int32 unique_task_id(void)
 /* 1 */
 #define MACHINE_STRING   "Unix"
 /* 2 */
-#define CHAR_IS_SIGNED
 #define USE_TEMPORARY_FILES
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #define Temporary_Directory "/tmp"
 #define INCLUDE_TASK_ID
@@ -437,13 +417,11 @@ static int32 unique_task_id(void)
 /* 1 */
 #define MACHINE_STRING   "Unix"
 /* 2 */
-#define CHAR_IS_SIGNED
 #define USE_TEMPORARY_FILES
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 /* 5 */
 #define Temporary_Directory "/tmp"
 #define INCLUDE_TASK_ID
@@ -467,11 +445,12 @@ static int32 unique_task_id(void)
 #else
 #define MACHINE_STRING   "VAX/VMS"
 #endif
+/* 2 */
+#define CHAR_IS_UNSIGNED
 /* 3 */
 #define DEFAULT_MEMORY_SIZE LARGE_SIZE
 /* 4 */
 #define FN_SEP '/'
-#define FILE_EXTENSIONS
 #define Code_Extension   ".zip"
 #define V4Code_Extension ".zip"
 #define V5Code_Extension ".zip"
@@ -482,6 +461,10 @@ static int32 unique_task_id(void)
 /* ========================================================================= */
 /* Default settings:                                                         */
 /* ------------------------------------------------------------------------- */
+
+#ifndef NO_FILE_EXTENSIONS
+#define FILE_EXTENSIONS
+#endif
 
 #ifndef Transcript_File
 #ifdef FILE_EXTENSIONS
@@ -543,6 +526,7 @@ static int32 unique_task_id(void)
 #define V6Code_Extension  ""
 #define V7Code_Extension  ""
 #define V8Code_Extension  ""
+#define GlulxCode_Extension  ""
 #define Module_Extension  ""
 #define ICL_Extension     ""
 #endif
@@ -609,7 +593,15 @@ static int32 unique_task_id(void)
 #define DEFAULT_ERROR_FORMAT 0
 #endif
 
-#ifdef CHAR_IS_SIGNED
+#ifndef MACHINE_STRING
+#define MACHINE_STRING "Generic"
+#endif
+
+#ifndef DEFAULT_MEMORY_SIZE
+#define DEFAULT_MEMORY_SIZE LARGE_SIZE
+#endif
+
+#ifndef CHAR_IS_UNSIGNED
     typedef unsigned char uchar;
 #else
     typedef char uchar;
