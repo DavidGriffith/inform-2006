@@ -2219,7 +2219,7 @@ extern void assemblez_store(assembly_operand o1, assembly_operand o2)
     assemblez_instruction(&AI);
 }
 
-void assemblez_jump(int n)
+extern void assemblez_jump(int n)
 {   assembly_operand AO;
     if (n==-4) assemblez_0(rtrue_zc);
     else if (n==-3) assemblez_0(rfalse_zc);
@@ -2227,6 +2227,81 @@ void assemblez_jump(int n)
     {   AO.type = LONG_CONSTANT_OT; AO.value = n; AO.marker = 0;
         assemblez_1(jump_zc, AO);
     }
+}
+
+extern void assemblez_call_1(assembly_operand o1)
+{
+    if (version_number >= 5)
+      assemblez_1(call_1n_zc, o1);
+    else
+    if (version_number == 4)
+      assemblez_1_to(call_vs_zc, o1, temp_var4);
+    else
+      assemblez_1_to(call_zc, o1, temp_var4);
+}
+
+extern void assemblez_call_1_to(assembly_operand o1, assembly_operand st)
+{
+    if (version_number >= 5)
+      assemblez_1_to(call_1s_zc, o1, st);
+    else
+    if (version_number == 4)
+      assemblez_1_to(call_vs_zc, o1, st);
+    else
+      assemblez_1_to(call_zc, o1, st);
+}
+
+extern void assemblez_call_2(assembly_operand o1, assembly_operand o2)
+{
+    if (version_number >= 5)
+      assemblez_2(call_2n_zc, o1, o2);
+    else
+    if (version_number == 4)
+      assemblez_2_to(call_vs_zc, o1, o2, temp_var4);
+    else
+      assemblez_2_to(call_zc, o1, o2, temp_var4);
+}
+
+extern void assemblez_call_3(assembly_operand o1, assembly_operand o2, 
+                             assembly_operand o3)
+{
+    if (version_number >= 5)
+      assemblez_3(call_vn_zc, o1, o2, o3);
+    else
+    if (version_number == 4)
+      assemblez_3_to(call_vs_zc, o1, o2, o3, temp_var4);
+    else
+      assemblez_3_to(call_zc, o1, o2, o3, temp_var4);
+}
+
+extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2, 
+                                assembly_operand o3, assembly_operand st)
+{
+    if (version_number >= 4)
+      assemblez_3_to(call_vs_zc, o1, o2, o3, st);
+    else
+      assemblez_3_to(call_zc, o1, o2, o3, st);
+}
+
+extern void assemblez_call_4(assembly_operand o1, assembly_operand o2, 
+                             assembly_operand o3, assembly_operand o4)
+{
+    if (version_number >= 5)
+      assemblez_4(call_vn_zc, o1, o2, o3, o4);
+    else
+    if (version_number == 4)
+      assemblez_4_to(call_vs_zc, o1, o2, o3, o4, temp_var4);
+    else
+      assemblez_4_to(call_zc, o1, o2, o3, o4, temp_var4);
+}
+
+extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2, 
+                                assembly_operand o3, assembly_operand o4, assembly_operand st)
+{
+    if (version_number >= 4)
+      assemblez_4_to(call_vs_zc, o1, o2, o3, o4, st);
+    else
+      assemblez_4_to(call_zc, o1, o2, o3, o4, st);
 }
 
 void assembleg_0(int internal_number)
