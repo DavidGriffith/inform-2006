@@ -491,19 +491,19 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
 
         type_ao = zero_ao; type_ao.value = array_types[y];
 
-    /*if ((!is_systemfile()))*/
-        if (byte_flag)
-        {
-            if ((array_types[y] == WORD_ARRAY)
-                || (array_types[y] == TABLE_ARRAY))
-                warning("Using '->' to access a --> or table array");
-        }
-        else
-        {
-            if ((array_types[y] == BYTE_ARRAY)
-                || (array_types[y] == STRING_ARRAY))
-             warning("Using '-->' to access a -> or string array");
-        }
+        if ((!is_systemfile()))
+            if (byte_flag)
+            {
+                if ((array_types[y] == WORD_ARRAY)
+                    || (array_types[y] == TABLE_ARRAY))
+                    warning("Using '->' to access a --> or table array");
+            }
+            else
+            {
+                if ((array_types[y] == BYTE_ARRAY)
+                    || (array_types[y] == STRING_ARRAY))
+                 warning("Using '-->' to access a -> or string array");
+            }
 
     }
 
@@ -838,19 +838,19 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
 
         type_ao = zero_ao; type_ao.value = array_types[y];
 
-        /*if ((!is_systemfile()))*/
-        if (data_len == 1)
-        {
-            if ((array_types[y] == WORD_ARRAY)
-                || (array_types[y] == TABLE_ARRAY))
-                warning("Using '->' to access a --> or table array");
-        }
-        else
-        {
-            if ((array_types[y] == BYTE_ARRAY)
-                || (array_types[y] == STRING_ARRAY))
-             warning("Using '-->' to access a -> or string array");
-        }
+        if ((!is_systemfile()))
+            if (data_len == 1)
+            {
+                if ((array_types[y] == WORD_ARRAY)
+                    || (array_types[y] == TABLE_ARRAY))
+                    warning("Using '->' to access a --> or table array");
+            }
+            else
+            {
+                if ((array_types[y] == BYTE_ARRAY)
+                    || (array_types[y] == STRING_ARRAY))
+                 warning("Using '-->' to access a -> or string array");
+            }
     }
 
 
