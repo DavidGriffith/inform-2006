@@ -1,0 +1,114 @@
+Constant Story "THE LABYRINTHS OF BAR-BI-CAN";
+Constant Headline "^An Interactive Arts Centre^";
+
+Include "Parser";
+Include "Verblib";
+Include "Grammar";
+
+Class Room
+  with n_to, e_to, w_to, s_to, ne_to, nw_to, se_to, sw_to,
+       in_to, out_to, u_to, d_to
+has light;
+
+CompassDirection white_obj "white wall" compass
+  with name 'white' 'sac' 'wall', door_dir n_to;
+
+CompassDirection red_obj "red wall" compass
+  with name 'red' 'chac' 'wall', door_dir e_to;
+
+CompassDirection yellow_obj "yellow wall" compass
+  with name 'yellow' 'kan' 'wall', door_dir s_to;
+
+CompassDirection black_obj "black wall" compass
+  with name 'black' 'chikin' 'wall', door_dir w_to;
+
+Property xyzzy_to;
+CompassDirection xyzzy_obj "magic word" compass
+  with name 'xyzzy', door_dir xyzzy_to;
+
+[ SwapDirs o1 o2 x;
+  x = o1.door_dir; o1.door_dir = o2.door_dir; o2.door_dir = x;
+];
+[ ReflectWorld;
+  SwapDirs(e_obj, w_obj);
+  SwapDirs(ne_obj, nw_obj);
+  SwapDirs(se_obj, sw_obj);
+];
+
+[ NormalWorld; string 0 "east"; string 1 "west"; ];
+[ ReversedWorld; string 0 "west"; string 1 "east"; ];
+
+
+Room Wormcast "Wormcast"
+  with description
+           "A disturbed place of hollows carved like a spider's web,
+           strands of empty space hanging in stone. The only burrows
+           wide enough to crawl through begin by running north@00,
+           south and upwards.",
+       w_to Square_Chamber,
+       ne_to [; return self.s_to(); ],
+       u_to [; return self.s_to(); ],
+       s_to [;
+           print "The wormcast becomes slippery around you, as though
+               your body-heat is melting long hardened resins, and
+               you shut your eyes tightly as you burrow through
+               darkness.^";
+           if (eggsac in player) return Square_Chamber;
+           return random(Square_Chamber, Corridor, Forest);
+       ],
+       cant_go "Though you feel certain that something lies behind
+           the wormcast, this way is impossible.",
+  has  light;
+
+Room Square_Chamber "Square Chamber"
+with description "Two of the sides of this large room seem to be naturally flat, while
+     the opposite walls have been artifically smoothed and decorated with shallow
+     carvings.  A way out is north, and some animal hole has been burrowed in the @00 wall.",
+     n_to Corridor
+;
+
+Room Corridor "Corridor"
+with description "This narrow passage is lit from above by greenish daylight.
+To the north-@01 is a strangely disorienting gallery, and the way back is south.",
+nw_to Moebius,
+u_to [; if (Moebius has general) return Forest; "Your struggles to reach the surface are frustrated by a lack of footholds.  On the
+other foot there are quite a number of toofholds.";]
+;
+
+Room Moebius "Moebius Room"
+with description "The natural limestone gallery is decorated with a series of M.C.Escher
+prints and curves oddly off to the @01.  An exit is south-@00.",
+w_to [; if (self has general)
+           {give self ~general; NormalWorld();}
+        else {give self general; ReversedWorld();}
+        ReflectWorld();
+        return Moebius;
+       ],
+;
+
+Room Forest "Forest"
+with
+description [; deadflag=2; "Escape!  Blearily you stare around at
+the landscape of ferns and trees.";];
+
+Object eggsac "egg sac";
+
+[ TwoWay x dp1 dp2 y;
+  y = x.dp1; if (metaclass(y) == Object && y ofclass Room) y.dp2 = x;
+  y = x.dp2; if (metaclass(y) == Object && y ofclass Room) y.dp1 = x;
+];
+
+[Initialise x;
+
+location = Square_Chamber;
+NormalWorld();
+objectloop (x ofclass Room) {
+    TwoWay(x, n_to, s_to);   TwoWay(x, e_to, w_to);
+    TwoWay(x, ne_to, sw_to); TwoWay(x, nw_to, se_to);
+    TwoWay(x, u_to, d_to);   TwoWay(x, in_to, out_to);
+}
+
+];
+
+Verb 'turquoise' 'yax' * -> Look;
+

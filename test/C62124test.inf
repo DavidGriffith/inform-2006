@@ -1,0 +1,47 @@
+!% -SE1
+!%
+!============================================================================
+
+#Ifdef TARGET_ZCODE;
+
+! Zcharacter table '@{00AB}' '@{00BB}';
+
+! Zcharacter
+!     "abcdefghijklmnopqrstuvwxyz"
+!     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+!        "0123456789-',.;:()!?/«»";
+
+#Endif; ! TARGET_
+
+Constant Story "STORY";
+Constant Headline "^HEADLINE^";
+
+Include "Parser";
+Include "VerbLib";
+Include "Grammar";
+
+!============================================================================
+! Entry point routines
+
+[ Initialise;
+    location = valley;
+];
+
+!============================================================================
+! The game objects
+
+Object  valley "A valley in the mountains"
+  with  description [;
+            #Ifdef TARGET_ZCODE;
+            "All like this '<<': @<< @@163 @{00AB} « ", (char) '«',
+            "^",
+            "All like this '>>': @>> @@162 @{00BB} » ", (char) '»';
+            #Ifnot; ! TARGET_GLULX
+            "All like this '<<': @<< @@171 @{00AB} « ", (char) '«',
+            "^",
+            "All like this '>>': @>> @@187 @{00BB} » ", (char) '»';
+            #Endif; ! TARGET_
+        ],
+  has   light;
+
+!============================================================================

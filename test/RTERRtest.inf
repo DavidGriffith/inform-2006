@@ -1,0 +1,205 @@
+!% -~D
+!============================================================================
+Constant Story "STORY";
+Constant Headline "^HEADLINE^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class   Room
+  with  description "UNDER CONSTRUCTION",
+  has   light;
+
+Room    valley "A valley in the mountains";
+Object  -> myObj1 "MyFirstObject" with MyProperty;
+Object  -> myObj2 "MySecondObject" with MyProperty;
+
+[ Initialise;
+    location = valley;
+];
+
+Include "Grammar";
+
+[ GoogleSub;
+
+    RT__ERR(1, Room);
+    RT__ERR(2, myObj1);
+    RT__ERR(3, myObj1);
+    RT__ERR(4, myObj1);
+    RT__ERR(5, myObj1);
+    RT__ERR(6, myObj1);
+    RT__ERR(7, myObj1);
+    RT__ERR(8, myObj1);
+    RT__ERR(9, myObj1);
+    RT__ERR(10, myObj1);
+    RT__ERR(11, myObj1);
+    RT__ERR(12, myObj1);
+    RT__ERR(13, myObj1);
+    RT__ERR(14, myObj1);
+    RT__ERR(15, myObj1);
+    RT__ERR(16, myObj1, myObj2);
+    RT__ERR(17, myObj1, myObj2);
+    RT__ERR(18, myObj1, myObj1);
+    RT__ERR(19, myObj1);
+    RT__ERR(20);
+    RT__ERR(21, myObj1);
+    RT__ERR(22, myObj1);
+    RT__ERR(23, myObj1);
+    RT__ERR(24);
+    RT__ERR(25);
+    RT__ERR(26);
+    RT__ERR(27);
+    RT__ERR(28, 999);
+    RT__ERR(29, 999);
+    RT__ERR(30, 999);
+    RT__ERR(31, 999);
+    RT__ERR(31, 999, 99, 2);
+    RT__ERR(31, 999, 99, 3);
+    RT__ERR(31, 999, 99, 4);
+    RT__ERR(31, 999, 99, 8);
+    RT__ERR(32, myObj1);
+    RT__ERR(33, 999);
+    RT__ERR(34);
+    RT__ERR(35);
+    RT__ERR(36);
+
+    RT__ERR("Fiddle With", 0, MyProperty);
+    RT__ERR("Fiddle With", Room, MyProperty);
+    RT__ERR("Fiddle With", myObj1, MyProperty);
+    RT__ERR("Fiddle With", myObj1, 999);
+    RT__ERR("Fiddle With", myObj1, MyProperty, true);
+    RT__ERR("Fiddle With", myObj1, -Room);
+];
+
+Verb 'google' 'goo'
+    *       -> Google;
+
+#Ifdef TARGET_ZCODE;
+
+!============================================================================
+
+[ Copy_of_RT__Err crime obj id size
+    p q;
+
+    print "^[** Programming error: ";
+
+    if (crime < 0) jump RErr;
+
+    if (crime == 1) {
+        print "class ";
+        @print_obj obj;
+        ": 'create' can have 0 to 5 parameters only **]";
+    }
+
+    if (crime == 32)
+        "objectloop broken because the object ", (name) obj, " was moved while the loop passed through it **]";
+
+    if (crime == 33)
+        "tried to print (char) ", obj, ", which is not a valid ZSCII character code for output **]";
+
+    if (crime == 34)
+        "tried to print (address) on something not the byte address of a string **]";
+
+    if (crime == 35)
+        "tried to print (string) on something not a string **]";
+
+    if (crime == 36)
+        "tried to print (object) on something not an object or class **]";
+
+    if (crime < 32) {
+        print "tried to ";
+        if (crime >= 28) {
+            if (crime == 28 or 29) print "read from ";
+            else                   print "write to ";
+            if (crime == 29 or 31) print "-";
+            print "->", obj,
+            " in the";
+            if (size >= 8) { print" (->)";  size=size-8; }
+            if (size >= 4) { print" (-->)"; size=size-4; }
+            switch (size) {
+              0,1:  q=0;
+              2:    print " string"; q=1;
+              3:    print " table";  q=1;
+            }
+            " array ~", (string) #array_names_offset-->p, "~, which has entries ", q, " up to ", id, " **]";
+        }
+        if (crime >= 24 && crime <= 27) {
+            if (crime <= 25) print "read";
+            else             print "write";
+            print " outside memory using ";
+            switch (crime) {
+              24,26:    "-> **]";
+              25,27:    "--> **]";
+            }
+        }
+        if (crime < 4) print "test ";
+        else
+            if (crime < 12 || crime > 20) print "find the ";
+            else
+                if (crime < 14) print "use ";
+        if (crime == 20) "divide by zero **]";
+        print "~";
+        switch (crime) {
+          2:    print "in~ or ~notin";
+          3:    print "has~ or ~hasnt";
+          4:    print "parent";
+          5:    print "eldest";
+          6:    print "child";
+          7:    print "younger";
+          8:    print "sibling";
+          9:    print "children";
+          10:   print "youngest";
+          11:   print "elder";
+          12:   print "objectloop";
+          13:   print "}~ at end of ~objectloop";
+          14:   "give~ an attribute to ", (name) obj, " **]";
+          15:   "remove~ ", (name) obj, " **]";
+          16,17,18:
+                print "move~ ", (name) obj, " to ", (name) id;
+                if (crime == 18) {
+                    print ", which would make a loop: ", (name) obj;
+                    p=id;
+                    if (p == obj)
+                        p=obj;
+                    else
+                        do {
+                            print " in ", (name) p;
+                            p=parent(p);
+                        } until (p == obj);
+                    " in ", (name) p, " **]";
+                }
+                " **]";
+          19:   "give~ or test ~has~ or ~hasnt~ with a non-attribute on the object ", (name) obj," **]";
+          21:   print ".&";
+          22:   print ".#";
+          23:   print ".";
+        }
+        "~ of ", (name) obj, " **]";
+    }
+
+  .RErr;
+
+    if (obj >= 0 && obj <= (#largest_object-255)) {
+        if (obj && obj in Class) print "class ";
+        if (obj) @print_obj obj;
+        else     print "nothing";
+        print " ";
+    }
+    print "(object number ", obj, ") ";
+    if (id < 0) print "is not of class ", (name) -id;
+    else
+        if (size) print ". ", (property) id, " is not of size 2";
+        else {
+            print " has no property ", (property) id;
+            p=#identifiers_table;
+            size=p-->0;
+            if (id < 0 || id >= size)
+                print " (and nor has any other object)";
+        }
+    print " to ", (string) crime, " **]^";
+];
+
+!============================================================================
+
+#Endif;
+

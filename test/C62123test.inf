@@ -1,0 +1,36 @@
+Constant Story "C62123 Test";
+Constant Headline
+        "^An experimental adventure by Ced.^";
+
+Include "Parser";
+Include "VerbLib";
+
+[ Initialise;
+    location = BusStop;
+    print "^^You're backpacking in Romania.^^It is night-time, and raining heavily.^^^";
+    <Fred>;
+    ];
+
+[ FredSub;
+    ];
+
+Object BusStop "Bus Stop"
+  with description "A log-built hut, only big enough for 3 or 4 people, containing nothing to sit on.
+    It is probably very picturesque in the summer months, but at the moment, besides the water leaking in through 
+    the roof in several locations, there is also rain blowing in directly from the front.
+    ^^The light from a pub is reflected in the wet road to the east.",
+  each_turn [;
+    ! Fred=45;  ! this would generate error in correct place
+    print Fred;  ! this wouldn't
+    if (Fred==45) { ! nor this
+        "You are startled by a shadow passing over the door.  Perhaps
+          it was a large dog or maybe a wolf.";
+         }
+     ;],
+  has light;
+
+Include "Grammar";
+
+Verb "fred" * -> fred;
+
+

@@ -1,0 +1,25 @@
+Constant Story "STORY";
+Constant Headline "^HEADLINE^"; 
+
+Include "Parser";
+Include "VerbLib";
+Include "Grammar"; 
+
+Object  valley "A valley in the mountains"
+ with  description "UNDER CONSTRUCTION",
+ has   light; 
+
+Array   theString -> 100; 
+
+Global  Pointer = 5; 
+
+[ Initialise i;
+   location = valley;
+   theString->1 = 'a';
+   theString->2 = 'b';
+   theString->3 = 'c';
+   theString->0 = theString->(Pointer-1) = $27; ! Bug here
+   for (i=0 : i<Pointer : i++) print (char) theString->i;
+   new_line;
+]; 
+

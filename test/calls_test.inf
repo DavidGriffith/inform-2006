@@ -1,0 +1,72 @@
+! Test calling functions and methods with differing numbers
+! of arguments. This acts as a test for both
+!  patches/create_params.patch, and
+!  patches/stack_args.patch
+!
+! When looking at this test, it is also worth looking at the
+! assembly output with the -a switch in both Z-code and Glulx
+! modes to check that the correct calling sequence is emitted.
+
+Class c(10) with
+  create [ a b c d;
+    "create (",a,",",b,",",c,",",d,")";
+  ];
+
+Object o with
+  p [ a b c d e;
+    "p(",a,",",b,",",c,",",d,",",e,")";
+  ];
+
+[ f a b c d e;
+  "f(",a,",",b,",",c,",",d,",",e,")";
+];
+
+[ Main win ci;
+
+#Ifdef TARGET_GLULX;
+  @setiosys 2 0;
+  win = glk($0023,0,0,0,3,0);
+  glk($002F,win);
+#Endif;
+
+  print "Calling ~create()~...^";
+  ci = c.create();
+  c.create(1);
+  c.create(1,2);
+  c.create(1,2,3);
+#Ifdef TARGET_ZCODE;
+  print "(This next call will generate a strict mode error.)";
+#Endif;
+  c.create(1,2,3,4);
+  new_line;
+
+  print "Calling ~recreate()~...^";
+  c.recreate(ci);
+  c.recreate(ci,1);
+  c.recreate(ci,1,2);
+  c.recreate(ci,1,2,3);
+#Ifdef TARGET_ZCODE;
+  print "(This next call will generate a strict mode error.)";
+#Endif;
+  c.recreate(ci,1,2,3,4);
+  new_line;
+
+  print "Calling routine ~f()~...^";
+  f();
+  f(1);
+  f(1,2);
+  f(1,2,3);
+  f(1,2,3,4);
+  f(1,2,3,4,5);
+  new_line;
+
+  print "Calling routine ~o.p()~...^";
+  o.p();
+  o.p(10);
+  o.p(10,11);
+  o.p(10,11,12);
+  o.p(10,11,12,13);
+  o.p(10,11,12,13,14);
+  new_line;
+];
+

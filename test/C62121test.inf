@@ -1,0 +1,35 @@
+[ Main win;
+
+#Ifdef TARGET_GLULX;
+  @setiosys 2 0;
+  win = glk($0023, 0, 0, 0, 3, 0);
+  glk($002F, win);
+#Endif;
+
+  Test(c1); Test(c2); Test(c3); ];
+
+  [ Test o;
+    print "Testing ", (name) o, "^";
+    if (o ofclass X || o ofclass Y)
+        print "1:YES^"; else print "1:NO^";
+    if (o ofclass X or Y)
+        print "2:YES^"; else print "2:NO^";
+    if (parent(o) ofclass X || parent(o) ofclass Y)
+        print "3:YES^"; else print "3:NO^";
+    if (parent(o) ofclass X or Y)
+        print "4:YES^"; else print "4:NO^";
+    "";
+  ];
+
+  Class X;
+  X     p1;
+  X  -> c1 "C1";
+
+  Class Y;
+  Y     p2;
+  Y  -> c2 "C2";
+
+  Class Z;
+  Z     p3;
+  Z  -> c3 "C3";
+

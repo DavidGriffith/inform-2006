@@ -1,0 +1,53 @@
+!% $MAX_INCLUSION_DEPTH=8
+
+! Test for C62118, which allows the depth to which files can be included
+! to be set on the command line.
+! This test recursively includes itself. For the test to pass, this file
+! should compile without error.
+
+Ifndef INCLUDE_0;
+  Constant INCLUDE_0;
+  Message "This is the file being read for the first time by Inform.";
+Ifnot;
+  Ifndef INCLUDE_1;
+    Constant INCLUDE_1;
+    Message "This is the file being included for the first time.";
+  Ifnot;
+    Ifndef INCLUDE_2;
+      Constant INCLUDE_2;
+      Message "This is the file being included for the second time.";
+    Ifnot;
+      Ifndef INCLUDE_3;
+        Constant INCLUDE_3;
+        Message "This is the file being included for the third time.";
+      Ifnot;
+        Ifndef INCLUDE_4;
+          Constant INCLUDE_4;
+          Message "This is the file being included for the fourth time.";
+        Ifnot;
+          Ifndef INCLUDE_5;
+            Constant INCLUDE_5;
+            Message "This is the file being included for the fifth time.";
+          Ifnot;
+            Ifndef INCLUDE_6;
+              Constant INCLUDE_6;
+              Message "This is the file being included for the sixth time.";
+            Ifnot;
+              Ifndef INCLUDE_7;
+                Constant INCLUDE_7;
+                Message "This is the file being included for the seventh and final time.";
+              Endif;
+            Endif;
+          Endif;
+        Endif;
+      Endif;
+    Endif;
+  Endif;
+Endif;
+
+Ifndef INCLUDE_7;
+  Include "C62118test.inf";
+Ifnot;
+  [ Main; ];
+Endif;
+

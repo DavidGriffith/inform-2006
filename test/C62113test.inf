@@ -1,0 +1,33 @@
+!% -~D
+Constant Story "STORY";
+Constant Headline "^HEADLINE^";
+
+! Note where 'f','F','g','G' are!
+Zcharacter
+  "abcdegGhijklmnopqrstuvwxyz"
+  "ABCDEfFHIJKLMNOPQRSTUVWXYZ"
+  "0123456789-',.;:@'e@`a@`e@`u@^e@^i@^u";
+
+Include "Parser";
+Include "VerbLib";
+
+Class   Room
+  with  description "'foo' should be a valid command.",
+  has   light;
+
+Room    a_room "A Room";
+
+[ Initialise;
+    location = a_room;
+];
+
+Include "Grammar";
+
+[ FooSub;
+
+  "foo!";
+];
+
+Verb 'FOO'
+ * -> Foo;
+

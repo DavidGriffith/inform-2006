@@ -1,0 +1,35 @@
+[ Main win;
+
+#Ifdef TARGET_GLULX;
+  @setiosys 2 0;
+  win = glk($0023,0,0,0,3,0);
+  glk($002F,win);
+#Endif;
+
+  font off;
+
+  print " -10 +  5 = ", -10 + 5, "^";
+  print " -10 -  5 = ", -10 - 5, "^";
+  print " -10 *  5 = ", -10 * 5, "^";
+  print "  10 /  5 = ", 10 / 5, "^";
+  print " -10 /  5 = ", -10 / 5, "^";
+  print "  10 / -5 = ", 10 / -5, "^";
+  print " -10 / -5 = ", -10 / -5, "^";
+  print "  12 %  5 = ", 12 % 5, "^";
+  print " -12 %  5 = ", -12 % 5, "^";
+  print "  12 % -5 = ", 12 % -5, "^";
+  print " -12 % -5 = ", -12 % -5, "^";
+  print " @@126", "0 = ", ~0, "^";
+  print " @@126", "10 = ", ~10, "^";
+  print " @@126", "(-10) = ", ~(-10), "^";
+
+! When uncommented, the following lines should produce an error
+! message each, with the correct values for each term in the
+! error message. (Only when compiled to Z-code.)
+
+!  print " 10000 * 500 = ", 10000 * 500, "^";
+!  print " -10000 * 500 = ", -10000 * 500, "^";
+!  print " -10000 * -500 = ", -10000 * -500, "^";
+!  print " 32000 - (-1000) = ", 32000 - (-1000), "^";
+];
+
