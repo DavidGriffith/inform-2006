@@ -6233,6 +6233,7 @@ Array StorageForShortName -> 160 + WORDSIZE;
 ];
 
 [ Defart o i;
+    if (~~o ofclass Object) {print (PSN__) o; return;}
     i = indef_mode; indef_mode = false;
     if (o has proper) {
         indef_mode = NULL; print (PSN__) o; indef_mode = i;
@@ -6248,6 +6249,7 @@ Array StorageForShortName -> 160 + WORDSIZE;
         return;
     }
     #Endif;
+    if (~~o ofclass Object) {print (PSN__) o; return;}
     i = indef_mode; indef_mode = false;
     if (o has proper) {
         indef_mode = NULL; print (PSN__) o; indef_mode = i;
