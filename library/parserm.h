@@ -1075,16 +1075,15 @@ Object  InformParser "(Inform Parser)"
     if (w == OOPS1__WD or OOPS2__WD or OOPS3__WD) jump DoOops;
 
     if (a_buffer->WORDSIZE == COMMENT_CHARACTER) {
-        #Ifdef TARGET_ZCODE;
-        transcript_mode = ((HDR_GAMEFLAGS-->0) & 1);
-        #Ifnot;
-        transcript_mode = (gg_scriptstr ~= 0);
-        #Endif;
+        #Ifdef TARGET_ZCODE; 
+        if ((HDR_GAMEFLAGS-->0) & 1 || xcommsdir)
+                                           L__M(##Miscellany, 54);
+        else                               L__M(##Miscellany, 55); 
+        #Ifnot; ! TARGET_GLULX 
+        if (gg_scriptstr || gg_commandstr) L__M(##Miscellany, 54); 
+        else                               L__M(##Miscellany, 55); 
+        #Endif; ! TARGET_ 
 
-        if (transcript_mode)
-            L__M(##Miscellany, 54);
-        else
-            L__M(##Miscellany, 55);
         jump FreshInput;
     }
 
@@ -2022,7 +2021,8 @@ Object  InformParser "(Inform Parser)"
         if (results-->0 == ##Remove && results-->3 ofclass Object) {
             noun = results-->3; ! ensure valid for messages
             if (noun has animate) L__M(##Take, 6, noun);
-            else if (noun hasnt open) L__M(##Take, 9, noun);
+            else if (noun hasnt container or supporter) L__M(##Insert, 2, noun);
+            else if (noun has container && noun hasnt open) L__M(##Take, 9, noun);
             else if (children(noun)==0) L__M(##Search, 6, noun);
             else results-->0 = 0;
             }
@@ -5158,6 +5158,7 @@ Object  InformLibrary "(Inform Library)"
     give player transparent concealed animate proper;
     i = player; while (parent(i) ~= 0) i = parent(i);
     location = i; real_location = location;
+    if (parent(player) == 0) return RunTimeError(10);
     MoveFloatingObjects();
     lightflag = OffersLight(parent(player));
     if (lightflag == 0) location = thedark;
