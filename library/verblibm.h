@@ -94,7 +94,7 @@ Include "linklv";
 
 [ RunTimeError n p1 p2;
     #Ifdef DEBUG;
-    print "** Library error ", n, " (", p1, ",", p2, ") **^** ";
+    print "** Library error ", n, " (", p1, ", ", p2, ") **^** ";
     switch (n) {
       1:    print "preposition not found (this should not occur)";
       2:    print "Property value not routine or string: ~", (property) p2, "~ of ~", (name) p1,
@@ -102,8 +102,8 @@ Include "linklv";
       3:    print "Entry in property list not routine or string: ~", (property) p2, "~ list of ~",
                   (name) p1, "~ (", p1, ")";
       4:    print "Too many timers/daemons are active simultaneously.
-                  The limit is the library constant MAX_TIMERS (currently ",
-                  MAX_TIMERS, ") and should be increased";
+                  The limit is the library constant MAX_TIMERS
+                  (currently ", MAX_TIMERS, ") and should be increased";
       5:    print "Object ~", (name) p1, "~ has no ~", (property) p2, "~ property";
       7:    print "The object ~", (name) p1, "~ can only be used as a player object if it has
                   the ~number~ property";
@@ -113,12 +113,13 @@ Include "linklv";
       11:   print "The room ~", (name) p1, "~ has no ~", (property) p2, "~ property";
       12:   print "Tried to set a non-existent pronoun using SetPronoun";
       13:   print "A 'topic' token can only be followed by a preposition";
+      14:   print "Overflowed buffer limit of ", p1, " using '@@64output_stream 3' ", (string) p2;
       default:
             print "(unexplained)";
     }
     " **";
     #Ifnot;
-    "** Library error ", n, " (", p1, ",", p2, ") **";
+    "** Library error ", n, " (", p1, ", ", p2, ") **";
     #Endif; ! DEBUG
 ];
 
@@ -935,7 +936,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     if (location == player or nothing) return;
     objectloop (i provides found_in) {
         address = i.&found_in;
-        if (address && i hasnt absent && ~~IndirectlyContains(player, i)) {
+        if (address && i hasnt non_floating && ~~IndirectlyContains(player, i)) {
             if (metaclass(address-->0) == Routine)
                 flag = i.found_in();
             else {
@@ -944,8 +945,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
                 for (l=0 : l<k : l++) {
                     m = address-->l;
                     if ((m in Class && location ofclass m) ||
-                            m == location || m in location)
-                    {
+                            m == location || m in location) {
                         flag = true;
                         break;
                     }
@@ -953,7 +953,8 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
             }
             if (flag) {
                 if (i notin location) move i to location;
-            } else {
+            }
+            else {
                 if (parent(i)) remove i;
             }
         }
@@ -2382,15 +2383,24 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 
 [ BlowSub; L__M(##Blow, 1, noun); ];
 
-[ BurnSub; L__M(##Burn, 1, noun); ];
+[ BurnSub;
+    if (noun has animate) return L__M(##Burn, 2, noun);
+    L__M(##Burn, 1, noun);
+];
 
 [ BuySub; L__M(##Buy, 1, noun); ];
 
-[ ClimbSub; L__M(##Climb, 1, noun); ];
+[ ClimbSub;
+    if (noun has animate) return L__M(##Climb, 2, noun);
+    L__M(##Climb, 1, noun);
+];
 
 [ ConsultSub; L__M(##Consult, 1, noun); ];
 
-[ CutSub; L__M(##Cut, 1, noun); ];
+[ CutSub;
+    if (noun has animate) return L__M(##Cut, 2, noun);
+    L__M(##Cut, 1, noun);
+];
 
 [ DigSub; L__M(##Dig, 1, noun); ];
 
@@ -2400,7 +2410,10 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 
 [ JumpSub; L__M(##Jump, 1, noun); ];
 
-[ JumpOverSub; L__M(##JumpOver, 1, noun); ];
+[ JumpOverSub;
+    if (noun has animate) return L__M(##JumpOver, 2, noun);
+    L__M(##JumpOver, 1, noun);
+];
 
 [ KissSub;
     if (ObjectIsUntouchable(noun)) return;
@@ -2435,7 +2448,11 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 
 [ PushDirSub; L__M(##PushDir, 1, noun); ];
 
-[ RubSub; L__M(##Rub, 1, noun); ];
+[ RubSub;
+    if (ObjectIsUntouchable(noun)) return;
+    if (noun has animate) return L__M(##Rub, 2, noun);
+    L__M(##Rub, 1, noun);
+];
 
 [ SetSub; L__M(##Set, 1, noun); ];
 
@@ -2445,7 +2462,10 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 
 [ SleepSub; L__M(##Sleep, 1, noun); ];
 
-[ SmellSub; L__M(##Smell, 1, noun); ];
+[ SmellSub;
+    if (noun has animate) return L__M(##Smell, 2, noun);
+    L__M(##Smell, 1, noun);
+];
 
 [ SorrySub; L__M(##Sorry, 1, noun); ];
 
@@ -2461,7 +2481,11 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
 
 [ SwingSub; L__M(##Swing, 1, noun); ];
 
-[ TasteSub; L__M(##Taste, 1, noun); ];
+[ TasteSub;
+    if (ObjectIsUntouchable(noun)) return;
+    if (noun has animate) return L__M(##Taste, 2, noun);
+    L__M(##Taste, 1, noun);
+];
 
 [ TellSub;
     if (noun == actor) return L__M(##Tell, 1, noun);
@@ -2484,13 +2508,16 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     L__M(##ThrowAt, 2, noun);
 ];
 
-[ TieSub; L__M(##Tie,1,noun); ];
+[ TieSub;
+    if (noun has animate) return L__M(##Tie, 2, noun);
+    L__M(##Tie, 1, noun);
+];
 
 [ TouchSub;
     if (noun == actor)    return L__M(##Touch, 3, noun);
     if (ObjectIsUntouchable(noun)) return;
     if (noun has animate) return L__M(##Touch, 1, noun);
-    L__M(##Touch,2,noun);
+    L__M(##Touch, 2, noun);
 ];
 
 [ TurnSub;

@@ -30,7 +30,7 @@ Class   CompassDirection
             L__M(##Look, 7, self);
         ],
         compass_look false,
-        parse_name [; return -1;]
+        parse_name [; return -1; ],
   has   scenery;
 
 Object Compass "compass" has concealed;
@@ -544,9 +544,15 @@ Constant COMMA__TX      = ", ";
 ! Ask:      see Answer
   Attack:   "Violence isn't the answer to this one.";
   Blow:     CSubjectCant(actor,true); "usefully blow ", (ThatOrThose) x1, ".";
-  Burn:     "This dangerous act would achieve little.";
+  Burn: switch (n) {
+        1:  "This dangerous act would achieve little.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Buy:      "Nothing is on sale.";
-  Climb:    "Climbing ", (ThatOrThose) x1, " would achieve little.";
+  Climb: switch (n) {
+        1:  "Climbing ", (ThatOrThose) x1, " would achieve little.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Close: switch (n) {
         1:  CSubjectIs__(x1,true); "not something ", (theActor) actor, " can close.";
         2:  CSubjectIs__(x1,true); "already closed.";
@@ -577,7 +583,10 @@ Constant COMMA__TX      = ", ";
         #Endif; ! TARGET_
     }
   Consult:  CSubjectVerb(actor,true,"discover",0,"discovers"); "nothing of interest in ", (the) x1, ".";
-  Cut:      "Cutting ", (ThatOrThose) x1, " up would achieve little.";
+  Cut: switch (n) {
+        1:  "Cutting ", (ThatOrThose) x1, " up would achieve little.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Dig:      "Digging would achieve nothing here.";
   Disrobe: switch (n) {
         1:  CSubjectIs__(actor,true); "not wearing ", (ThatOrThose) x1, ".";
@@ -676,8 +685,10 @@ Constant COMMA__TX      = ", ";
         4:  print ".^";
     }
   Jump:     CSubjectVerb(actor,false,"jump",0,"jumps"); "on the spot, fruitlessly.";
-  JumpOver,Tie:
-            CSubjectVerb(actor,true,"would",0,0); "achieve nothing by this.";
+  JumpOver: switch (n) {
+        1:  CSubjectVerb(actor,true,"would",0,0); "achieve nothing by this.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Kiss:     "Keep your mind on the game.";
   Listen:   CSubjectVerb(actor,true,"hear",0,"hears"); "nothing unexpected.";
   ListMiscellany: switch (n) {
@@ -917,7 +928,10 @@ Constant COMMA__TX      = ", ";
         1:  "Restore failed.";
         2:  "Ok.";
     }
-  Rub:      CSubjectVerb(actor,true,"achieve",0,"achieves"); "nothing by this.";
+  Rub: switch (n) {
+        1:  CSubjectVerb(actor,true,"achieve",0,"achieves"); "nothing by this.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Save: switch (n) {
         1:  "Save failed.";
         2:  "Ok.";
@@ -960,7 +974,10 @@ Constant COMMA__TX      = ", ";
     }
   Sing:     CSubjectVerb(actor,false,"sing",0,"sings"); "abominably.";
   Sleep:    CSubjectIsnt(actor,true); "feeling especially drowsy.";
-  Smell:    CSubjectVerb(actor,true,"smell",0,"smells"); "nothing unexpected.";
+  Smell: switch (n) {
+        1:  CSubjectVerb(actor,true,"smell",0,"smells"); "nothing unexpected.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
             #Ifdef DIALECT_US;
   Sorry:    "Oh, don't apologize.";
             #Ifnot;
@@ -998,7 +1015,10 @@ Constant COMMA__TX      = ", ";
         12: CSubjectIs__(actor,true); "carrying too many things already.";
         13: "(putting ", (the) x1, " into ", (the) x2, " to make room)";
     }
-  Taste:    CSubjectVerb(actor,true,"taste",0,"tastes"); "nothing unexpected.";
+  Taste: switch (n) {
+        1:  CSubjectVerb(actor,true,"taste",0,"tastes"); "nothing unexpected.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Tell: switch (n) {
         1:  CSubjectVerb(actor,false,"conduct",0,"conducts"); "a brief monologue.";
         2:  "This provokes no reaction.";
@@ -1008,7 +1028,10 @@ Constant COMMA__TX      = ", ";
         1:  "Futile.";
         2:  CSubjectVerb(actor,true,"lack",0,"lacks"); "the nerve when it comes to the crucial moment.";
     }
-! Tie:  see JumpOver.
+  Tie: switch (n) {
+        1:  CSubjectVerb(actor,true,"would",0,0); "achieve nothing by this.";
+        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+    }
   Touch: switch (n) {
         1:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
         2:  CSubjectVerb(actor,true,"feel",0,"feels"); "nothing unexpected.";
