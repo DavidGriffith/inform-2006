@@ -285,6 +285,9 @@ extern void issue_unused_warnings(void)
                 + INSF_SFLAG + USED_SFLAG + REPLACE_SFLAG)) == 0)
              && (stypes[i] != OBJECT_T))
             dbnu_warning(typename(stypes[i]), (char *) symbs[i], slines[i]);
+        if (((sflags[i] & (REPLACE_SFLAG + ALIASED_SFLAG)) 
+                == REPLACE_SFLAG + ALIASED_SFLAG) && stypes[i+1] == CONSTANT_T)
+            sflags[i+1] |= UNKNOWN_SFLAG;
     }
 }
 

@@ -73,6 +73,7 @@ extern int parse_directive(int internal_flag)
         Returns: TRUE if program continues, FALSE if end of file reached.    */
 
     int routine_symbol;
+    int is_aliased = FALSE;
 
     begin_syntax_line(FALSE);
     get_next_token();
@@ -98,13 +99,19 @@ extern int parse_directive(int internal_flag)
                 && (!(sflags[token_value] & REPLACE_SFLAG))))
         {   ebf_error("routine name", token_text);
             duplicate_error();
-            return(FALSE);
+            goto IgnoreRoutine;
         }
 
+        if (sflags[token_value] & ALIASED_SFLAG && is_systemfile())
+        {   token_value++;
+            is_aliased = TRUE;
+        }
+        
         routine_symbol = token_value;
 
         if ((sflags[routine_symbol] & REPLACE_SFLAG) && (is_systemfile()))
-        {   dont_enter_into_symbol_table = TRUE;
+        {   IgnoreRoutine:
+            dont_enter_into_symbol_table = TRUE;
             do
             {   get_next_token();
             } while (!((token_type == EOF_TT)
@@ -118,7 +125,8 @@ extern int parse_directive(int internal_flag)
                 parse_routine(lexical_source, FALSE,
                     (char *) symbs[routine_symbol], FALSE, routine_symbol),
                 ROUTINE_T);
-            slines[routine_symbol] = routine_starts_line;
+            if (!is_aliased)
+                slines[routine_symbol] = routine_starts_line;
         }
         get_next_token();
         if ((token_type != SEP_TT) || (token_value != SEMICOLON_SEP))
