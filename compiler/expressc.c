@@ -472,8 +472,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
     assembly_operand zero_ao, max_ao, size_ao, en_ao, type_ao, an_ao,
         index_ao;
     int x, y, byte_flag, read_flag, from_module;
-    int left_operand = ET[below].operator_number;
-
+    int left_operand = (is_constant_ot(AO1.type))?0:ET[below].operator_number;
     if (AO1.marker == ARRAY_MV)
     {
         if ((oc == loadb_zc) || (oc == storeb_zc)) byte_flag=TRUE;
@@ -1355,7 +1354,7 @@ static void generate_code_from(int n, int void_flag)
 
         if (void_flag)
             warning_named("Evaluating this has no effect:",
-                operators[opnum].description);
+                tx(operators[opnum].description));
         if (oc >= 400) { oc = oc - 400; flag = FALSE; }
 
         if ((oc == je_zc) && (arity == 2))
@@ -1512,7 +1511,7 @@ static void generate_code_from(int n, int void_flag)
 
       if (void_flag)
           warning_named("Evaluating this has no effect:",
-              operators[opnum].description);
+              tx(operators[opnum].description));
 
       if ((cc == &condclasses[1]) && (arity == 2)) {
         i = ET[ET[n].down].right;
@@ -1627,7 +1626,7 @@ static void generate_code_from(int n, int void_flag)
 
     if (void_flag && (!(operators[opnum].side_effect)))
         error_named("Evaluating this has no effect:",
-            operators[opnum].description);
+            tx(operators[opnum].description));
 
     /*  Where shall we put the resulting value? (In Glulx, this could
         be smarter, and peg the result into ZEROCONSTANT.) */
