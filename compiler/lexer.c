@@ -713,10 +713,15 @@ static void make_tokeniser_grid(void)
 
 typedef struct LexicalBlock_s
 {   char *filename;                              /*  Full translated name    */
+    char *fakename;                              /*  Alternative file name   */
     int   main_flag;                             /*  TRUE if the main file
                                                      (the first one opened)  */
     int   sys_flag;                              /*  TRUE if a System_File   */
+    int   fake_incr;                             /*  amount by which to
+                                                     increment fake_line
+                                                     for each line read      */
     int   source_line;                           /*  Line number count       */
+    int   fake_line;                             /*  Alternative line number */
     int   line_start;                            /*  Char number within file
                                                      where the current line
                                                      starts                  */
@@ -727,13 +732,13 @@ typedef struct LexicalBlock_s
 } LexicalBlock;
 
 static LexicalBlock NoFileOpen =
-{   "<before compilation>", FALSE, FALSE, 0, 0, 0, 255 };
+{   "<before compilation>", NULL, FALSE, FALSE, 0, 0, 0, 0, 0, 255 };
 
 static LexicalBlock MakingOutput =
-{   "<constructing output>", FALSE, FALSE, 0, 0, 0, 255 };
+{   "<constructing output>", NULL, FALSE, FALSE, 0, 0, 0, 0, 0, 255 };
 
 static LexicalBlock StringLB =
-{   "<veneer routine>", FALSE, TRUE, 0, 0, 0, 255 };
+{   "<veneer routine>", NULL, FALSE, TRUE, 0, 0, 0, 0, 0, 255 };
 
 static LexicalBlock *CurrentLB;                  /*  The current lexical
                                                      block of input text     */
@@ -744,6 +749,28 @@ extern void declare_systemfile(void)
 
 extern int is_systemfile(void)
 {   return ((CurrentLB->sys_flag)?1:0);
+}
+
+extern void declare_alternate_source(char *name, int line, int flag)
+{
+    if (name && line < 0)
+        fatalerror("bad call to declare_alternate_source()");
+    if (line == -1)
+    {
+        if (CurrentLB->fakename)
+            my_free(CurrentLB->fakename, "fake filename");
+        CurrentLB->fakename = NULL;
+        CurrentLB->fake_line = 0;
+    }
+    else {
+        if (name != NULL)
+        {   if (CurrentLB->fakename)
+                my_free(&CurrentLB->fakename, "fake filename");
+            CurrentLB->fakename = name;
+        }
+        if (line != 0) CurrentLB->fake_line = line;
+        CurrentLB->fake_incr = flag;
+    }
 }
 
 extern dbgl get_current_dbgl(void)
@@ -761,10 +788,12 @@ static dbgl ErrorReport_dbgl;
 
 extern void report_errors_at_current_line(void)
 {   ErrorReport.line_number = CurrentLB->source_line;
+    ErrorReport.fake_number = CurrentLB->fake_line;
     ErrorReport.file_number = CurrentLB->file_no;
     if (ErrorReport.file_number == 255)
         ErrorReport.file_number = -1;
     ErrorReport.source      = CurrentLB->filename;
+    ErrorReport.fakename    = CurrentLB->fakename;
     ErrorReport.main_flag   = CurrentLB->main_flag;
     if (debugfile_switch)
         ErrorReport_dbgl = get_current_dbgl();
@@ -808,6 +837,7 @@ static void reached_new_line(void)
     forerrors_pointer = 0;
 
     CurrentLB->source_line++;
+    if (CurrentLB->fake_line) CurrentLB->fake_line += CurrentLB->fake_incr;
     CurrentLB->line_start = CurrentLB->chars_read;
 
     total_source_line_count++;
@@ -911,9 +941,11 @@ static void begin_buffering_file(int i, int file_no)
     lookahead3 = source_to_iso_grid[p[2]];
     FileStack[i].read_pos = 3;
 
+    FileStack[i].LB.fake_line = 0;
     if (file_no==1) FileStack[i].LB.main_flag = TRUE;
                else FileStack[i].LB.main_flag = FALSE;
     FileStack[i].LB.sys_flag = FALSE;
+    FileStack[i].LB.fakename = NULL;
     FileStack[i].LB.source_line = 1;
     FileStack[i].LB.line_start = 0;
     FileStack[i].LB.chars_read = 3;

@@ -34,28 +34,88 @@ static void print_preamble(void)
 
     if (!p) p = ""; /* ###-call me paranoid */
 
+    /*printf("\n");*/
     switch(error_format)
     {
         case 0:  /* RISC OS error message format */
+        case 5:  /* Reversed RISC OS format */
 
-            if (!(ErrorReport.main_flag)) printf("\"%s\", ", p);
-            printf("line %d: ", ErrorReport.line_number);
+            if (ErrorReport.fakename)
+                if (error_format < 5)
+                    printf("\"%s\", line %d: [via \"%s\", line %d] ",
+                        ErrorReport.fakename, ErrorReport.fake_number,
+                        p, ErrorReport.line_number);
+                else
+                    printf("\"%s\", line %d: [from \"%s\", line %d] ",
+                        p, ErrorReport.line_number,
+                        ErrorReport.fakename, ErrorReport.fake_number);
+            else
+            {   if (!(ErrorReport.main_flag))
+                    printf("\"%s\", ", p);
+                printf("line %d: ", ErrorReport.line_number);
+            }
             break;
 
         case 1:  /* Microsoft error message format */
+        case 6:  /* Reversed Microsoft format */
 
-            for (j=0; p[j]!=0; j++)
-            {   if (p[j] == FN_SEP) with_extension_flag = TRUE;
-                if (p[j] == '.') with_extension_flag = FALSE;
+            if (ErrorReport.fakename)
+                if (error_format < 5)
+                    printf("%s(%d): [via %s(%d)] ",
+                        ErrorReport.fakename, ErrorReport.fake_number,
+                        p, ErrorReport.line_number);
+                else
+                    printf("%s(%d): [from %s(%d)] ",
+                        p, ErrorReport.line_number,
+                        ErrorReport.fakename, ErrorReport.fake_number);
+            else
+            {   for (j=0; p[j]!=0; j++)
+                {   if (p[j] == FN_SEP) with_extension_flag = TRUE;
+                    if (p[j] == '.') with_extension_flag = FALSE;
+                }
+                printf("%s", p);
+                if (with_extension_flag) printf("%s", Source_Extension);
+                printf("(%d): ", ErrorReport.line_number);
             }
-            printf("%s", p);
-            if (with_extension_flag) printf("%s", Source_Extension);
-            printf("(%d): ", ErrorReport.line_number);
             break;
 
         case 2:  /* Macintosh Programmer's Workshop error message format */
+        case 7:  /* Reversed Macintosh Programmer's Workshop format */
 
-            printf("File \"%s\"; Line %d\t# ", p, ErrorReport.line_number);
+            if (ErrorReport.fakename)
+                if (error_format < 5)
+                    printf("File \"%s\"; Line %d\t# [via \"%s\"; %d] ",
+                        ErrorReport.fakename, ErrorReport.fake_number,
+                        p, ErrorReport.line_number);
+                else
+                    printf("File \"%s\"; Line %d\t# [from \"%s\"; %d] ",
+                        p, ErrorReport.line_number,
+                        ErrorReport.fakename, ErrorReport.fake_number);
+            else
+                printf("File \"%s\"; Line %d\t# ", p, ErrorReport.line_number);
+            break;
+
+        case 3:  /* GCC error message format */
+        case 8:  /* Reversed GCC format */
+
+            if (ErrorReport.fakename)
+                if (error_format < 5)
+                    printf("%s:%d: [via %s:%d] ",
+                        ErrorReport.fakename, ErrorReport.fake_number,
+                        p, ErrorReport.line_number);
+                else
+                    printf("%s:%d: [from %s:%d] ",
+                        p, ErrorReport.line_number,
+                        ErrorReport.fakename, ErrorReport.fake_number);
+            else
+            {   for (j=0; p[j]!=0; j++)
+                {   if (p[j] == FN_SEP) with_extension_flag = TRUE;
+                    if (p[j] == '.') with_extension_flag = FALSE;
+                }
+                printf("%s", p);
+                if (with_extension_flag) printf("%s", Source_Extension);
+                printf(":%d: ", ErrorReport.line_number);
+            }
             break;
     }
 }
