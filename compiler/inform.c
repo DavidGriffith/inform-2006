@@ -168,6 +168,7 @@ int bothpasses_switch,              /* -b */
     oddeven_packing_switch,         /* -B */
     define_DEBUG_switch,            /* -D */
     temporary_files_switch,         /* -F */
+    incompatibility_switch,         /* -I */
     module_switch,                  /* -M */
     runtime_error_checking_switch,  /* -S */
     define_USE_MODULES_switch,      /* -U */
@@ -231,6 +232,7 @@ static void reset_switch_settings(void)
 #else
     temporary_files_switch = FALSE;
 #endif
+    incompatibility_switch = FALSE;
     define_USE_MODULES_switch = FALSE;
     module_switch = FALSE;
 #ifdef ARC_THROWBACK
@@ -289,6 +291,12 @@ static void init_vars(void)
     init_text_vars();
     init_veneer_vars();
     init_verbs_vars();
+
+    endofpass_flag = FALSE;
+    line_trace_level = 0; expr_trace_level = 0;
+    asm_trace_level = asm_trace_setting;
+    linker_trace_level = linker_trace_setting;
+    if (listing_switch) line_trace_level=1;
 }
 
 static void begin_pass(void)
@@ -302,12 +310,6 @@ static void begin_pass(void)
     expressc_begin_pass();
     expressp_begin_pass();
     files_begin_pass();
-
-    endofpass_flag = FALSE;
-    line_trace_level = 0; expr_trace_level = 0;
-    asm_trace_level = asm_trace_setting;
-    linker_trace_level = linker_trace_setting;
-    if (listing_switch) line_trace_level=1;
 
     lexer_begin_pass();
     linker_begin_pass();
@@ -1173,6 +1175,7 @@ printf("  F1  use temporary files to reduce memory consumption\n");
 #endif
 printf("  G   compile a Glulx game file\n");
 printf("  H   use Huffman encoding to compress Glulx strings\n");
+printf("  I   reject obsolete usages as incompatible\n");
 printf("  M   compile as a Module for future linking\n");
 printf("  O1  optimise for memory\n");
 printf("  O2  optimise for speed (default)\n");
@@ -1301,6 +1304,7 @@ extern void switches(char *p, int cmode)
                       default:  temporary_files_switch = state; break;
                   }
                   break;
+        case 'I': incompatibility_switch = state; break;
         case 'M': module_switch = state;
                   if (state && (r_e_c_s_set == FALSE))
                       runtime_error_checking_switch = FALSE;
