@@ -870,7 +870,7 @@ typedef struct Sourcefile_s
 {   char *buffer;                                /*  Input buffer            */
     int   read_pos;                              /*  Read position in buffer */
     int   size;                                  /*  Number of meaningful
-                                 characters in buffer    */
+                                                     characters in buffer    */
     int   la, la2, la3;                          /*  Three characters of
                                                      lookahead pipeline      */
     int   file_no;                               /*  Internal file number
@@ -886,7 +886,7 @@ static Sourcefile *CF;                           /*  Top entry on stack      */
 static int last_no_files;
 
 static void begin_buffering_file(int i, int file_no)
-{   uchar *p;
+{   int j, cnt; uchar *p;
 
     if (i >= MAX_INCLUSION_DEPTH) 
        memoryerror("MAX_INCLUSION_DEPTH",MAX_INCLUSION_DEPTH);
@@ -918,6 +918,16 @@ static void begin_buffering_file(int i, int file_no)
 
     CurrentLB = &(FileStack[i].LB);
     CF = &(FileStack[i]);
+
+    /* Check for recursive inclusion */
+    cnt = 0;
+    for (j=0; j<i; j++)
+    {   if (!strcmp(FileStack[i].LB.filename, FileStack[j].LB.filename))
+            cnt++;
+    }
+    if (cnt==1)
+        warning_named("File included more than once",
+            FileStack[j].LB.filename);
 }
 
 static void create_char_pipeline(void)
