@@ -235,7 +235,7 @@ static void output_compression(int entnum, int32 *size)
     (*size) += 1;
     break;
   case 3:
-    cx = (char *)abbreviations_at + ent->u.val*MAX_ABBREV_LENGTH;
+    cx = (char *)abbreviations_gl + ent->u.val*MAX_ABBREV_LENGTH;
     while (*cx) {
       sf_put(*cx);
       cx++;
@@ -834,6 +834,11 @@ static void output_file_g(void)
       if (size - origsize != compression_string_size)
         compiler_error("Compression string size mismatch.");
 
+    }
+
+    if (temporary_files_switch)
+    {   fclose(Temp1_fp);
+        remove(Temp1_Name); remove(Temp2_Name);
     }
 
     /*  (4.5)  Output any null bytes (required to reach a GPAGESIZE address)
