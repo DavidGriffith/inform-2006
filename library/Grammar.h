@@ -436,3 +436,4 @@ Verb 'wake' 'awake' 'awaken'
 Constant LIBRARY_GRAMMAR;       ! for dependency checking
 
 ! ==============================================================================
+#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;

@@ -53,3 +53,4 @@ Include "verblibm";
 Constant LIBRARY_VERBLIB;       ! for dependency checking
 
 ! ==============================================================================
+#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;

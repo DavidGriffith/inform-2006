@@ -16,10 +16,11 @@ System_file;
 ! ------------------------------------------------------------------------------
 
 Constant LibSerial       "040227";
-Constant LibRelease      "6/11";
-Constant LIBRARY_VERSION  611;
+Constant LibRelease      "6/12";
+Constant LIBRARY_VERSION  612;
 Constant Grammar__Version 2;
 
+#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;
 Default COMMENT_CHARACTER '*';
 
 #Ifdef INFIX;
@@ -126,3 +127,4 @@ Include "parserm";
 Constant LIBRARY_PARSER;        ! for dependency checking
 
 ! ==============================================================================
+#ifdef MASTER_INCLUDE; Include MASTER_INCLUDE; #endif;
