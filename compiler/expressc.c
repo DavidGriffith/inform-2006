@@ -490,6 +490,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
         if (size_ao.value==-1) 
             from_module=TRUE; /*compiler_error("Array size can't be found");*/
         else {
+            from_module=FALSE;
             type_ao = zero_ao; type_ao.value = array_types[y];
 
             if ((!is_systemfile()))
