@@ -1138,6 +1138,7 @@ typedef struct operator_s
 #define ASSEMBLY_CONTEXT   6
 #define ARRAY_CONTEXT      7
 #define FORINIT_CONTEXT    8
+#define RETURN_Q_CONTEXT   9
 
 #define LOWEST_SYSTEM_VAR_NUMBER 249        /* globals 249 to 255 are used
                                                in compiled code (Z-code 
