@@ -1055,8 +1055,14 @@ compiling modules: disabling -S switch\n");
 /*   The command line interpreter                                            */
 /* ------------------------------------------------------------------------- */
 
+static char* error_format_name[] = {
+    "Archimedes", "Microsoft", "Macintosh MPW", "GCC", NULL,
+    "Reversed Archimedes", "Reversed Microsoft", "Reversed Macintosh MPW",
+    "Reversed GCC", NULL};
+
 static void cli_print_help(int help_level)
 {
+	int i;
     printf(
 "\nThis program is a compiler of Infocom format (also called \"Z-machine\")\n\
 story files: copyright (c) Graham Nelson 1993 - 2004.\n\n");
@@ -1162,12 +1168,12 @@ printf("\
       (1 to 4, Latin1 to Latin4; 5, Cyrillic; 6, Arabic;\n\
        7, Greek; 8, Hebrew; 9, Latin5.  Default is -C1.)\n");
 printf("  D   insert \"Constant DEBUG;\" automatically\n");
-printf("  E0  Archimedes-style error messages%s\n",
-      (error_format==0)?" (current setting)":"");
-printf("  E1  Microsoft-style error messages%s\n",
-      (error_format==1)?" (current setting)":"");
-printf("  E2  Macintosh MPW-style error messages%s\n",
-      (error_format==2)?" (current setting)":"");
+
+for (i=0; i<10; i++)
+	if (error_format_name[i])
+printf("  E%d  %s-style error messages%s\n", i, error_format_name[i],
+      (error_format==i)?" (current setting)":"");
+
 #ifdef USE_TEMPORARY_FILES
 printf("  F0  use extra memory rather than temporary files\n");
 #else
@@ -1292,9 +1298,9 @@ extern void switches(char *p, int cmode)
                   break;
         case 'D': define_DEBUG_switch = state; break;
         case 'E': switch(p[i+1])
-                  {   case '0': s=2; error_format=0; break;
-                      case '1': s=2; error_format=1; break;
-                      case '2': s=2; error_format=2; break;
+                  {   case '0': case '1': case '2': case '3':
+                      case '5': case '6': case '7': case '8':
+			  s=2; error_format=p[i+1]-'0'; break;
                       default:  error_format=1; break;
                   }
                   break;
