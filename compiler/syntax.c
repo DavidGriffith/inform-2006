@@ -148,7 +148,7 @@ extern int parse_directive(int internal_flag)
         return TRUE;
     }
 
-    return (!parse_given_directive());
+    return !(parse_given_directive());
 }
 
 extern void get_next_token_not_directive(void)
