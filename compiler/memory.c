@@ -477,16 +477,16 @@ static void explain_parameter(char *command)
     }
     if (strcmp(command,"DICT_WORD_SIZE")==0)
     {   printf(
-"  DICT_WORD_SIZE is the number of characters in a dictionary word. In \n\
-  Z-code this is always 6 (only 4 are used in v3 games). In Glulx it \n\
+"  DICT_WORD_SIZE is the number of characters in a dictionary word.  In \n\
+  Z-code this is always 6 (only 4 are used in v3 games).  In Glulx it \n\
   can be any number.\n");
         return;
     }
     if (strcmp(command,"NUM_ATTR_BYTES")==0)
     {   printf(
-"  NUM_ATTR_BYTES is the space used to store attribute flags. Each byte \n\
-  stores eight attribytes. In Z-code this is always 6 (only 4 are used in \n\
-  v3 games). In Glulx it can be any number which is a multiple of four, \n\
+"  NUM_ATTR_BYTES is the space used to store attribute flags.  Each byte \n\
+  stores eight attribytes.  In Z-code this is always 6 (only 4 are used in \n\
+  v3 games).  In Glulx it can be any number which is a multiple of four, \n\
   plus three.\n");
         return;
     }
