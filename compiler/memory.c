@@ -493,10 +493,10 @@ static void explain_parameter(char *command)
     if (strcmp(command,"INDIV_PROP_START")==0)
     {   printf(
 "  INDIV_PROP_START is the first property number which is an individual \n\
-  property. The eight class-system i-props (create, recreate, ... \n\
-  print_to_array) are numbered from INDIV_PROP_START to INDIV_PROP_START+7\n\
+  property.  The eight class-system i-props (create, recreate, ... \n\
+  print_to_array) are numbered from INDIV_PROP_START to INDIV_PROP_START+7.\n\
   INDIV_PROP_START is the maximum number of defaulting common properties \n\
-  In Z-code this is always 64. In Glulx it can be any number.\n");
+  In Z-code this is always 64.  In Glulx it can be any number.\n");
         return;
     }
     if (strcmp(command,"MAX_STATIC_DATA")==0)
