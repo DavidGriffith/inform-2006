@@ -433,7 +433,7 @@ Module_Path or ICL_Path variables. Other paths are for output only.", FN_ALT);
         }
         else path[i++] = value[j++];
         if (i == PATHLEN-1) {
-            printf("A specified path is longer than %d characters.\n", 
+            printf("Fatal error: A specified path is longer than %d characters.\n", 
                 PATHLEN-1);
             exit(1);
         }
@@ -500,7 +500,7 @@ static int write_translated_name(char *new_name, char *old_name,
                                  char *extension)
 {   int x;
     if (strlen(old_name)+strlen(extension) >= PATHLEN) {
-        printf("One of your filenames is longer than %d characters.\n", PATHLEN);
+        printf("Fatal error: One of your filenames is longer than %d characters.\n", PATHLEN);
         exit(1);
     }
     if (prefix_path == NULL)
@@ -511,7 +511,7 @@ static int write_translated_name(char *new_name, char *old_name,
     for (x=0; (new_name[x]!=0) && (new_name[x]!=FN_ALT); x++) ;
     if (new_name[x] == 0) start_pos = 0; else start_pos += x+1;
     if (x+strlen(old_name)+strlen(extension) >= PATHLEN) {
-        printf("One of your pathnames is longer than %d characters.\n", PATHLEN);
+        printf("Fatal error: One of your pathnames is longer than %d characters.\n", PATHLEN);
         exit(1);
     }
     sprintf(new_name + x, "%s%s", old_name, extension);
@@ -877,7 +877,7 @@ extern void translate_temp_filename(int i)
         case 3: p=Temp3_Name; break;
     }
     if (strlen(Temporary_Path)+strlen(Temporary_File)+6 >= PATHLEN) {
-        printf ("Temporary_Path is too long.\n");
+        printf ("Fatal error: Temporary_Path is too long.\n");
         exit(1);
     }
     sprintf(p,"%s%s%d", Temporary_Path, Temporary_File, i);
@@ -1403,7 +1403,7 @@ static int copy_icl_word(char *from, char *to, int max)
     }
     to[j] = 0;
     if (truncated == 1)
-        printf("The following parameter has been truncated:\n%s\n", to);
+        printf("Warning: The following parameter has been truncated:\n%s\n", to);
     return i;
 }
 
