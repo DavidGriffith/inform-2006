@@ -15,7 +15,7 @@ System_file;
 
 ! ------------------------------------------------------------------------------
 
-Constant LibSerial       "140227";
+Constant LibSerial       "040227";
 Constant LibRelease      "6/11";
 Constant LIBRARY_VERSION  611;
 Constant Grammar__Version 2;
