@@ -538,6 +538,8 @@ Constant COMMA__TX      = ", ";
     else                            print (string) s2, " ";
 ];
 
+[ DecideAgainst; CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea."; ];
+
 [ LanguageLM n x1 x2;
   Answer,Ask:
             "There is no reply.";
@@ -546,12 +548,12 @@ Constant COMMA__TX      = ", ";
   Blow:     CSubjectCant(actor,true); "usefully blow ", (ThatOrThose) x1, ".";
   Burn: switch (n) {
         1:  "This dangerous act would achieve little.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Buy:      "Nothing is on sale.";
   Climb: switch (n) {
         1:  "Climbing ", (ThatOrThose) x1, " would achieve little.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Close: switch (n) {
         1:  CSubjectIs__(x1,true); "not something ", (theActor) actor, " can close.";
@@ -585,7 +587,7 @@ Constant COMMA__TX      = ", ";
   Consult:  CSubjectVerb(actor,true,"discover",0,"discovers"); "nothing of interest in ", (the) x1, ".";
   Cut: switch (n) {
         1:  "Cutting ", (ThatOrThose) x1, " up would achieve little.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Dig:      "Digging would achieve nothing here.";
   Disrobe: switch (n) {
@@ -687,7 +689,7 @@ Constant COMMA__TX      = ", ";
   Jump:     CSubjectVerb(actor,false,"jump",0,"jumps"); "on the spot, fruitlessly.";
   JumpOver: switch (n) {
         1:  CSubjectVerb(actor,true,"would",0,0); "achieve nothing by this.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Kiss:     "Keep your mind on the game.";
   Listen:   CSubjectVerb(actor,true,"hear",0,"hears"); "nothing unexpected.";
@@ -893,7 +895,7 @@ Constant COMMA__TX      = ", ";
         2:  CSubjectIs__(actor,true); "unable to.";
         3:  "Nothing obvious happens.";
         4:  "That would be less than courteous.";
-        5:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        5:  DecideAgainst();
     }
 ! Push: see Pull
   PushDir: switch (n) {
@@ -931,7 +933,7 @@ Constant COMMA__TX      = ", ";
     }
   Rub: switch (n) {
         1:  CSubjectVerb(actor,true,"achieve",0,"achieves"); "nothing by this.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Save: switch (n) {
         1:  "Save failed.";
@@ -977,7 +979,7 @@ Constant COMMA__TX      = ", ";
   Sleep:    CSubjectIsnt(actor,true); "feeling especially drowsy.";
   Smell: switch (n) {
         1:  CSubjectVerb(actor,true,"smell",0,"smells"); "nothing unexpected.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
             #Ifdef DIALECT_US;
   Sorry:    "Oh, don't apologize.";
@@ -985,7 +987,7 @@ Constant COMMA__TX      = ", ";
   Sorry:    "Oh, don't apologise.";
             #Endif;
   Squeeze: switch (n) {
-        1:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        1:  DecideAgainst();
         2:  CSubjectVerb(actor,true,"achieve",0,"achieves"); "nothing by this.";
     }
   Strong:   "Real adventurers do not use such language.";
@@ -1018,7 +1020,7 @@ Constant COMMA__TX      = ", ";
     }
   Taste: switch (n) {
         1:  CSubjectVerb(actor,true,"taste",0,"tastes"); "nothing unexpected.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Tell: switch (n) {
         1:  CSubjectVerb(actor,false,"conduct",0,"conducts"); "a brief monologue.";
@@ -1031,10 +1033,10 @@ Constant COMMA__TX      = ", ";
     }
   Tie: switch (n) {
         1:  CSubjectVerb(actor,true,"would",0,0); "achieve nothing by this.";
-        2:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        2:  DecideAgainst();
     }
   Touch: switch (n) {
-        1:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        1:  DecideAgainst();
         2:  CSubjectVerb(actor,true,"feel",0,"feels"); "nothing unexpected.";
         3:  "That really wouldn't serve any purpose.";
     }
@@ -1057,7 +1059,7 @@ Constant COMMA__TX      = ", ";
   Wave: switch (n) {
         1:  CSubjectIsnt(actor,true); "holding ", (ThatOrThose) x1, ".";
         2:  CSubjectVerb(actor,false,"look",0,"looks"); "ridiculous waving ", (the) x1, ".";
-        3:  CSubjectVerb(actor,false,"decide",0,"decides"); "that's not such a good idea.";
+        3:  DecideAgainst();
     }
   WaveHands:CSubjectVerb(actor,false,"wave,",0,"waves,"); "feeling foolish.";
   Wear: switch (n) {
