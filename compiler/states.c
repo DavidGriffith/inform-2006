@@ -2666,7 +2666,7 @@ static void parse_statement_g(int break_label, int continue_label)
        Inform compiler, but which is important in development. */
 
         default:
-          error("*** Statement code gen: Can't generate yet ***\n");
+          error("*** Statement code gen: Can't generate yet ***");
           panic_mode_error_recovery(); return;
     }
 
