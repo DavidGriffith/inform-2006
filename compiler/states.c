@@ -413,7 +413,7 @@ static void parse_print_z(int finally_return)
 }
 
 static void parse_print_g(int finally_return)
-{   int count = 0; assembly_operand AO, AO2, AO3;
+{   int count = 0; assembly_operand AO, AO2;
 
     /*  print <printlist> -------------------------------------------------- */
     /*  print_ret <printlist> ---------------------------------------------- */
@@ -1364,7 +1364,7 @@ static void parse_statement_z(int break_label, int continue_label)
                          error(
 "In Version 3 no status-line drawing routine can be given");
                      else
-                     {   assembly_operand AO5, AO6;
+                     {   assembly_operand AO5;
                          put_token_back();
                          AO5 = parse_expression(CONSTANT_CONTEXT);
 
