@@ -187,6 +187,7 @@ int character_set_setting,          /* set by -C */
     trace_fns_setting,              /* set by -g: 0, 1 or 2 */
     linker_trace_setting,           /* set by -y: ditto for linker_... */
     header_ext_setting,             /* set by -W */
+    optimise_setting,               /* set by -O */
     store_the_text;                 /* when set, record game text to a chunk
                                        of memory (used by both -r & -k) */
 static int r_e_c_s_set;             /* has -S been explicitly set? */
@@ -197,6 +198,7 @@ static void reset_switch_settings(void)
 {   asm_trace_setting=0;
     linker_trace_level=0;
     tokens_trace_level=0;
+    optimise_setting=2;
 
     store_the_text = FALSE;
 
@@ -1172,6 +1174,8 @@ printf("  F1  use temporary files to reduce memory consumption\n");
 printf("  G   compile a Glulx game file\n");
 printf("  H   use Huffman encoding to compress Glulx strings\n");
 printf("  M   compile as a Module for future linking\n");
+printf("  O1  optimise for memory\n");
+printf("  O2  optimise for speed (default)\n");
 
 #ifdef ARCHIMEDES
 printf("\
@@ -1300,6 +1304,13 @@ extern void switches(char *p, int cmode)
         case 'M': module_switch = state;
                   if (state && (r_e_c_s_set == FALSE))
                       runtime_error_checking_switch = FALSE;
+                  break;
+        case 'O': switch(p[i+1])
+                  {   case '0': s=2; optimise_setting=0; break;
+                      case '1': s=2; optimise_setting=1; break;
+                      case '2': s=2; optimise_setting=2; break;
+                      default:  optimise_setting=-2*state; break;
+                  }
                   break;
 #ifdef ARCHIMEDES
         case 'R': switch(p[i+1])
