@@ -946,10 +946,9 @@ extern void assemblez_instruction(assembly_instruction *AI)
 extern void assembleg_instruction(assembly_instruction *AI)
 {
     uchar *start_pc, *opmodes_pc, *operands_pc;
-    int32 offset, j, topbits, types_byte1, types_byte2;
-    int operand_rules, min, max, no_operands_given, at_seq_point = FALSE;
+    int32 offset, j;
+    int operand_rules, no_operands_given, at_seq_point = FALSE;
     int ix, k;
-    assembly_operand o1, o2;
     opcodeg opco;
 
     ASSERT_GLULX();
@@ -1177,8 +1176,6 @@ extern void assembleg_instruction(assembly_instruction *AI)
           j = (j << 4);
       opmodes_pc[ix/2] |= j;
     }
-
-    Instruction_Done:
 
     /* Print assembly trace. */
     if ((asm_trace_level > 0) && (veneer_mode == FALSE)) {
@@ -1671,7 +1668,7 @@ static void transfer_routine_z(void)
 
 static void transfer_routine_g(void)
 {   int32 i, j, pc, new_pc, label, form_len, offset_of_next, addr,
-          branch_on_true, rstart_pc;
+          rstart_pc;
     void (* transfer_byte)(uchar *);
 
     adjusted_pc = zmachine_pc - zcode_ha_size; rstart_pc = adjusted_pc;
@@ -2732,7 +2729,6 @@ static void parse_assembly_g(void)
   opcodeg O;
   assembly_operand AO;
   int error_flag = FALSE;
-  int n;
 
   AI.operand_count = 0;
 
