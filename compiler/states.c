@@ -1236,6 +1236,82 @@ static void parse_statement_z(int break_label, int continue_label)
                      put_token_back();
                  }
 
+                 /*  Objectloops that can be optimised from 
+                     object features known at compile time. */
+                 if (((token_type == CND_TT) && 
+                     (token_value == PROVIDES_COND || token_value == OFCLASS_COND))
+                     || ((token_type == SEP_TT) && (token_value == PROPADD_SEP)))
+                 {   ln4 = (token_value == OFCLASS_COND);
+                     get_next_token();
+                     if (optimise_setting > 1 && version_number > 3 && token_type == SYMBOL_TT 
+                             && stypes[token_value] != GLOBAL_VARIABLE_T && !module_switch
+                             && svals[token_value] > 2) { /* Not Object or Class */
+                         char obj_array_name[MAX_IDENTIFIER_LENGTH+4];
+                         int i;
+                         sprintf(obj_array_name, "%s__%c", token_text, ln4?'C':'P');
+                         
+                         get_next_token();
+                         if ((token_type == SEP_TT) && 
+                             (token_value == CLOSEB_SEP /*|| token_value == LOGAND_SEP*/))
+                         {
+                             /* if (token_value == CLOSEB_SEP)
+                                 flag = FALSE; */
+
+                             i = symbol_index(obj_array_name, -1);
+                             if (sflags[i] & UNKNOWN_SFLAG)
+                             {  array_sizes[no_arrays] = 0; /* really not known */
+                                array_symbols[no_arrays++] = i;
+                             }
+                             assign_symbol(i, 0, ARRAY_T);
+                             sflags[i] |= USED_SFLAG;
+                             if (no_arrays == MAX_ARRAYS)
+                                    memoryerror("MAX_ARRAYS", MAX_ARRAYS);
+                             AO2.value = i; AO2.type = LONG_CONSTANT_OT; AO2.marker = SYMBOL_MV;
+                             
+                             AO3.type = LONG_CONSTANT_OT; AO3.marker = ARRAY_MV;
+                             AO3.value = dynamic_array_area_size; 
+                             dynamic_array_area[dynamic_array_area_size++] = 0x01;
+                             dynamic_array_area[dynamic_array_area_size++] = 0x1d;
+                             if (dynamic_array_area_size >= MAX_STATIC_DATA)
+                                memoryerror("MAX_STATIC_DATA", MAX_STATIC_DATA);
+
+                             assemblez_store(temp_var1, zero_operand);
+                             assemble_label_no(ln = next_label++);
+                             assemblez_3(storew_zc, AO3, zero_operand, temp_var1);
+                             assemblez_2_to(loadw_zc, AO2, temp_var1, AO);
+                             ln2 = next_label++; ln3 = next_label++;
+                             assemblez_1_branch(jz_zc, AO, ln2, TRUE);
+                             sequence_point_follows = TRUE;
+                             /* if (flag) { 
+                                 code_generate(parse_expression(CONDITION_CONTEXT),
+                                     CONDITION_CONTEXT, ln3);
+                                 match_close_bracket();
+                             } /* @@ this has just broken left associativity of || */
+                             parse_code_block(ln2, ln3, 0);
+
+                             sequence_point_follows = FALSE;
+                             assemble_label_no(ln3);
+                             assemblez_2_to(loadw_zc, AO3, zero_operand, temp_var1);
+                             if (runtime_error_checking_switch)
+                             {   assembly_operand en_ao;
+                                 assemblez_2_to(loadw_zc, AO2, temp_var1, stack_pointer);
+                                 assemblez_2_branch(je_zc, AO, stack_pointer, next_label, TRUE);
+                                 en_ao.value = OBJECTLOOP_BROKEN_RTE;
+                                 en_ao.marker = 0;
+                                 en_ao.type = SHORT_CONSTANT_OT;
+                                 assemblez_3(call_vn_zc, veneer_routine(RT__Err_VR), en_ao, AO);
+                                 assemble_label_no(next_label++);
+                             }
+                             assemblez_inc(temp_var1);
+                             assemblez_jump(ln);
+                             assemble_label_no(ln2);
+                             return;
+                         }
+                         put_token_back();
+                     }
+                     put_token_back();
+                 }
+
                  if (ln > 0)
                  {   /*  Old style (Inform 5) objectloops: note that we
                          implement objectloop (a in b) in the old way since
@@ -2240,6 +2316,77 @@ static void parse_statement_g(int break_label, int continue_label)
                          get_next_token();
                          if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
                              ln = 3;
+                         put_token_back();
+                     }
+                     put_token_back();
+                 }
+
+                 /*  Objectloops that can be optimised from 
+                     object features known at compile time. */
+                 if (((token_type == CND_TT) && 
+                     (token_value == PROVIDES_COND || token_value == OFCLASS_COND))
+                     || ((token_type == SEP_TT) && (token_value == PROPADD_SEP)))
+                 {   ln4 = (token_value == OFCLASS_COND);
+                     get_next_token();
+                     if (optimise_setting > 1 && token_type == SYMBOL_TT 
+                             && stypes[token_value] != GLOBAL_VARIABLE_T && !module_switch
+                             && svals[token_value] > 2) { /* Not Object or Class */
+                         char obj_array_name[MAX_IDENTIFIER_LENGTH+4];
+                         int i;
+                         sprintf(obj_array_name, "%s__%c", token_text, ln4?'C':'P');
+                         
+                         get_next_token();
+                         if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
+                         {
+                             i = symbol_index(obj_array_name, -1);
+                             if (sflags[i] & UNKNOWN_SFLAG)
+                             {  array_sizes[no_arrays] = 0; /* really not known */
+                                array_symbols[no_arrays++] = i;
+                             }
+                             assign_symbol(i, 0, ARRAY_T);
+                             sflags[i] |= USED_SFLAG;
+                             if (no_arrays == MAX_ARRAYS)
+                                    memoryerror("MAX_ARRAYS", MAX_ARRAYS);
+                             AO2.value = i; AO2.type = CONSTANT_OT; AO2.marker = SYMBOL_MV;
+                             
+                             AO3.type = CONSTANT_OT; AO3.marker = ARRAY_MV;
+                             AO3.value = dynamic_array_area_size -4*MAX_GLOBAL_VARIABLES;  
+                             /* Glulx measures Array backpatches from top of globals */ 
+                             dynamic_array_area[dynamic_array_area_size++] = 0;
+                             dynamic_array_area[dynamic_array_area_size++] = 0;
+                             dynamic_array_area[dynamic_array_area_size++] = 0;
+                             dynamic_array_area[dynamic_array_area_size++] = 0;
+                             if (dynamic_array_area_size >= MAX_STATIC_DATA)
+                                memoryerror("MAX_STATIC_DATA", MAX_STATIC_DATA);
+
+                             assembleg_store(temp_var1, zero_operand);
+                             assemble_label_no(ln = next_label++);
+                             assembleg_3(astore_gc, AO3, zero_operand, temp_var1);
+                             assembleg_3(aload_gc, AO2, temp_var1, AO);
+                             ln2 = next_label++; ln3 = next_label++;
+                             assembleg_1_branch(jz_gc, AO, ln2);
+                             sequence_point_follows = TRUE;
+                             parse_code_block(ln2, ln3, 0);
+
+                             sequence_point_follows = FALSE;
+                             assemble_label_no(ln3);
+                             assembleg_3(aload_gc, AO3, zero_operand, temp_var1);
+                             if (runtime_error_checking_switch)
+                             {   assembly_operand en_ao;
+                                 assembleg_3(aload_gc, AO2, temp_var1, stack_pointer);
+                                 assembleg_2_branch(jeq_gc, AO, stack_pointer, next_label);
+                                 en_ao.value = OBJECTLOOP_BROKEN_RTE;
+                                 en_ao.marker = 0;
+                                 en_ao.type = BYTECONSTANT_OT;
+                                 assembleg_call_2(veneer_routine(RT__Err_VR),
+                                 en_ao, AO, zero_operand);
+                                 assemble_label_no(next_label++);
+                             }
+                             assembleg_inc(temp_var1);
+                             assembleg_jump(ln);
+                             assemble_label_no(ln2);
+                             return;
+                         }
                          put_token_back();
                      }
                      put_token_back();
