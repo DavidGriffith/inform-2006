@@ -4987,6 +4987,21 @@ Object  InformLibrary "(Inform Library)"
     }
 ];
 
+[ PrintOrRunVar var flag;
+    switch (metaclass(var)) {
+      Object:
+        print (name) var;
+      String:
+        print (string) var;
+        if (flag == 0) new_line;
+      Routine:
+        return var();
+      default:
+        print (char) '(', var, (char) ')';
+    }
+    rtrue;
+];
+
 [ ValueOrRun obj prop;
   !### this is entirely unlikely to work. Does anyone care? (AP)
   ! Well, it's certainly used three times in verblibm.h (RF)
