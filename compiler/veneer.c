@@ -607,8 +607,13 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
                         0  none of the above                                 */
 
         "Z__Region",
-        "addr;\
-         if (addr==0 || Unsigned__Compare(addr, $001A-->0) >= 0) rfalse;\
+        "addr top;\
+         if (addr==0 or -1) rfalse;\
+         top = addr;\
+         #IfV5; #Iftrue (#version_number == 6);\
+         @log_shift addr $FFFF -> top; #Endif; #Iftrue (#version_number == 7);\
+         @log_shift addr $FFFF -> top; #Endif; #Endif;\
+         if (Unsigned__Compare(top, $001A-->0) >= 0) rfalse;\
          if (addr>=1 && addr<=(#largest_object-255)) rtrue;\
          #iftrue #oddeven_packing;\
          @test addr 1 ?~NotString;\
