@@ -360,7 +360,12 @@ static void parse_switch_spec(assembly_operand switch_value, int label,
                 ((!glulx_mode) ? LONG_CONSTANT_OT : CONSTANT_OT);
             spec_stack[spec_sp].value = 0;
             spec_stack[spec_sp].marker = 0;
-            spec_stack[spec_sp] = action_of_name(token_text);
+            if (token_type == SYMBOL_TT || token_type >= STATEMENT_TT)
+                spec_stack[spec_sp] = action_of_name(token_text);
+            else
+            {   spec_stack[spec_sp].value = -1;
+                warning("Extraneous comma or 'to'? This looks like a switch() case.");
+            }
 
             if (spec_stack[spec_sp].value == -1)
             {   spec_stack[spec_sp].value = 0;
