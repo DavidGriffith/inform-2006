@@ -85,7 +85,7 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag, int i
 
     if (line_trace_level > 0) 
     {
-        printf("Opening file");
+        printf(tx("Opening file"));
         print_main_line();
         printf(" \"%s\"\n",name);
     }
@@ -113,6 +113,36 @@ static void close_sourcefile(int file_number)
 extern void close_all_source(void)
 {   int i;
     for (i=0; i<input_file; i++) close_sourcefile(i+1);
+}
+
+/* ------------------------------------------------------------------------- */
+/*   Reading in auxiliary text files                                         */
+/* ------------------------------------------------------------------------- */
+
+extern char *file_read_line(char *buf, int maxlen, FILE *f)
+{   /* replacement for fgets() to deal with Mac line-endings, and chopping
+    off final line terminator.  Used by execute_icl_header(), 
+    read_translation_file() and read_source_to_iso_file() */
+    static char lc;
+    int i, c;
+    char *retval;
+    i = 0;
+    maxlen--; retval = buf;
+    do
+    {   c = fgetc(f);
+        if (feof(f) || ferror(f))
+        {   retval = NULL;
+            break;
+        }
+        if (c==10 || c==12 || c==13)
+        {   if (i==0 && ((c==13 && lc==10) || (c==10 && lc==13))) continue;
+            break;
+        }
+        if (i < maxlen) buf[i++]=c;
+    } while (TRUE);
+    buf[i] = 0;
+    lc = c;
+    return retval;
 }
 
 /* ------------------------------------------------------------------------- */
