@@ -135,6 +135,7 @@ extern void make_fake_action(void)
 
     if (!(sflags[i] & UNKNOWN_SFLAG))
     {   ebf_error("new fake action name", token_text);
+        duplicate_error();    
         panic_mode_error_recovery(); return;
     }
 
