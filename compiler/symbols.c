@@ -442,32 +442,32 @@ extern void write_the_identifier_names(void)
         array_name_strings[j]
             = compile_string(idname_string, FALSE, FALSE);
     }
-  if (define_INFIX_switch)
-  { for (i=0; i<no_symbols; i++)
-    {   if (stypes[i] == GLOBAL_VARIABLE_T)
-        {   sprintf(idname_string, "%s", (char *) symbs[i]);
-            array_name_strings[no_arrays + svals[i] -16]
-                = compile_string(idname_string, FALSE, FALSE);
+    if (define_INFIX_switch) { 
+        for (i=0; i<no_symbols; i++)
+        {   if (stypes[i] == GLOBAL_VARIABLE_T)
+            {   sprintf(idname_string, "%s", (char *) symbs[i]);
+                array_name_strings[no_arrays + svals[i] -16]
+                  = compile_string(idname_string, FALSE, FALSE);
+            }
+        }
+
+        for (i=0; i<no_named_routines; i++)
+        {   sprintf(idname_string, "%s", (char *) symbs[named_routine_symbols[i]]);
+              array_name_strings[no_arrays + no_globals + i]
+                 = compile_string(idname_string, FALSE, FALSE);
+        }
+
+        for (i=0, no_named_constants=0; i<no_symbols; i++)
+        {   if (((stypes[i] == OBJECT_T) || (stypes[i] == CLASS_T)
+                || (stypes[i] == CONSTANT_T))
+                && ((sflags[i] & (UNKNOWN_SFLAG+ACTION_SFLAG))==0))
+            {   sprintf(idname_string, "%s", (char *) symbs[i]);
+                array_name_strings[no_arrays + no_globals + no_named_routines
+                    + no_named_constants++]
+                    = compile_string(idname_string, FALSE, FALSE);
+            }
         }
     }
-
-    for (i=0; i<no_named_routines; i++)
-    {   sprintf(idname_string, "%s", (char *) symbs[named_routine_symbols[i]]);
-            array_name_strings[no_arrays + no_globals + i]
-                = compile_string(idname_string, FALSE, FALSE);
-    }
-
-    for (i=0, no_named_constants=0; i<no_symbols; i++)
-    {   if (((stypes[i] == OBJECT_T) || (stypes[i] == CLASS_T)
-            || (stypes[i] == CONSTANT_T))
-            && ((sflags[i] & (UNKNOWN_SFLAG+ACTION_SFLAG))==0))
-        {   sprintf(idname_string, "%s", (char *) symbs[i]);
-            array_name_strings[no_arrays + no_globals + no_named_routines
-                + no_named_constants++]
-                = compile_string(idname_string, FALSE, FALSE);
-        }
-    }
-  }
 
     veneer_mode = FALSE;
 }
