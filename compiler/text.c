@@ -49,9 +49,9 @@ uchar *abbreviations_gl;               /* Memory to hold the Glulx encoded
 /*   Glulx string compression storage                                        */
 /* ------------------------------------------------------------------------- */
 
-int no_strings;                        /* No of strings in static strings
+int32 no_strings;                      /* No of strings in static strings
                                           area.                              */
-int no_dynamic_strings;                /* No. of @.. string escapes used
+int32 no_dynamic_strings;              /* No. of @.. string escapes used
                                           (actually, the highest value used
                                           plus one)                          */
 
