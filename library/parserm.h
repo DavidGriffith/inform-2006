@@ -6119,8 +6119,13 @@ Array StorageForShortName -> 160 + WORDSIZE;
 #Ifnot; ! TARGET_GLULX
 
 [ PrintToBuffer buf len a b;
-    if (b)
-        buf-->0 = PrintAnyToArray(buf+WORDSIZE, len, a, b);
+    if (b) {
+        if (metaclass(a) == Object && a.#b == WORDSIZE
+            && metaclass(a.b) == String)
+            buf-->0 = PrintAnyToArray(buf+WORDSIZE, len, a.b);
+        else
+            buf-->0 = PrintAnyToArray(buf+WORDSIZE, len, a, b);
+    }
     else
         buf-->0 = PrintAnyToArray(buf+WORDSIZE, len, a);
     if (buf-->0 > len) buf-->0 = len;
