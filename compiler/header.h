@@ -31,7 +31,7 @@
 /* ------------------------------------------------------------------------- */
 
 #define RELEASE_DATE "18th Dec 2004 development version"
-#define RELEASE_NUMBER 1632
+#define RELEASE_NUMBER 1631
 #define GLULX_RELEASE_NUMBER 38
 #define MODULE_VERSION_NUMBER 1
 #define VNUMBER RELEASE_NUMBER
