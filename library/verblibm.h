@@ -2424,9 +2424,9 @@ Constant NOARTICLE_BIT  4096;       ! Print no articles, definite or not
 
 #Ifnot;
 
-[ ChangesOnSub; "[Changes listing available only under Inform 6.2.]"; ];
+[ ChangesOnSub; "[Changes listing available only from Inform 6.2 onwards.]"; ];
 
-[ ChangesOffSub; "[Changes listing available only under Inform 6.2.]"; ];
+[ ChangesOffSub; "[Changes listing available only from Inform 6.2 onwards.]"; ];
 
 #Endif; ! VN_1610
 
