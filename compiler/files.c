@@ -328,6 +328,10 @@ static void output_file_z(void)
         if (backpatch_marker >= 0x80) long_flag = FALSE;
         backpatch_marker &= 0x7f;
         offset = offset + (backpatch_marker/32)*0x10000;
+        while (offset+0x30000 < j) {
+            offset += 0x40000;
+            long_flag = !long_flag;
+        }
         backpatch_marker &= 0x1f;
 
         while (j<offset)
@@ -439,6 +443,7 @@ static void output_file_z(void)
       fatalerror("I/O failure: couldn't backtrack on story file for checksum");
 
     fclose(sf_handle);
+    if (no_errors>0) remove(new_name);
 
     /*  Write a copy of the header into the debugging information file
         (mainly so that it can be used to identify which story file matches
@@ -855,6 +860,7 @@ static void output_file_g(void)
       fatalerror("I/O failure: couldn't backtrack on story file for checksum");
 
     fclose(sf_handle);
+    if (no_errors>0) remove(new_name);
 
 #ifdef ARCHIMEDES
     {   char settype_command[PATHLEN];
