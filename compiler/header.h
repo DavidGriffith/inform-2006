@@ -1163,6 +1163,7 @@ typedef struct operator_s
 #define ARRAY_CONTEXT      7
 #define FORINIT_CONTEXT    8
 #define RETURN_Q_CONTEXT   9
+#define IFDEF_CONTEXT      10
 
 #define LOWEST_SYSTEM_VAR_NUMBER 249        /* globals 249 to 255 are used
                                                in compiled code (Z-code
@@ -2283,7 +2284,7 @@ extern int
     version_set_switch,     nowarnings_switch,    hash_switch,
     memory_map_switch,      module_switch,        temporary_files_switch,
     define_DEBUG_switch,    define_USE_MODULES_switch, define_INFIX_switch,
-    runtime_error_checking_switch;
+    runtime_error_checking_switch, incompatibility_switch;
 
 extern int oddeven_packing_switch;
 
@@ -2484,6 +2485,7 @@ extern int   no_syntax_lines;
 
 extern void  panic_mode_error_recovery(void);
 extern int   parse_directive(int internal_flag);
+extern void  get_next_token_not_directive(void);
 extern void  parse_program(char *source);
 extern int32 parse_routine(char *source, int embedded_flag, char *name,
                  int veneer_flag, int r_symbol);
