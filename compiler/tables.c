@@ -189,7 +189,7 @@ static int32 rough_size_of_paged_memory_g(void)
         memory required to store the machine's paged memory area
         (that is, everything up to the start of the code area).              */
 
-    int32 total, i;
+    int32 total;
 
     ASSERT_GLULX();
 
@@ -1130,13 +1130,12 @@ printf("        +---------------------+   %05lx\n", (long int) Out_Size);
 
 static void construct_storyfile_g(void)
 {   uchar *p;
-    int32 i, j, k, l, mark, objs, strings_length,
-          limit, excess, extend_offset;
-    int32 globals_at, link_table_at, dictionary_at, actions_at, preactions_at,
+    int32 i, j, k, l, mark, strings_length,
+		limit;
+    int32 globals_at, dictionary_at, actions_at, preactions_at,
           abbrevs_at, prop_defaults_at, object_tree_at, object_props_at,
-          map_of_module, grammar_table_at, charset_at, headerext_at,
-          terminating_chars_at,
-          unicode_at, id_names_length, arrays_at;
+          grammar_table_at, charset_at, headerext_at,
+          unicode_at, arrays_at;
     int32 threespaces;
     char *output_called = (module_switch)?"module":"story file";
 
