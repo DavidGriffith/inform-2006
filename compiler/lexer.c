@@ -1104,7 +1104,10 @@ extern void get_next_token(void)
     circle[circle_position].line_ref = get_current_dbgl();
 
     switch(e)
-    {   case 0: char_error("Illegal character found in source:", d);
+    {   case 0: 
+            if ((dont_enter_into_symbol_table <= -2) && (d == '\\'))
+                (*get_next_char)();
+            char_error("Illegal character found in source:", d);
             goto StartTokenAgain;
 
         case WHITESPACE_CODE:
@@ -1191,6 +1194,11 @@ extern void get_next_token(void)
                 }
                 else if (d == '\\')
                 {   int newline_passed = FALSE;
+                    if (dont_enter_into_symbol_table <= -2)
+                    {
+                        (*get_next_char)();
+                        continue;
+                    }
                     lex_p--;
                     while ((tokeniser_grid[lookahead] != EOF_CODE) &&
                           (tokeniser_grid[lookahead] == WHITESPACE_CODE))
@@ -1203,6 +1211,8 @@ extern void get_next_token(void)
                         ebf_error("empty rest of line after '\\' in string",
                             chb);
                     }
+                    if (incompatibility_switch)
+                        obsolete_warning("'\\' at end of line");
                 }
             }   while ((tokeniser_grid[d] != EOF_CODE) && (d!='\"'));
             if (EOF_CODE == tokeniser_grid[d]) ebf_error("'\"'", "end of file");
