@@ -1228,7 +1228,8 @@ static void check_property_operator(int from_node)
                 && ((ET[n].value.type == LONG_CONSTANT_OT)
                     || (ET[n].value.type == SHORT_CONSTANT_OT))
                 && ((ET[n].value.value > 0) && (ET[n].value.value < 64))
-                && ((!module_switch) || (ET[n].value.marker == 0)))
+                && ((!module_switch) || (ET[n].value.marker == 0))
+                && (ET[n].value.marker != SYMBOL_MV))
             flag = TRUE;
 
         if (!flag)
