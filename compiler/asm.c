@@ -1299,7 +1299,6 @@ extern int32 assemble_routine_header(int no_locals,
       /*  Not the packed address, but the scaled offset from code area start:  */
 
       rv = zmachine_pc/scale_factor;
-
       if (instruction_set_number<5)
           for (i=0; i<no_locals; i++) { byteout(0,0); byteout(0,0); }
 
@@ -1531,12 +1530,17 @@ static void transfer_routine_z(void)
         {   if (asm_trace_level >= 4)
                 printf("Branch detected at offset %04x\n", pc);
             j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x7fff;
+            addr = label_offsets[j]-pc;
             if (asm_trace_level >= 4)
                 printf("To label %d, which is %d from here\n",
-                    j, label_offsets[j]-pc);
-            if ((label_offsets[j] >= pc+2) && (label_offsets[j] < pc+64))
+                    j, addr);
+            if ((addr > 2) && (addr < 64))
             {   if (asm_trace_level >= 4) printf("Short form\n");
                 zcode_markers[i+1] = DELETED_MV;
+            }
+            else if (addr<-0x2000 || addr>0x1fff) 
+            {   if (asm_trace_level >= 4) printf("Inverted branch and jump\n");
+                zcode_markers[i+1] = EXPANDED_MV;
             }
         }
     }
@@ -1567,6 +1571,7 @@ static void transfer_routine_z(void)
                 label = label_next[label];
             }
            if (zcode_markers[i] != DELETED_MV) new_pc++;
+           if (zcode_markers[i] == EXPANDED_MV) new_pc+=2;
         }
     }
 
@@ -1578,19 +1583,28 @@ static void transfer_routine_z(void)
     {   switch(zcode_markers[i])
         { case BRANCH_MV:
             long_form = 1; if (zcode_markers[i+1] == DELETED_MV) long_form = 0;
+            if (zcode_markers[i+1] == EXPANDED_MV) long_form = 3;
 
             j = (256*zcode_holding_area[i] + zcode_holding_area[i+1]) & 0x7fff;
             branch_on_true = ((zcode_holding_area[i]) & 0x80);
             offset_of_next = new_pc + long_form + 1;
 
             addr = label_offsets[j] - offset_of_next + 2;
-            if (addr<-0x2000 || addr>0x1fff)
+            if (addr<-0x8000 || addr>0x7fff) 
                 fatalerror("Branch out of range: divide the routine up?");
             if (addr<0) addr+=(int32) 0x10000L;
 
-            addr=addr&0x3fff;
-            if (long_form==1)
-            {   zcode_holding_area[i] = branch_on_true + addr/256;
+            if (long_form==3)
+            {   zcode_holding_area[i] = (0x80 ^ branch_on_true) + 0x40 + 5;
+                transfer_byte(zcode_holding_area + i); new_pc++;
+                zcode_holding_area[i] = 0x8c;
+                transfer_byte(zcode_holding_area + i); new_pc++;
+                zcode_holding_area[i] = addr/256;
+                zcode_holding_area[i+1] = addr%256;
+            }
+            else if (long_form==1)
+            {   addr=addr&0x3fff;
+                zcode_holding_area[i] = branch_on_true + addr/256;
                 zcode_holding_area[i+1] = addr%256;
             }
             else
@@ -1619,7 +1633,8 @@ static void transfer_routine_z(void)
 
           default:
             switch(zcode_markers[i] & 0x7f)
-            {   case NULL_MV: break;
+            {   case EXPANDED_MV:
+                case NULL_MV: break;
                 case VARIABLE_MV:
                 case OBJECT_MV:
                 case ACTION_MV:
