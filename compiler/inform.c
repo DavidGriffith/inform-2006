@@ -1146,7 +1146,7 @@ One or more words can be supplied as \"commands\". These may be:\n\n\
   v3  compile to version-3 (\"Standard\") story file\n\
   v4  compile to version-4 (\"Plus\") story file\n\
   v5  compile to version-5 (\"Advanced\") story file: the default\n\
-  v6  compile to version-6 (graphical) story file\n\
+  v6  compile to version-6 (\"Graphical\") story file\n\
   v8  compile to version-8 (expanded \"Advanced\") story file\n\
   w   disable warning messages\n\
   x   print # for every 100 lines compiled\n\
