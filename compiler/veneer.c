@@ -245,7 +245,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
                    { x = indirect(obj, a, b, c, d, e, f);\
                      return x; }\
                    jump Call__Error;",
-              "3: if (id == print) { @print_paddr obj; rtrue; }\
+              "3: if (id == print) print_ret (string) obj;\
                    if (id == print_to_array)\
                    { @output_stream 3 a; @print_paddr obj; @output_stream -3;\
                      return a-->0; }\
@@ -1032,7 +1032,7 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
            }",
         "  if (zr == 3) {\
              if (id == print) {\
-               @streamstr obj; rtrue;\
+               @streamstr obj; @streamchar 10; rtrue;\
              }\
              if (id == print_to_array) {\
                if (_vararg_count >= 2) {\
