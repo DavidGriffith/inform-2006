@@ -250,8 +250,8 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
     /*   End                                                                 */
     /* --------------------------------------------------------------------- */
 
-    case END_CODE: 
-        terminate_file(); 
+    case END_CODE:
+        terminate_file();
         return(FALSE);
 
     case ENDIF_CODE:
