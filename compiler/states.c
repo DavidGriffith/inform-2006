@@ -119,34 +119,17 @@ static void parse_action(void)
 
       switch(args)
       {   case 0:
-            if (version_number>=5)
-                assemblez_2(call_2n_zc, AO, AO2);
-            else
-            if (version_number==4)
-                assemblez_2_to(call_vs_zc, AO, AO2, temp_var1);
-            else
-                assemblez_2_to(call_zc, AO, AO2, temp_var1);
+            assemblez_call_2(AO, AO2);
             break;
           case 1:
-            if (version_number>=5)
-                assemblez_3(call_vn_zc, AO, AO2, AO3);
-            else
-            if (version_number==4)
-                assemblez_3_to(call_vs_zc, AO, AO2, AO3, temp_var1);
-            else
-                assemblez_3_to(call_zc, AO, AO2, AO3, temp_var1);
+            assemblez_call_3(AO, AO2, AO3);
             break;
           case 2:
-            if (version_number>=5)
-                assemblez_4(call_vn_zc, AO, AO2, AO3, AO4);
-            else
-            if (version_number==4)
-                assemblez_4_to(call_vs_zc, AO, AO2, AO3, AO4, temp_var1);
-            else
-                assemblez_4(call_zc, AO, AO2, AO3, AO4);
+            assemblez_call_4(AO, AO2, AO3, AO4);
             break;
           case 3:
             assemblez_5(call_vn2_zc, AO, AO2, AO3, AO4, AO5);
+            break;
             /* V4 assemblez_6(call_vs2_zc, AO, AO2, AO3, AO4, AO5, temp_var1); */
       }
 
@@ -171,7 +154,6 @@ static void parse_action(void)
       case 3:
         four_ao = three_operand; four_ao.value = 4;
         assembleg_3(call_gc, AO, four_ao, zero_operand);
-        /*assembleg_call_4(AO, AO2, AO3, AO4, AO5, zero_operand);*/
         break;
       }
 
@@ -373,18 +355,9 @@ static void parse_print_z(int finally_return)
                           PrintByRoutine:
 
                           get_next_token();
-                          if (version_number >= 5)
-                            assemblez_2(call_2n_zc, AO,
+                          assemblez_call_2(AO,
                               code_generate(parse_expression(QUANTITY_CONTEXT),
                                 QUANTITY_CONTEXT, -1));
-                          else if (version_number == 4)
-                            assemblez_2_to(call_vs_zc, AO,
-                              code_generate(parse_expression(QUANTITY_CONTEXT),
-                                QUANTITY_CONTEXT, -1), temp_var1);
-                          else
-                            assemblez_2_to(call_zc, AO,
-                              code_generate(parse_expression(QUANTITY_CONTEXT),
-                                QUANTITY_CONTEXT, -1), temp_var1);
                           goto PrintTermDone;
 
                         default: ebf_error("print specification", token_text);
@@ -776,11 +749,11 @@ static void parse_statement_z(int break_label, int continue_label)
                  if (ln == 0)
                      error("No lines of text given for 'box' display");
 
-                 if (version_number == 3) return;
+                 if (version_number == 3) return; /* Why not v3? */
 
                  AO2.type = SHORT_CONSTANT_OT; AO2.value = ln2; AO2.marker = 0;
                  AO4.type = VARIABLE_OT; AO4.value = 255; AO4.marker = 0;
-                 assemblez_3_to(call_vs_zc, veneer_routine(Box__Routine_VR),
+                 assemblez_call_3_to(veneer_routine(Box__Routine_VR),
                      AO2, AO3, AO4);
                  return;
 
@@ -1059,19 +1032,8 @@ static void parse_statement_z(int break_label, int continue_label)
                      AO2 = code_generate(parse_expression(QUANTITY_CONTEXT),
                                QUANTITY_CONTEXT, -1);
                      if (runtime_error_checking_switch)
-                     {   /* ln2 = next_label++;
-                         check_nonzero_at_runtime(AO, ln2, GIVE_RTE);
-                         assemblez_2(ln, AO, AO2);
-                         assemble_label_no(ln2); */
-                         ln2 = (ln==set_attr_zc)?RT__ChG_VR:RT__ChGt_VR;
-                         if (version_number >= 5)
-                             assemblez_3(call_vn_zc, veneer_routine(ln2),
-                             AO, AO2);
-                         else
-                         {
-                             assemblez_3_to(call_zc, veneer_routine(ln2),
-                                 AO, AO2, temp_var1);
-                         }
+                     {   ln2 = (ln==set_attr_zc)?RT__ChG_VR:RT__ChGt_VR;
+                         assemblez_call_3(veneer_routine(ln2), AO, AO2);
                      }
                      else
                          assemblez_2(ln, AO, AO2);
@@ -1190,14 +1152,7 @@ static void parse_statement_z(int break_label, int continue_label)
                      QUANTITY_CONTEXT, -1);
                  AO = code_generate(AO, QUANTITY_CONTEXT, -1);
                  if ((runtime_error_checking_switch) && (veneer_mode == FALSE))
-                 {   if (version_number >= 5)
-                         assemblez_3(call_vn_zc, veneer_routine(RT__ChT_VR),
-                             AO, AO2);
-                     else
-                     {   assemblez_3_to(call_zc, veneer_routine(RT__ChT_VR),
-                             AO, AO2, temp_var1);
-                     }
-                 }
+                     assemblez_call_3(veneer_routine(RT__ChT_VR), AO, AO2);
                  else
                      assemblez_2(insert_obj_zc, AO, AO2);
                  break;
@@ -1270,11 +1225,8 @@ static void parse_statement_z(int break_label, int continue_label)
                          
                          get_next_token();
                          if ((token_type == SEP_TT) && 
-                             (token_value == CLOSEB_SEP /*|| token_value == LOGAND_SEP*/))
+                             (token_value == CLOSEB_SEP))
                          {
-                             /* if (token_value == CLOSEB_SEP)
-                                 flag = FALSE; */
-
                              i = symbol_index(obj_array_name, -1);
                              if (sflags[i] & UNKNOWN_SFLAG)
                              {  array_sizes[no_arrays] = 0; /* really not known */
@@ -1300,11 +1252,6 @@ static void parse_statement_z(int break_label, int continue_label)
                              ln2 = next_label++; ln3 = next_label++;
                              assemblez_1_branch(jz_zc, AO, ln2, TRUE);
                              sequence_point_follows = TRUE;
-                             /* if (flag) { 
-                                 code_generate(parse_expression(CONDITION_CONTEXT),
-                                     CONDITION_CONTEXT, ln3);
-                                 match_close_bracket();
-                             } /* @@ this has just broken left associativity of || */
                              parse_code_block(ln2, ln3, 0);
 
                              sequence_point_follows = FALSE;
@@ -1380,7 +1327,7 @@ static void parse_statement_z(int break_label, int continue_label)
                              en_ao.type = SHORT_CONSTANT_OT;
                              assemblez_2_branch(jin_zc, AO, AO4,
                                  next_label, TRUE);
-                             assemblez_3(call_vn_zc, veneer_routine(RT__Err_VR),
+                             assemblez_call_3(veneer_routine(RT__Err_VR),
                                  en_ao, AO);
                              assemblez_jump(ln2);
                              assemble_label_no(next_label++);
@@ -1466,11 +1413,7 @@ static void parse_statement_z(int break_label, int continue_label)
                      {   assembly_operand AO5;
                          put_token_back();
                          AO5 = parse_expression(CONSTANT_CONTEXT);
-
-                         if (version_number >= 5)
-                             assemblez_1(call_1n_zc, AO5);
-                         else
-                             assemblez_1_to(call_zc, AO5, temp_var1);
+                         assemblez_call_1(AO5);
                      }
                  }
 
@@ -1488,14 +1431,7 @@ static void parse_statement_z(int break_label, int continue_label)
                  AO = code_generate(parse_expression(QUANTITY_CONTEXT),
                      QUANTITY_CONTEXT, -1);
                  if ((runtime_error_checking_switch) && (veneer_mode == FALSE))
-                 {   if (version_number >= 5)
-                         assemblez_2(call_2n_zc, veneer_routine(RT__ChR_VR),
-                             AO);
-                     else
-                     {   assemblez_2_to(call_zc, veneer_routine(RT__ChR_VR),
-                             AO, temp_var1);
-                     }
-                 }
+                     assemblez_call_2(veneer_routine(RT__ChR_VR), AO);
                  else
                      assemblez_1(remove_obj_zc, AO);
                  break;
