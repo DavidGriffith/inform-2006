@@ -149,6 +149,7 @@ extern int parse_given_directive(void)
         if ((token_type != SYMBOL_TT)
             || (!(sflags[i] & (UNKNOWN_SFLAG + REDEFINABLE_SFLAG))))
         {   ebf_error("new constant name", token_text);
+            duplicate_error();
             panic_mode_error_recovery(); break;
         }
 
@@ -529,6 +530,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         get_next_token(); i = token_value;
         if ((token_type != SYMBOL_TT) || (!(sflags[i] & UNKNOWN_SFLAG)))
         {   ebf_error("new low string name", token_text);
+            duplicate_error();
             panic_mode_error_recovery(); return FALSE;
         }
 
@@ -650,6 +652,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
 
         if (!(sflags[token_value] & UNKNOWN_SFLAG))
         {   ebf_error("name of routine not yet defined", token_text);
+            duplicate_error();
             break;
         }
         sflags[token_value] |= REPLACE_SFLAG;
