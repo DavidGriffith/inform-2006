@@ -274,7 +274,7 @@ keyword_group directives =
     "iffalse", "import", "include", "link", "lowstring", "message",
     "nearby", "object", "property", "release", "replace",
     "serial", "switches", "statusline", "stub", "system_file", "trace",
-    "verb", "version", "zcharacter",
+    "undef", "verb", "version", "zcharacter",
     "" },
     DIRECTIVE_TT, FALSE, FALSE
 };
@@ -939,6 +939,11 @@ static void create_char_pipeline(void)
     File_sp = 0;
     begin_buffering_file(File_sp++, 1);
     pipeline_made = TRUE; last_no_files = input_file;
+}
+
+extern void terminate_file(void)
+{
+    CF->size = -(CF->read_pos);
 }
 
 static int get_next_char_from_pipeline(void)
