@@ -30,7 +30,7 @@
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-#define RELEASE_DATE "14th Jan 2004 - second beta"
+#define RELEASE_DATE "16th Jan 2004 - second beta"
 #define RELEASE_NUMBER 1630
 #define GLULX_RELEASE_NUMBER 38
 #define MODULE_VERSION_NUMBER 1
@@ -120,7 +120,7 @@
 /*   TIME_UNAVAILABLE    - don't use ANSI time routines to work out today's  */
 /*                         date                                              */
 /*   CHAR_IS_UNSIGNED    - if on your compiler the type "char" is unsigned   */
-/*                         by default, you must define this                  */
+/*                         by default, you should define this                */
 /*                                                                           */
 /*   3. An estimate of the typical amount of memory likely to be free        */
 /*   should be given in DEFAULT_MEMORY_SIZE.                                 */
@@ -144,22 +144,22 @@
 /*   character FN_ALT, which unless defined here will be a comma and will    */
 /*   be used to separate alternative locations in a path variable.           */
 /*                                                                           */
-/*   If FILE_EXTENSIONS is defined then the OS allows "file extensions" of   */
-/*   1 to 3 alphanumeric characters like ".txt" (for text files), ".z5"      */
+/*   If NO_FILE_EXTENSIONS is undefined then the OS allows "file extensions" */
+/*   of 1 to 3 alphanumeric characters like ".txt" (for text files), ".z5"   */
 /*   (for game files), etc., to indicate the file's type (and, crucially,    */
 /*   regards the same filename but with different extensions -- e.g.,        */
 /*   "frog.amp" and "frog.lil" -- as being different names).                 */
 /*   (The file extensions defined below are widely accepted, so please use   */
 /*   them unless there's a good reason why not.)                             */
 /*                                                                           */
-/*   Alternatively (or possibly as well) you can define STANDARD_DIRECTORIES */
+/*   You should then define STANDARD_DIRECTORIES (you can define it anyway)  */
 /*   in which case Inform will expect by default that files are sorted out   */
 /*   by being put into suitable directories (e.g., a "games" directory for   */
 /*   story files).                                                           */
 /*                                                                           */
 /*   If it's convenient for your port you can alter the detailed definitions */
-/*   which these broad settings make.  Be careful if neither                 */
-/*   STANDARD_DIRECTORIES nor FILE_EXTENSIONS is set, as then Inform may     */
+/*   which these broad settings make.  Be careful if NO_FILE_EXTENSIONS      */
+/*   is set without STANDARD_DIRECTORIES, as then Inform may                 */
 /*   overwrite its source with object code.                                  */
 /*                                                                           */
 /*   5. Filenames (or code related to filenames) for the three temporary     */
@@ -381,7 +381,7 @@ static int32 unique_task_id(void)
 /* ------------------------------------------------------------------------- */
 #ifdef PC_WIN32
 /* 1 */
-#define MACHINE_STRING   "PC/Win32"
+#define MACHINE_STRING   "Win32"
 /* 3 */
 #define DEFAULT_MEMORY_SIZE HUGE_SIZE
 /* 4 */
@@ -591,10 +591,6 @@ static int32 unique_task_id(void)
 
 #ifndef DEFAULT_ERROR_FORMAT
 #define DEFAULT_ERROR_FORMAT 0
-#endif
-
-#ifndef MACHINE_STRING
-#define MACHINE_STRING "Generic"
 #endif
 
 #ifndef DEFAULT_MEMORY_SIZE
