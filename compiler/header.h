@@ -2290,7 +2290,7 @@ extern int glulx_mode, compression_switch;
 
 extern int error_format,    store_the_text,       asm_trace_setting,
     double_space_setting,   trace_fns_setting,    character_set_setting,
-    header_ext_setting;
+    header_ext_setting,     optimise_setting;
 
 extern char Debugging_Name[];
 extern char Transcript_Name[];
@@ -2435,7 +2435,7 @@ extern void make_object(int nearby_flag,
 extern void make_class(char *metaclass_name);
 extern int  object_provides(int obj, int id);
 extern void list_object_tree(void);
-extern void write_the_identifier_names(void);
+extern void make_objectloop_lists(void);
 
 /* ------------------------------------------------------------------------- */
 /*   Extern definitions for "symbols"                                        */
@@ -2467,6 +2467,7 @@ extern void list_symbols(int level);
 extern void assign_marked_symbol(int index, int marker, int32 value, int type);
 extern void assign_symbol(int index, int32 value, int type);
 extern void issue_unused_warnings(void);
+extern void write_the_identifier_names(void);
 extern void duplicate_error(void);
 
 /* ------------------------------------------------------------------------- */

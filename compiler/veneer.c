@@ -2447,6 +2447,7 @@ override the standard definition) but cannot use it for anything else:",
         }
     }
 
+    make_objectloop_lists();
     compile_symbol_table_routine();
 }
 
