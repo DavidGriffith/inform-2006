@@ -771,7 +771,7 @@ static int gpropsort(void *ptr1, void *ptr2)
   return (prop1->continuation - prop2->continuation);
 }
 
-static int32 write_property_block_g(char *shortname)
+static int32 write_property_block_g(void)
 {
   /*  Compile the (now complete) full_object properties into a
       property-table block at "p" in Inform's memory. 
@@ -926,7 +926,7 @@ static void manufacture_object_g(void)
             blocks, one for each object in order of definition, exactly as
             it will appear in the final machine image.                      */
 
-    j = write_property_block_g(shortname_buffer);
+    j = write_property_block_g();
 
     objectsg[no_objects].propaddr = full_object_g.finalpropaddr;
 
