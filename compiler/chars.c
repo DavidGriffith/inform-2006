@@ -313,7 +313,7 @@ static void read_source_to_iso_file(uchar *uccg)
         fatalerror_named("Couldn't open character set mapping", Charset_Map);
 
     while (feof(charset_file)==0)
-    {   if (fgets(cs_buff,256,charset_file)==0) break;
+    {   if (file_read_line(cs_buff,256,charset_file)==0) break;
 
         switch (cs_buff[0])
         {   case '!': /* Ignore comments in file */
