@@ -30,8 +30,8 @@
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-#define RELEASE_DATE "27th Aug 2004 development version"
-#define RELEASE_NUMBER 1631
+#define RELEASE_DATE "18th Dec 2004 development version"
+#define RELEASE_NUMBER 1632
 #define GLULX_RELEASE_NUMBER 38
 #define MODULE_VERSION_NUMBER 1
 #define VNUMBER RELEASE_NUMBER
@@ -2361,6 +2361,7 @@ extern int  dont_enter_into_symbol_table;
 extern int  return_sp_as_variable;
 extern int  next_token_begins_syntax_line;
 extern char **local_variable_texts;
+extern int  File_sp;
 
 extern int32 token_value;
 extern int   token_type;
