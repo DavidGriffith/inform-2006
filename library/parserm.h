@@ -203,7 +203,7 @@ Global x_scope_count;               ! Used in printing a list of everything
 #Endif; ! DEBUG                     ! in scope
 
 ! Colour control -- see http://www.inform-fiction.org/patches/L61007.html
-! To enable colour define a CLR_ON Constant or Global:
+! To enable colour define a non-zero CLR_ON Constant or Global:
 #Ifdef CLR_ON;
 Global clr_fg = 1;                  ! foreground colour
 Global clr_bg = 1;                  ! background colour
@@ -5996,10 +5996,10 @@ Object  InformLibrary "(Inform Library)"
         print "** Warning: grammar properties might not work correctly **^";
     #Endif; ! DEBUG
 
-    buffer->0  = INPUT_BUFFER_LEN - WORDSIZE;
+    buffer->0  = INPUT_BUFFER_LEN - WORDSIZE; ! allow this many characters in input
     buffer2->0 = INPUT_BUFFER_LEN - WORDSIZE;
     buffer3->0 = INPUT_BUFFER_LEN - WORDSIZE;
-    parse->0   = MAX_BUFFER_WORDS;
+    parse->0   = MAX_BUFFER_WORDS; ! allow input to be tokenised into this many words
     parse2->0  = MAX_BUFFER_WORDS;
 ];
 
