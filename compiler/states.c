@@ -2112,31 +2112,33 @@ static void parse_statement_g(int break_label, int continue_label)
                  assembleg_2(copyb_gc, AO2, stack_pointer);
                  assembleg_1(streamchar_gc, stack_pointer);
 
-                 AO.marker = 0;
-                 AO.value = '(';
-                 set_constant_ot(&AO);
-                 assembleg_1(streamchar_gc, AO);
-                 AO.value = 'G';
-                 set_constant_ot(&AO);
-                 assembleg_1(streamchar_gc, AO);
+                 if (0) {
+                     AO.marker = 0;
+                     AO.value = '(';
+                     set_constant_ot(&AO);
+                     assembleg_1(streamchar_gc, AO);
+                     AO.value = 'G';
+                     set_constant_ot(&AO);
+                     assembleg_1(streamchar_gc, AO);
 
-                 AO2.value  = GLULX_HEADER_SIZE+12; 
-                 assembleg_2(copyb_gc, AO2, stack_pointer);
-                 assembleg_1(streamchar_gc, stack_pointer);
-                 AO2.value  = GLULX_HEADER_SIZE+13; 
-                 assembleg_2(copyb_gc, AO2, stack_pointer);
-                 assembleg_1(streamchar_gc, stack_pointer);
-                 AO2.value  = GLULX_HEADER_SIZE+14; 
-                 assembleg_2(copyb_gc, AO2, stack_pointer);
-                 assembleg_1(streamchar_gc, stack_pointer);
-                 AO2.value  = GLULX_HEADER_SIZE+15; 
-                 assembleg_2(copyb_gc, AO2, stack_pointer);
-                 assembleg_1(streamchar_gc, stack_pointer);
+                     AO2.value  = GLULX_HEADER_SIZE+12; 
+                     assembleg_2(copyb_gc, AO2, stack_pointer);
+                     assembleg_1(streamchar_gc, stack_pointer);
+                     AO2.value  = GLULX_HEADER_SIZE+13; 
+                     assembleg_2(copyb_gc, AO2, stack_pointer);
+                     assembleg_1(streamchar_gc, stack_pointer);
+                     AO2.value  = GLULX_HEADER_SIZE+14; 
+                     assembleg_2(copyb_gc, AO2, stack_pointer);
+                     assembleg_1(streamchar_gc, stack_pointer);
+                     AO2.value  = GLULX_HEADER_SIZE+15; 
+                     assembleg_2(copyb_gc, AO2, stack_pointer);
+                     assembleg_1(streamchar_gc, stack_pointer);
 
-                 AO.marker = 0;
-                 AO.value = ')';
-                 set_constant_ot(&AO);
-                 assembleg_1(streamchar_gc, AO);
+                     AO.marker = 0;
+                     AO.value = ')';
+                     set_constant_ot(&AO);
+                     assembleg_1(streamchar_gc, AO);
+                 }
 
                  break;
 
