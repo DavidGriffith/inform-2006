@@ -1,0 +1,43 @@
+!% -v4~S
+
+! This should run under any Z-code version, but is miscompiled
+! by Inform 6.21 and earlier for Z-code version 4.
+
+#iftrue (#version_number == 3);
+Object nowhere "Nowhere special";
+Global loc;
+#endif;
+
+Array buffer -> 63;
+Array parse buffer 63;
+
+#iffalse #version_number == 3;
+[ DoNothing;
+];
+#endif;
+
+[ Main i;
+
+#iftrue #version_number == 3;
+  loc = nowhere;
+#endif;
+
+  print "Enter something!^> ";
+  buffer->0 = 60;
+#iftrue #version_number == 3;
+  read buffer parse;
+#ifnot;
+  read buffer parse DoNothing;
+#endif;
+
+  print "You entered ";
+#iftrue #version_number == 3 || #version_number == 4;
+  for (i = 1: buffer->i ~= 0: i++)
+    print (char)buffer->i;
+#ifnot;
+  for (i = 0: i < buffer->1: i++)
+    print (char)(buffer->(i+2));
+#endif;
+  new_line;
+];
+
