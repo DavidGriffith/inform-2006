@@ -429,14 +429,14 @@ Module_Path or ICL_Path variables. Other paths are for output only.", FN_ALT);
                  && (path != Language_Name) && (path != Charset_Map)
                  && (i>0) && (isalnum(path[i-1]))) path[i++] = FN_SEP;
             path[i++] = value[j++];
-            if (i == PATHLEN-1) {
-                printf("A specified path is longer than %d characters.\n", 
-                    PATHLEN-1);
-                exit(1);
-            }
             if (value[j-1] == 0) return;
         }
         else path[i++] = value[j++];
+        if (i == PATHLEN-1) {
+            printf("A specified path is longer than %d characters.\n", 
+                PATHLEN-1);
+            exit(1);
+        }
     }
 }
 
