@@ -1108,7 +1108,7 @@ static void properties_segment_z(int this_segment)
           individual_property, this_identifier_number;
 
     do
-    {   get_next_token();
+    {   get_next_token_not_directive();
         if ((token_type == SEGMENT_MARKER_TT)
             || (token_type == EOF_TT)
             || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP)))
@@ -1200,7 +1200,7 @@ the names '%s' and '%s' actually refer to the same property",
         length=0;
         do
         {   assembly_operand AO;
-            get_next_token();
+            get_next_token_not_directive();
             if ((token_type == EOF_TT)
                 || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))
                 || ((token_type == SEP_TT) && (token_value == COMMA_SEP)))
@@ -1251,6 +1251,8 @@ the names '%s' and '%s' actually refer to the same property",
             {   AO.value = dictionary_add(token_text, 0x80, 0, 0);
                 AO.type = LONG_CONSTANT_OT;
                 AO.marker = DWORD_MV;
+                if (incompatibility_switch)
+                    obsolete_warning("\"...\"-quotes in name property instead of '...'");
             }
             else
             {   if (length!=0)
@@ -1362,7 +1364,7 @@ static void properties_segment_g(int this_segment)
     int32 property_name_symbol, property_number, length;
 
     do
-    {   get_next_token();
+    {   get_next_token_not_directive();
         if ((token_type == SEGMENT_MARKER_TT)
             || (token_type == EOF_TT)
             || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP)))
@@ -1455,7 +1457,7 @@ object; MAX_OBJ_PROP_COUNT is", MAX_OBJ_PROP_COUNT);
         length=0;
         do
         {   assembly_operand AO;
-            get_next_token();
+            get_next_token_not_directive();
             if ((token_type == EOF_TT)
                 || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))
                 || ((token_type == SEP_TT) && (token_value == COMMA_SEP)))
@@ -1600,7 +1602,7 @@ static void attributes_segment(void)
 
         ParseAttrN:
 
-        get_next_token();
+        get_next_token_not_directive();
         if ((token_type == SEGMENT_MARKER_TT)
             || (token_type == EOF_TT)
             || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP)))
@@ -1687,7 +1689,7 @@ static void classes_segment(void)
         <class-1> ... <class-n>                                              */
 
     do
-    {   get_next_token();
+    {   get_next_token_not_directive();
         if ((token_type == SEGMENT_MARKER_TT)
             || (token_type == EOF_TT)
             || ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP)))
@@ -1718,7 +1720,7 @@ static void parse_body_of_definition(void)
     do
     {   commas_in_row = -1;
         do
-        {   get_next_token(); commas_in_row++;
+        {   get_next_token_not_directive(); commas_in_row++;
         } while ((token_type == SEP_TT) && (token_value == COMMA_SEP));
 
         if (commas_in_row>1)
@@ -1970,11 +1972,17 @@ extern void make_object(int nearby_flag,
 
     individual_prop_table_size = 0;
 
-    if (nearby_flag) tree_depth=1; else tree_depth=0;
+    if (nearby_flag) 
+    {
+        tree_depth=1;
+        obsolete_warning("Nearby instead of Object ->");
+    }
+    else 
+        tree_depth=0;
 
     if (specified_class != -1) goto HeaderPassed;
 
-    get_next_token();
+    get_next_token(); 
 
     /*  Read past and count a sequence of "->"s, if any are present          */
 
@@ -2015,7 +2023,7 @@ extern void make_object(int nearby_flag,
     /*  The next word is either a parent object, or
         a textual short name, or the end of the header part                  */
 
-    get_next_token();
+    get_next_token_not_directive();
     if (end_of_header()) goto HeaderPassed;
 
     if (token_type == DQ_TT)
@@ -2055,7 +2063,7 @@ extern void make_object(int nearby_flag,
 
     /*  Now it really has to be the body of the definition.                  */
 
-    get_next_token();
+    get_next_token_not_directive();
     if (end_of_header()) goto HeaderPassed;
 
     ebf_error("body of object definition", token_text);
