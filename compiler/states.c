@@ -626,9 +626,10 @@ static void parse_print_g(int finally_return)
 }
 
 static void parse_statement_z(int break_label, int continue_label)
-{   int ln, ln2, ln3, ln4, flag;
+{   int ln, ln2, ln3, ln4, flag, fnum;
     assembly_operand AO, AO2, AO3, AO4;
     dbgl spare_dbgl1, spare_dbgl2;
+    char *src;
 
     ASSERT_ZCODE();
 
@@ -708,6 +709,40 @@ static void parse_statement_z(int break_label, int continue_label)
 
     switch(token_value)
     {
+    /*  -------------------------------------------------------------------- */
+    /*  assert ... --------------------------------------------------------- */
+    /*  -------------------------------------------------------------------- */
+
+        case ASSERT_CODE:
+             if (!runtime_error_checking_switch)
+             {  parse_expression(QUANTITY_CONTEXT);
+                break;
+             }
+
+             fnum = ErrorReport.file_number;
+             if (fnum <= 0) src = ErrorReport.source;
+             else src = InputFiles[fnum-1].filename;
+
+             AO = code_generate(parse_expression(QUANTITY_CONTEXT),
+                                QUANTITY_CONTEXT, -1);
+             assemblez_1_branch(jz_zc, AO, ln = next_label++, TRUE);
+             assemble_jump(ln2 = next_label++);
+             assemble_label_no(ln);
+             AO2.value  = compile_string(src, FALSE, FALSE);
+             AO2.marker = STRING_MV;
+             AO2.type   = LONG_CONSTANT_OT;
+             AO3.value  = ErrorReport.line_number / 10000;
+             AO3.marker = 0;
+             AO3.type   = LONG_CONSTANT_OT;
+             AO4.value  = ErrorReport.line_number % 10000;
+             AO4.marker = 0;
+             AO4.type   = LONG_CONSTANT_OT;
+             assemblez_4(call_vn_zc, veneer_routine(AssertFailed_VR),
+                        AO2, AO3, AO4);
+             assemble_label_no(ln2);
+             break;
+
+
     /*  -------------------------------------------------------------------- */
     /*  box <string-1> ... <string-n> -------------------------------------- */
     /*  -------------------------------------------------------------------- */
@@ -1639,9 +1674,10 @@ static void parse_statement_z(int break_label, int continue_label)
 }
 
 static void parse_statement_g(int break_label, int continue_label)
-{   int ln, ln2, ln3, ln4, flag, onstack;
+{   int ln, ln2, ln3, ln4, flag, onstack, fnum;
     assembly_operand AO, AO2, AO3, AO4;
     dbgl spare_dbgl1, spare_dbgl2;
+    char *src;
 
     ASSERT_GLULX();
 
@@ -1721,6 +1757,36 @@ static void parse_statement_g(int break_label, int continue_label)
 
     switch(token_value)
     {
+
+    /*  -------------------------------------------------------------------- */
+    /*  assert ... --------------------------------------------------------- */
+    /*  -------------------------------------------------------------------- */
+
+        case ASSERT_CODE:
+             if (!runtime_error_checking_switch)
+             {  parse_expression(QUANTITY_CONTEXT);
+                break;
+             }
+
+             fnum = ErrorReport.file_number;
+             if (fnum <= 0) src = ErrorReport.source;
+             else src = InputFiles[fnum-1].filename;
+
+             AO = code_generate(parse_expression(QUANTITY_CONTEXT),
+                                QUANTITY_CONTEXT, -1);
+             assembleg_1_branch(jz_gc, AO, ln = next_label++);
+             assembleg_jump(ln2 = next_label++);
+             assemble_label_no(ln);
+             AO2.value  = compile_string(src, FALSE, FALSE);
+             AO2.marker = STRING_MV;
+             AO2.type   = CONSTANT_OT;
+             AO3.value  = ErrorReport.line_number;
+             AO3.marker = 0;
+             set_constant_ot(&AO3);
+             assembleg_call_2(veneer_routine(AssertFailed_VR),
+                              AO2, AO3, zero_operand);
+             assemble_label_no(ln2);
+             break;
 
     /*  -------------------------------------------------------------------- */
     /*  box <string-1> ... <string-n> -------------------------------------- */

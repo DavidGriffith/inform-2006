@@ -313,11 +313,11 @@ keyword_group misc_keywords =
 };
 
 keyword_group statements =
-{ { "box", "break", "continue", "default", "do", "else", "font", "for",
-    "give", "if", "inversion", "jump", "move", "new_line", "objectloop",
-    "print", "print_ret", "quit", "read", "remove", "restore", "return",
-    "rfalse", "rtrue", "save", "spaces", "string", "style", "switch",
-    "until", "while", "" },
+{ { "assert", "box", "break", "continue", "default", "do", "else", "font",
+    "for", "give", "if", "inversion", "jump", "move", "new_line",
+    "objectloop", "print", "print_ret", "quit", "read", "remove", "restore",
+    "return", "rfalse", "rtrue", "save", "spaces", "string", "style",
+    "switch", "until", "while", "" },
     STATEMENT_TT, FALSE, TRUE
 };
 

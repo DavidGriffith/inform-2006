@@ -937,6 +937,17 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
         "a;\
          if (Z__Region(a)~=1) return RT__Err(36);",
         "@print_obj a; ]", "", "", "", ""
+    },
+    {
+        /*  AssertFailed:  handle runtime assertion failure
+         */
+        "AssertFailed",
+        "file lhi llo;",
+        "print \"^[** Assertion failed at line \";\
+         if (lhi > 0) { print lhi; if (llo < 1000) print \"0\";\
+         if (llo < 100) print \"0\"; if (llo < 10) print \"0\"; }\
+         print llo, \" in file ~\", (string) file, \"~ **]^\";\
+         ]", "", "", "", ""
     }
 };
 
@@ -1917,6 +1928,15 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
              return RT__Err(36);\
            @aload obj 3 sp; @streamstr sp;\
          ]", "", "", "", "", ""
+    },
+    {
+        /*  AssertFailed:  handle runtime assertion failure
+         */
+        "AssertFailed",
+        "file line;",
+        "print \"^[** Assertion failed at line \";\
+         print line, \" in file ~\", (string) file, \"~ **]^\";\
+         ]", "", "", "", ""
     },
     {
         /*  OB__Move: Move an object within the object tree. This does no
