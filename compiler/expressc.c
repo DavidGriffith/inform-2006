@@ -431,7 +431,10 @@ static void value_in_void_context_z(assembly_operand AO)
                 t = (char *) (symbs[AO.value]);
             break;
         default:
-            t = (char *) (symbs[variable_tokens[AO.value]]);
+            if (AO.value < MAX_LOCAL_VARIABLES)
+                t= (char *) (local_variables.keywords[AO.value-1]);
+            else
+                t = (char *) (symbs[variable_tokens[AO.value]]);
             break;
     }
     vivc_flag = TRUE;
@@ -794,6 +797,9 @@ static void value_in_void_context_g(assembly_operand AO)
             t = "<constant>";
             if (AO.marker == SYMBOL_MV)
                 t = (char *) (symbs[AO.value]);
+            break;
+        case LOCALVAR_OT:
+            t= (char *) (local_variables.keywords[AO.value-1]);
             break;
         default:
             t = (char *) (symbs[variable_tokens[AO.value]]);
@@ -1334,6 +1340,9 @@ static void generate_code_from(int n, int void_flag)
             make_jump_away = FALSE, make_branch_label = FALSE;
         int oc = operators[opnum].opcode_number_z-400, flag = TRUE;
 
+        if (void_flag)
+            warning_named("Evaluating this has no effect:",
+                operators[opnum].description);
         if (oc >= 400) { oc = oc - 400; flag = FALSE; }
 
         if ((oc == je_zc) && (arity == 2))
@@ -1487,6 +1496,10 @@ static void generate_code_from(int n, int void_flag)
           to the simple "zero" test. Unfortunately, this doesn't
           work for the commutative form "(constant) 0 is equal to".
           At least I don't think it does. */
+
+      if (void_flag)
+          warning_named("Evaluating this has no effect:",
+              operators[opnum].description);
 
       if ((cc == &condclasses[1]) && (arity == 2)) {
         i = ET[ET[n].down].right;
