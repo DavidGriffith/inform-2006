@@ -1425,7 +1425,7 @@ static void parse_statement_z(int break_label, int continue_label)
                  if ((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))
                  {   assemblez_0(rtrue_zc); return; }
                  put_token_back();
-                 AO = code_generate(parse_expression(QUANTITY_CONTEXT),
+                 AO = code_generate(parse_expression(RETURN_Q_CONTEXT),
                      QUANTITY_CONTEXT, -1);
                  if ((AO.type == SHORT_CONSTANT_OT) && (AO.value == 0)
                      && (AO.marker == 0))
@@ -2387,7 +2387,7 @@ static void parse_statement_g(int break_label, int continue_label)
             return; 
           }
           put_token_back();
-          AO = code_generate(parse_expression(QUANTITY_CONTEXT),
+          AO = code_generate(parse_expression(RETURN_Q_CONTEXT),
             QUANTITY_CONTEXT, -1);
           assembleg_1(return_gc, AO);
           break;
