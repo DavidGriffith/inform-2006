@@ -58,12 +58,6 @@ extern void select_version(int vn)
 int   WORDSIZE;            /* Size of a machine word: 2 or 4 */
 int32 MAXINTWORD;          /* 0x7FFF or 0x7FFFFFFF */
 
-/* The first property number which is an individual property. The
-   eight class-system i-props (create, recreate, ... print_to_array)
-   are numbered from INDIV_PROP_START to INDIV_PROP_START+7.
-*/
-int INDIV_PROP_START;
-
 /* The length of an object, as written in tables.c. It's easier to define
    it here than to repeat the same expression all over the source code.
    Not used in Z-code.
@@ -76,12 +70,15 @@ static void select_target(int targ)
     /* Z-machine */
     WORDSIZE = 2;
     MAXINTWORD = 0x7FFF;
-    INDIV_PROP_START = 64;
     OBJECT_BYTE_LENGTH = 0; /* not used */
 
     if (DICT_WORD_SIZE != 6) {
       DICT_WORD_SIZE = 6;
       warning("You cannot change DICT_WORD_SIZE in Z-code; resetting to 6");
+    }
+    if (INDIV_PROP_START != 64) {
+      INDIV_PROP_START = 64;
+      warning("You cannot change INDIV_PROP_START in Z-code; resetting to 64");
     }
     if (NUM_ATTR_BYTES != 6) {
       NUM_ATTR_BYTES = 6;
@@ -100,7 +97,7 @@ static void select_target(int targ)
     /* Glulx */
     WORDSIZE = 4;
     MAXINTWORD = 0x7FFFFFFF;
-    INDIV_PROP_START = 256; /* This could be a memory setting */
+    /*INDIV_PROP_START = 256; This is now a memory setting */
     scale_factor = 0; /* It should never even get used in Glulx */
 
     if (NUM_ATTR_BYTES % 4 != 3) {

@@ -173,6 +173,7 @@ int MAX_LOCAL_VARIABLES;
 int MAX_GLOBAL_VARIABLES;
 int DICT_WORD_SIZE;
 int NUM_ATTR_BYTES;
+int INDIV_PROP_START;
 int32 MAX_NUM_STATIC_STRINGS;
 
 /* The way memory sizes are set causes great nuisance for those parameters
@@ -185,6 +186,7 @@ static int MAX_GLOBAL_VARIABLES_z, MAX_GLOBAL_VARIABLES_g;
 static int MAX_LOCAL_VARIABLES_z, MAX_LOCAL_VARIABLES_g;
 static int DICT_WORD_SIZE_z, DICT_WORD_SIZE_g;
 static int NUM_ATTR_BYTES_z, NUM_ATTR_BYTES_g;
+static int INDIV_PROP_START_z, INDIV_PROP_START_g;
 
 /* ------------------------------------------------------------------------- */
 /*   Memory control from the command line                                    */
@@ -202,6 +204,7 @@ static void list_memory_sizes(void)
     printf("|  %25s = %-7d |\n","MAX_CLASS_TABLE_SIZE",MAX_CLASS_TABLE_SIZE);
     printf("|  %25s = %-7d |\n","MAX_DICT_ENTRIES",MAX_DICT_ENTRIES);
     printf("|  %25s = %-7d |\n","DICT_WORD_SIZE",DICT_WORD_SIZE);
+    printf("|  %25s = %-7d |\n","INDIV_PROP_START",INDIV_PROP_START);
     printf("|  %25s = %-7d |\n","MAX_EXPRESSION_NODES",MAX_EXPRESSION_NODES);
     printf("|  %25s = %-7d |\n","MAX_GLOBAL_VARIABLES",MAX_GLOBAL_VARIABLES);
     printf("|  %25s = %-7d |\n","HASH_TAB_SIZE",HASH_TAB_SIZE);
@@ -392,6 +395,8 @@ extern void set_memory_sizes(int size_flag)
     DICT_WORD_SIZE_g = 9;
     NUM_ATTR_BYTES_z = 6;
     NUM_ATTR_BYTES_g = 7;
+    INDIV_PROP_START_z = 64;
+    INDIV_PROP_START_g = 256;
 
     adjust_memory_sizes();
 }
@@ -405,6 +410,7 @@ extern void adjust_memory_sizes()
     MAX_LOCAL_VARIABLES = MAX_LOCAL_VARIABLES_z;
     DICT_WORD_SIZE = DICT_WORD_SIZE_z;
     NUM_ATTR_BYTES = NUM_ATTR_BYTES_z;
+    INDIV_PROP_START = INDIV_PROP_START_z;
   }
   else {
     MAX_ZCODE_SIZE = MAX_ZCODE_SIZE_g;
@@ -413,6 +419,7 @@ extern void adjust_memory_sizes()
     MAX_LOCAL_VARIABLES = MAX_LOCAL_VARIABLES_g;
     DICT_WORD_SIZE = DICT_WORD_SIZE_g;
     NUM_ATTR_BYTES = NUM_ATTR_BYTES_g;
+    INDIV_PROP_START = INDIV_PROP_START_g;
   }
 }
 
@@ -481,6 +488,15 @@ static void explain_parameter(char *command)
   stores eight attribytes. In Z-code this is always 6 (only 4 are used in \n\
   v3 games). In Glulx it can be any number which is a multiple of four, \n\
   plus three.\n");
+        return;
+    }
+    if (strcmp(command,"INDIV_PROP_START")==0)
+    {   printf(
+"  INDIV_PROP_START is the first property number which is an individual \n\
+  property. The eight class-system i-props (create, recreate, ... \n\
+  print_to_array) are numbered from INDIV_PROP_START to INDIV_PROP_START+7\n\
+  INDIV_PROP_START is the maximum number of defaulting common properties \n\
+  In Z-code this is always 64. In Glulx it can be any number.\n");
         return;
     }
     if (strcmp(command,"MAX_STATIC_DATA")==0)
@@ -705,6 +721,10 @@ extern void memory_command(char *command)
             if (strcmp(command,"NUM_ATTR_BYTES")==0)
             {   NUM_ATTR_BYTES=j, flag=1;
                 NUM_ATTR_BYTES_g=NUM_ATTR_BYTES_z=j;
+            }
+            if (strcmp(command,"INDIV_PROP_START")==0)
+            {   INDIV_PROP_START=j, flag=1;
+                INDIV_PROP_START_g=INDIV_PROP_START_z=j;
             }
             if (strcmp(command,"MAX_STATIC_DATA")==0)
                 MAX_STATIC_DATA=j, flag=1;
