@@ -983,7 +983,6 @@ static void compress_makebits(int entnum, int depth, int prevbit,
   huffbitlist_t *bits)
 {
   huffentity_t *ent = &(huff_entities[entnum]);
-  int ix;
   char *cx;
 
   ent->addr = compression_table_size;
@@ -1493,8 +1492,7 @@ apostrophe in", dword);
 /* Also used by verbs.c */
 static void dictionary_prepare_g(char *dword, uchar *optresult)
 { 
-  int i, j, k, k2; 
-  int32 tot;
+  int i, j, k;
 
   number_and_case = 0;
 
