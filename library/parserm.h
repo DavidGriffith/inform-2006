@@ -1997,7 +1997,7 @@ Object  InformParser "(Inform Parser)"
     if (etype == STUCK_PE) {    L__M(##Miscellany, 27); oops_from = 1; }
     if (etype == UPTO_PE) {     L__M(##Miscellany, 28);
         for (m=0 : m<32 : m++) pattern-->m = pattern2-->m;
-        pcount = pcount2; PrintCommand(0); print ".^";
+        pcount = pcount2; PrintCommand(0);L__M(##Miscellany, 56);
     }
     if (etype == NUMBER_PE)     L__M(##Miscellany, 29);
     if (etype == CANTSEE_PE) {  L__M(##Miscellany, 30); oops_from=saved_oops; }
@@ -2472,7 +2472,7 @@ Constant UNLIT_BIT  =  32;
         l = NounDomain(actors_location, actor, token);
         if (l == REPARSE_CODE) return l;                  ! Reparse after Q&A
         if (indef_wanted == 100 && l == 0 && number_matched == 0)
-        	l = 1;  ! ReviseMulti if TAKE ALL FROM empty container
+            l = 1;  ! ReviseMulti if TAKE ALL FROM empty container
 
         if (token_allows_multiple && ~~multiflag) {
             if (best_etype==MULTI_PE) best_etype=STUCK_PE;
@@ -2819,10 +2819,10 @@ Constant UNLIT_BIT  =  32;
 
         if (match_classes-->marker > 0) print (the) k; else print (a) k;
 
-        if (i < j-1)  print ", ";
+        if (i < j-1)  print (string) COMMA__TX;
         if (i == j-1) print (string) OR__TX;
     }
-    print "?^";
+    L__M(##Miscellany, 57);
 
     ! ...and get an answer:
 
@@ -4403,7 +4403,7 @@ Constant SCORE__DIVISOR = 20;
             print (the) y;
         }
         d++;
-        if (d < c-1) print ", ";
+        if (d < c-1) print (string) COMMA__TX;
         if (d == c-1) print (string) AND__TX;
     }
     if (player ~= selfobj) {
@@ -4411,7 +4411,7 @@ Constant SCORE__DIVISOR = 20;
         c = player; player = selfobj;
         print (the) c; player = c;
     }
-    ".";
+    L__M(##Pronouns, 5);
 ];
 
 [ SetPronoun dword value x;
