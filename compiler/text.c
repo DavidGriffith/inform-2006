@@ -1954,7 +1954,7 @@ static void recursively_show_z(int node)
 
 static void recursively_show_g(int node)
 {
-  warning("### Glulx dictionary-show not yet implemented.\n");
+  warning("### Glulx dictionary-show not yet implemented.");
 }
 
 static void show_alphabet(int i)
