@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   LINKLPA:  Link declarations of common properties and attributes.
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
+!   Supplied for use with Inform 6 -- Release 6/12 -- Serial number 040506
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !

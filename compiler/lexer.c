@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "lexer" : Lexical analyser                                              */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -250,20 +250,20 @@ static char *opcode_list_z[] = {
 static char *opcode_list_g[] = {
     "nop", "add", "sub", "mul", "div", "mod", "neg", "bitand", "bitor",
     "bitxor", "bitnot", "shiftl", "sshiftr", "ushiftr", "jump", "jz",
-    "jnz", "jeq", "jne", "jlt", "jge", "jgt", "jle", 
-    "jltu", "jgeu", "jgtu", "jleu", 
+    "jnz", "jeq", "jne", "jlt", "jge", "jgt", "jle",
+    "jltu", "jgeu", "jgtu", "jleu",
     "call", "return",
-    "catch", "throw", "tailcall", 
+    "catch", "throw", "tailcall",
     "copy", "copys", "copyb", "sexs", "sexb", "aload",
     "aloads", "aloadb", "aloadbit", "astore", "astores", "astoreb",
     "astorebit", "stkcount", "stkpeek", "stkswap", "stkroll", "stkcopy",
-    "streamchar", "streamnum", "streamstr", 
+    "streamchar", "streamnum", "streamstr",
     "gestalt", "debugtrap", "getmemsize", "setmemsize", "jumpabs",
     "random", "setrandom", "quit", "verify",
     "restart", "save", "restore", "saveundo", "restoreundo", "protect",
     "glk", "getstringtbl", "setstringtbl", "getiosys", "setiosys",
     "linearsearch", "binarysearch", "linkedsearch",
-    "callf", "callfi", "callfii", "callfiii", 
+    "callf", "callfi", "callfii", "callfiii",
     ""
 };
 
@@ -487,7 +487,7 @@ extern void construct_local_variable_tables(void)
         strcpy(p, q);
         p += strlen(p)+1;
     }
-    for (;i<MAX_LOCAL_VARIABLES-1;i++) 
+    for (;i<MAX_LOCAL_VARIABLES-1;i++)
       local_variable_texts[i] = "<no such local variable>";
 }
 
@@ -888,7 +888,7 @@ static int last_no_files;
 static void begin_buffering_file(int i, int file_no)
 {   int j, cnt; uchar *p;
 
-    if (i >= MAX_INCLUSION_DEPTH) 
+    if (i >= MAX_INCLUSION_DEPTH)
        memoryerror("MAX_INCLUSION_DEPTH",MAX_INCLUSION_DEPTH);
 
     p = (uchar *) FileStack[i].buffer;

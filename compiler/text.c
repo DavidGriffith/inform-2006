@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "text" : Text translation, the abbreviations optimiser, the dictionary  */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -55,7 +55,7 @@ int no_dynamic_strings;                /* No. of @.. string escapes used
 
 static int MAX_CHARACTER_SET;          /* Number of possible entities */
 huffentity_t *huff_entities;           /* The list of entities (characters,
-                                          abbreviations, @.. escapes, and 
+                                          abbreviations, @.. escapes, and
                                           the terminator)                    */
 static huffentity_t **hufflist;        /* Copy of the list, for sorting      */
 
@@ -69,7 +69,7 @@ int huff_entity_root;                  /* The position in the list of the root
                                           as a tree).                        */
 
 int done_compression;                  /* Has the game text been compressed? */
-int32 compression_table_size;          /* Length of the Huffman table, in 
+int32 compression_table_size;          /* Length of the Huffman table, in
                                           bytes                              */
 int32 compression_string_size;         /* Length of the compressed string
                                           data, in bytes                     */
@@ -328,7 +328,7 @@ static void write_z_char_g(int i)
   total_zchars_trans++;
   text_out_pc[0] = i;
   text_out_pc++;
-  total_bytes_trans++;  
+  total_bytes_trans++;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -538,7 +538,7 @@ advance as part of 'Zcharacter table':", unicode);
        "@ANNNN" to indicate an abbreviation,
        "@DNNNN" to indicate a dynamic string thing.
        (NNNN is a four-digit hex number using the letters A-P... an
-       ugly representation but a convenient one.) 
+       ugly representation but a convenient one.)
     */
 
     for (i=0; text_in[i]!=0; i++) {
@@ -548,7 +548,7 @@ advance as part of 'Zcharacter table':", unicode);
       if ((double_space_setting >= 1)
         && (text_in[i+1]==' ') && (text_in[i+2]==' ')) {
         if (text_in[i]=='.'
-          || (double_space_setting >= 2 
+          || (double_space_setting >= 2
             && (text_in[i]=='?' || text_in[i]=='!'))) {
           text_in[i+1] = text_in[i];
           i++;
@@ -560,7 +560,7 @@ advance as part of 'Zcharacter table':", unicode);
       /*  Try abbreviations if the economy switch set. We have to be in
           compression mode too, since the abbreviation mechanism is part
           of string decompression. */
-      
+
       if ((economy_switch) && (compression_switch) && (!is_abbreviation)
         && ((k=abbrevs_lookup[text_in[i]])!=-1)
         && ((j=try_abbreviations_from(text_in, i, k)) != -1)) {
@@ -825,7 +825,7 @@ void compress_game_text()
       bran->u.branch[1] = (hufflist[best2] - huff_entities);
       hufflist[best1] = bran;
       if (best2 < numlive-1) {
-        memmove(&(hufflist[best2]), &(hufflist[best2+1]), 
+        memmove(&(hufflist[best2]), &(hufflist[best2+1]),
           ((numlive-1) - best2) * sizeof(huffentity_t *));
       }
       numlive--;
@@ -837,10 +837,10 @@ void compress_game_text()
     for (ix=0; ix<MAXHUFFBYTES; ix++)
       bits.b[ix] = 0;
     compression_table_size = 12;
-    
+
     compress_makebits(huff_entity_root, 0, -1, &bits);
     /* compress_dumptable(huff_entity_root, 0);  */
-    
+
   }
 
   /* Now, sadly, we have to compute the size of the string section,
@@ -851,14 +851,14 @@ void compress_game_text()
     fseek(Temp1_fp, 0, SEEK_SET);
   }
 
-  if (no_strings >= MAX_NUM_STATIC_STRINGS) 
+  if (no_strings >= MAX_NUM_STATIC_STRINGS)
     memoryerror("MAX_NUM_STATIC_STRINGS", MAX_NUM_STATIC_STRINGS);
 
   for (lx=0, ix=0; lx<no_strings; lx++) {
     int escapelen=0, escapetype=0;
     int done=FALSE;
     int32 escapeval;
-    jx = 0; 
+    jx = 0;
     compressed_offsets[lx] = compression_table_size + compression_string_size;
     compression_string_size++; /* for the type byte */
     while (!done) {
@@ -1379,16 +1379,16 @@ int dict_entries;                     /* Total number of records entered     */
 
 extern int compare_sorts(uchar *d1, uchar *d2)
 {   int i;
-    for (i=0; i<DICT_WORD_SIZE; i++) 
+    for (i=0; i<DICT_WORD_SIZE; i++)
         if (d1[i]!=d2[i]) return((int)(d1[i]) - (int)(d2[i]));
-    /* (since memcmp(d1, d2, DICT_WORD_SIZE); runs into a bug on some Unix 
+    /* (since memcmp(d1, d2, DICT_WORD_SIZE); runs into a bug on some Unix
        libraries) */
     return(0);
 }
 
 extern void copy_sorts(uchar *d1, uchar *d2)
 {   int i;
-    for (i=0; i<DICT_WORD_SIZE; i++) 
+    for (i=0; i<DICT_WORD_SIZE; i++)
         d1[i] = d2[i];
 }
 
@@ -1491,7 +1491,7 @@ apostrophe in", dword);
 
 /* Also used by verbs.c */
 static void dictionary_prepare_g(char *dword, uchar *optresult)
-{ 
+{
   int i, j, k;
 
   number_and_case = 0;
@@ -1501,7 +1501,7 @@ static void dictionary_prepare_g(char *dword, uchar *optresult)
       for (j+=2; dword[j] != 0; j++) {
         switch(dword[j]) {
         case 'p':
-          number_and_case |= 4;  
+          number_and_case |= 4;
           break;
         default:
           error_named("Expected 'p' after '//' \
@@ -1514,10 +1514,10 @@ to give gender or number of dictionary word", dword);
     if (i>=DICT_WORD_SIZE) break;
 
     k= (int)dword[j];
-    if (k=='\'') 
+    if (k=='\'')
       warning_named("Obsolete usage: use the ^ character for the \
 apostrophe in", dword);
-    if (k=='^') 
+    if (k=='^')
       k='\'';
     if (k=='~') /* as in iso_to_alphabet_grid */
       k='\"';
@@ -1533,7 +1533,7 @@ apostrophe in", dword);
         k = '?';
       }
     }
-    
+
     if (k >= 'A' && k <= 'Z')
       k += ('a' - 'A');
 
@@ -1778,7 +1778,7 @@ extern int dictionary_add(char *dword, int x, int y, int z)
 
         p = dictionary + (3+res)*dict_entries + 7;
 
-        /*  So copy in the 4 (or 6) bytes of Z-coded text and the 3 data 
+        /*  So copy in the 4 (or 6) bytes of Z-coded text and the 3 data
             bytes */
 
         p[0]=prepared_sort[0]; p[1]=prepared_sort[1];
@@ -1798,13 +1798,13 @@ extern int dictionary_add(char *dword, int x, int y, int z)
 
         for (i=0; i<DICT_WORD_SIZE; i++)
           p[1+i] = prepared_sort[i];
-        
+
         p[1+DICT_WORD_SIZE+0] = 0; p[1+DICT_WORD_SIZE+1] = x;
         p[1+DICT_WORD_SIZE+2] = 0; p[1+DICT_WORD_SIZE+3] = y;
         p[1+DICT_WORD_SIZE+4] = 0; p[1+DICT_WORD_SIZE+5] = z;
-        if (x & 128) 
+        if (x & 128)
           p[1+DICT_WORD_SIZE+1] |= number_and_case;
-        
+
         dictionary_top += (7+DICT_WORD_SIZE);
 
     }
@@ -1825,13 +1825,13 @@ extern void dictionary_set_verb_number(char *dword, int to)
     int res=((version_number==3)?4:6);
     i=dictionary_find(dword);
     if (i!=0)
-    {   
+    {
         if (!glulx_mode) {
-            p=dictionary+7+(i-1)*(3+res)+res; 
+            p=dictionary+7+(i-1)*(3+res)+res;
             p[1]=to;
         }
         else {
-            p=dictionary+4 + (i-1)*(7+DICT_WORD_SIZE) + 1+DICT_WORD_SIZE; 
+            p=dictionary+4 + (i-1)*(7+DICT_WORD_SIZE) + 1+DICT_WORD_SIZE;
             p[3]=to;
         }
     }
@@ -1970,8 +1970,8 @@ static void show_alphabet(int i)
 extern void show_dictionary(void)
 {   printf("Dictionary contains %d entries:\n",dict_entries);
     if (dict_entries != 0)
-    {   d_show_total = 0; d_show_to = NULL; 
-        if (!glulx_mode)    
+    {   d_show_total = 0; d_show_to = NULL;
+        if (!glulx_mode)
             recursively_show_z(root);
         else
             recursively_show_g(root);
@@ -1990,8 +1990,8 @@ extern void write_dictionary_to_transcript(void)
     d_buffer[0] = 0; write_to_transcript_file(d_buffer);
 
     if (dict_entries != 0)
-    {   d_show_total = 0; d_show_to = d_buffer; 
-        if (!glulx_mode)    
+    {   d_show_total = 0; d_show_to = d_buffer;
+        if (!glulx_mode)
             recursively_show_z(root);
         else
             recursively_show_g(root);
@@ -2077,9 +2077,9 @@ extern void text_allocate_arrays(void)
     if (glulx_mode) {
       if (compression_switch) {
         MAX_CHARACTER_SET = 257 + MAX_ABBREVS + MAX_DYNAMIC_STRINGS;
-        huff_entities = my_calloc(sizeof(huffentity_t), MAX_CHARACTER_SET*2+1, 
+        huff_entities = my_calloc(sizeof(huffentity_t), MAX_CHARACTER_SET*2+1,
           "huffman entities");
-        hufflist = my_calloc(sizeof(huffentity_t *), MAX_CHARACTER_SET, 
+        hufflist = my_calloc(sizeof(huffentity_t *), MAX_CHARACTER_SET,
           "huffman node list");
       }
       compressed_offsets = my_calloc(sizeof(int32), MAX_NUM_STATIC_STRINGS,

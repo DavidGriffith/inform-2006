@@ -3,7 +3,7 @@
 /*               end of dynamic memory, gluing together all the required     */
 /*               tables.                                                     */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -1150,7 +1150,7 @@ static void construct_storyfile_g(void)
         my_calloc(sizeof(int32), NUM_ATTR_BYTES*8,
             "attribute name strings");
     array_name_strings =
-        my_calloc(sizeof(int32), 
+        my_calloc(sizeof(int32),
             no_symbols,
             "array name strings");
 
@@ -1173,13 +1173,13 @@ static void construct_storyfile_g(void)
         "dictionary table start".  It begins at 0x40, just after the header  */
 
     /* Ok, our policy here will be to set the *_at values all relative
-       to RAM. That's so we can write into zmachine_paged_memory[mark] 
+       to RAM. That's so we can write into zmachine_paged_memory[mark]
        and actually hit what we're aiming at.
        All the *_offset values will be set to true Glulx machine
        addresses. */
 
     /* To get our bearings, figure out where the strings and code are. */
-    /* We start with two words, which conventionally identify the 
+    /* We start with two words, which conventionally identify the
        memory layout. This is why the code starts eight bytes after
        the header. */
     Write_Code_At = GLULX_HEADER_SIZE + GLULX_STATIC_ROM_SIZE;
@@ -1290,7 +1290,7 @@ static void construct_storyfile_g(void)
     for (i=0; i<properties_table_size; i++)
       p[mark+i]=properties_table[i];
 
-    for (i=0; i<no_objects; i++) { 
+    for (i=0; i<no_objects; i++) {
       int32 tableaddr = object_props_at + objectsg[i].propaddr;
       int32 tablelen = ReadInt32(p+tableaddr);
       tableaddr += 4;
@@ -1312,7 +1312,7 @@ static void construct_storyfile_g(void)
     }
 
     /*  ----------- Table of Class Prototype Object Numbers ---------------- */
-    
+
     class_numbers_offset = mark;
     for (i=0; i<no_classes; i++) {
       j = Write_RAM_At + object_tree_at +
@@ -1350,7 +1350,7 @@ static void construct_storyfile_g(void)
     }
 
     WriteInt32(p+identifier_names_offset+8, Write_RAM_At + mark);
-    WriteInt32(p+identifier_names_offset+12, 
+    WriteInt32(p+identifier_names_offset+12,
       no_individual_properties-INDIV_PROP_START);
     for (i=INDIV_PROP_START; i<no_individual_properties; i++) {
       j = individual_name_strings[i];
@@ -1391,7 +1391,7 @@ static void construct_storyfile_g(void)
         j = Write_Strings_At + compressed_offsets[j-1];
       WriteInt32(p+mark, j);
       mark += 4;
-    }    
+    }
 
     individuals_offset = mark;
 
@@ -1449,7 +1449,7 @@ table format requested (producing number 2 format instead)");
     dictionary_at = mark;
 
     WriteInt32(dictionary+0, dict_entries);
-    for (i=0; i<4; i++) 
+    for (i=0; i<4; i++)
       p[mark+i] = dictionary[i];
 
     for (i=0; i<dict_entries; i++) {
@@ -1461,7 +1461,7 @@ table format requested (producing number 2 format instead)");
     mark += 4 + dict_entries * (7+DICT_WORD_SIZE);
 
     /*  -------------------------- All Data -------------------------------- */
-    
+
     /* The end-of-RAM boundary must be a multiple of GPAGESIZE. */
     while (mark % GPAGESIZE)
       p[mark++]=0;
@@ -1503,16 +1503,16 @@ table format requested (producing number 2 format instead)");
         }
 
         for (l = 0; l<no_Inform_verbs; l++) {
-          k = grammar_table_at + 4 + 4*l; 
+          k = grammar_table_at + 4 + 4*l;
           i = ((p[k] << 24) | (p[k+1] << 16) | (p[k+2] << 8) | (p[k+3]));
           i -= Write_RAM_At;
           for (j = p[i++]; j>0; j--) {
-            int topbits; 
+            int topbits;
             int32 value;
             i = i + 3;
             while (p[i] != 15) {
               topbits = (p[i]/0x40) & 3;
-              value = ((p[i+1] << 24) | (p[i+2] << 16) 
+              value = ((p[i+1] << 24) | (p[i+2] << 16)
                 | (p[i+3] << 8) | (p[i+4]));
               switch(topbits) {
               case 1:
@@ -1567,7 +1567,7 @@ Out:   Version %d \"%s\" %s %d.%c%c%c%c%c%c (%ld%sK long):\n",
                  serialnum[0], serialnum[1], serialnum[2],
                  serialnum[3], serialnum[4], serialnum[5],
                  (long int) k_long, k_str);
-            } 
+            }
 
             printf("\
 %6d classes (maximum %2d)         %6d objects (maximum %3d)\n\
@@ -1696,7 +1696,7 @@ printf("        | string decode table |\n");
 printf("        + - - - - - - - - - - +   %06lx\n",
   (long int) Write_Strings_At + compression_table_size);
 printf("        |       strings       |\n");
-printf("        +=====================+   %06lx\n", 
+printf("        +=====================+   %06lx\n",
   (long int) (Write_RAM_At+globals_at));
 printf("Dynamic |  global variables   |\n");
 printf("memory  + - - - - - - - - - - +   %06lx\n",
@@ -1707,17 +1707,17 @@ printf("        +---------------------+   %06lx\n",
 printf("        | printing variables  |\n");
             if (alphabet_modified)
             {
-printf("        + - - - - - - - - - - +   %06lx\n", 
+printf("        + - - - - - - - - - - +   %06lx\n",
   (long int) (Write_RAM_At+charset_at));
 printf("        |   alphabets table   |\n");
             }
             if (zscii_defn_modified)
             {
-printf("        + - - - - - - - - - - +   %06lx\n", 
+printf("        + - - - - - - - - - - +   %06lx\n",
   (long int) (Write_RAM_At+unicode_at));
 printf("        |    Unicode table    |\n");
             }
-printf("        +---------------------+   %06lx\n", 
+printf("        +---------------------+   %06lx\n",
   (long int) (Write_RAM_At+object_tree_at));
 printf("        |       objects       |\n");
 printf("        + - - - - - - - - - - +   %06lx\n",
@@ -1733,10 +1733,10 @@ printf("        + - - - - - - - - - - +   %06lx\n",
   (long int) (Write_RAM_At+identifier_names_offset));
 printf("        |   id names table    |\n");
 printf("        +=====================+   %06lx\n",
-                                          
+
   (long int) (Write_RAM_At+grammar_table_at));
 printf("Readable|    grammar table    |\n");
-printf("memory  + - - - - - - - - - - +   %06lx\n", 
+printf("memory  + - - - - - - - - - - +   %06lx\n",
   (long int) (Write_RAM_At+actions_at));
 printf("        |       actions       |\n");
 printf("        + - - - - - - - - - - +   %06lx\n", (long int) preactions_at);
@@ -1744,7 +1744,7 @@ printf("        |   parsing routines  |\n");
 printf("        + - - - - - - - - - - +   %06lx\n",
                                           (long int) adjectives_offset);
 printf("        |     adjectives      |\n");
-printf("        +---------------------+   %06lx\n", 
+printf("        +---------------------+   %06lx\n",
   (long int) dictionary_offset);
 printf("        |     dictionary      |\n");
 printf("        +---------------------+   %06lx\n", (long int) Out_Size);

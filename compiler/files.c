@@ -7,7 +7,7 @@
 /*             routines in "inform.c", since they are tied up with ICL       */
 /*             settings and are very host OS-dependent.                      */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -189,9 +189,9 @@ static void sf_put(int c)
         checksum_long += ((int32)(c & 0xFF));
         break;
       }
-      
+
       checksum_count = (checksum_count+1) & 3;
-      
+
     }
 
     fputc(c, sf_handle);
@@ -237,10 +237,10 @@ static void output_compression(int entnum, int32 *size)
     while (*cx) {
       sf_put(*cx);
       cx++;
-      (*size) += 1;  
+      (*size) += 1;
     }
     sf_put('\0');
-    (*size) += 1;  
+    (*size) += 1;
     break;
   case 9:
     val = abbreviations_offset + 4 + ent->u.val*4;
@@ -541,7 +541,7 @@ static void output_file_g(void)
     sf_put(0x00);
     sf_put(0x00);
     sf_put(0x00);
-    
+
     size = GLULX_HEADER_SIZE;
 
     /*  (1a) Output the eight-byte memory layout identifier. */
@@ -587,7 +587,7 @@ static void output_file_g(void)
       for (i=0; i<zcode_backpatch_size; i=i+6) {
         int data_len;
         int32 offset, v;
-        offset = 
+        offset =
           (read_byte_from_memory_block(&zcode_backpatch_table, i+2) << 24)
           | (read_byte_from_memory_block(&zcode_backpatch_table, i+3) << 16)
           | (read_byte_from_memory_block(&zcode_backpatch_table, i+4) << 8)
@@ -731,7 +731,7 @@ static void output_file_g(void)
         else
           sf_put(0xE0); /* type byte -- non-compressed string */
         size++;
-        jx = 0; 
+        jx = 0;
         curbyte = 0;
         while (!done) {
           if (temporary_files_switch)
@@ -774,7 +774,7 @@ static void output_file_g(void)
                 compiler_error("Strange @ escape in processed text.");
               }
             }
-            else 
+            else
               continue;
           }
           else {
@@ -823,12 +823,12 @@ static void output_file_g(void)
           size++;
         }
       }
-      
+
       if (size - origsize != compression_string_size)
         compiler_error("Compression string size mismatch.");
 
     }
-    
+
     /*  (4.5)  Output any null bytes (required to reach a GPAGESIZE address)
              before RAMSTART. */
 
@@ -1093,7 +1093,7 @@ extern void files_allocate_arrays(void)
 {   filename_storage = my_malloc(MAX_SOURCE_FILES*64, "filename storage");
     filename_storage_p = filename_storage;
     filename_storage_left = MAX_SOURCE_FILES*64;
-    InputFiles = my_malloc(MAX_SOURCE_FILES*sizeof(FileId), 
+    InputFiles = my_malloc(MAX_SOURCE_FILES*sizeof(FileId),
         "input file storage");
 }
 

@@ -2,7 +2,7 @@
 /*   "verbs" :  Manages actions and grammar tables; parses the directives    */
 /*              Verb and Extend.                                             */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -234,7 +234,7 @@ static int make_adjective(char *English_word)
         This routine is used only in grammar version 1: the corresponding
         table is left empty in GV2.                                          */
 
-    int i; 
+    int i;
     uchar new_sort_code[MAX_DICT_WORD_SIZE];
 
     if (no_adjectives >= MAX_ADJECTIVES)

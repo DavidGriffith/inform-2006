@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "syntax" : Syntax analyser and compiler                                 */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -174,13 +174,13 @@ static void compile_alternatives_z(assembly_operand switch_value, int n,
 
 static void compile_alternatives_g(assembly_operand switch_value, int n,
     int stack_level, int label, int flag)
-{   
+{
     int the_zc = (flag) ? jeq_gc : jne_gc;
 
     if (n == 1) {
       assembleg_2_branch(the_zc, switch_value,
         spec_stack[stack_level],
-        label); 
+        label);
     }
     else {
       error("*** Cannot generate multi-equality tests in Glulx ***");
@@ -213,7 +213,7 @@ static void parse_switch_spec(assembly_operand switch_value, int label,
 
         if (action_switch)
         {   get_next_token();
-            spec_stack[spec_sp].type = 
+            spec_stack[spec_sp].type =
                 ((!glulx_mode) ? LONG_CONSTANT_OT : CONSTANT_OT);
             spec_stack[spec_sp].value = 0;
             spec_stack[spec_sp].marker = 0;
@@ -269,7 +269,7 @@ static void parse_switch_spec(assembly_operand switch_value, int label,
              i=j;
          }
          else
-         {   
+         {
            if (!glulx_mode) {
              if (i == spec_sp - 2)
              {   assemblez_2_branch(jl_zc, switch_value, spec_stack[i],
@@ -402,7 +402,7 @@ extern int32 parse_routine(char *source, int embedded_flag, char *name,
                     if (!glulx_mode)
                         assemblez_0((embedded_flag)?rfalse_zc:rtrue_zc);
                     else
-                        assembleg_1(return_gc, 
+                        assembleg_1(return_gc,
                             ((embedded_flag)?zero_operand:one_operand));
                 }
                 assemble_label_no(switch_label);
@@ -419,7 +419,7 @@ extern int32 parse_routine(char *source, int embedded_flag, char *name,
 
         /*  Only check for the form of a case switch if the initial token
             isn't double-quoted text, as that would mean it was a print_ret
-            statement: this is a mild ambiguity in the grammar. 
+            statement: this is a mild ambiguity in the grammar.
             Action statements also cannot be cases. */
 
         if ((token_type != DQ_TT) && (token_type != SEP_TT))
@@ -435,7 +435,7 @@ extern int32 parse_routine(char *source, int embedded_flag, char *name,
                         if (!glulx_mode)
                             assemblez_0((embedded_flag)?rfalse_zc:rtrue_zc);
                         else
-                            assembleg_1(return_gc, 
+                            assembleg_1(return_gc,
                                 ((embedded_flag)?zero_operand:one_operand));
                     }
                     assemble_label_no(switch_label);

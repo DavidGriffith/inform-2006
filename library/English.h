@@ -1,7 +1,7 @@
 ! ==============================================================================
 !   ENGLISH:  Language Definition File
 !
-!   Supplied for use with Inform 6 -- Release 6/11 -- Serial number 040227
+!   Supplied for use with Inform 6 -- Release 6/12 -- Serial number 040506
 !
 !   Copyright Graham Nelson 1993-2004 but freely usable (see manuals)
 !
@@ -285,7 +285,7 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
 ];
 
 ! ----------------------------------------------------------------------------
-!  LanguageVerbIsDebugging is called by SearchScope.  It should return true 
+!  LanguageVerbIsDebugging is called by SearchScope.  It should return true
 !  if word w is a debugging verb which needs all objects to be in scope.
 ! ----------------------------------------------------------------------------
 
@@ -313,7 +313,7 @@ Array LanguageGNAsToArticles --> 0 0 0 1 1 1 0 0 0 1 1 1;
 ];
 
 ! ----------------------------------------------------------------------------
-!  LanguageVerbMayBeName is called by NounDomain when dealing with the 
+!  LanguageVerbMayBeName is called by NounDomain when dealing with the
 !  player's reply to a "Which do you mean, the short stick or the long
 !  stick?" prompt from the parser. If the reply is another verb (for example,
 !  LOOK) then then previous ambiguous command is discarded /unless/

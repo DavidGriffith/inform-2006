@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "expressc" :  The expression code generator                             */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -354,7 +354,7 @@ operator operators[NUM_OPERATORS] =
                          /*  unchanged.              */
                          /* ------------------------ */
 
-  {14,     -1, -1,              -1,   -1,  0, -1, -1, 1, 0,     
+  {14,     -1, -1,              -1,   -1,  0, -1, -1, 1, 0,
       "push on stack" }
 };
 
@@ -421,8 +421,8 @@ static void annotate_for_conditions(int n, int a, int b)
 static void value_in_void_context_z(assembly_operand AO)
 {   char *t;
 
-    ASSERT_ZCODE(); 
- 
+    ASSERT_ZCODE();
+
     switch(AO.type)
     {   case LONG_CONSTANT_OT:
         case SHORT_CONSTANT_OT:
@@ -472,7 +472,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
     int x, y, byte_flag, read_flag, from_module;
 
     if (AO1.marker == ARRAY_MV)
-    {   
+    {
         if ((oc == loadb_zc) || (oc == storeb_zc)) byte_flag=TRUE;
         else byte_flag = FALSE;
         if ((oc == loadb_zc) || (oc == loadw_zc)) read_flag=TRUE;
@@ -487,7 +487,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
             {   size_ao.value = array_sizes[x]; y=x;
             }
         }
-        if (size_ao.value==-1) 
+        if (size_ao.value==-1)
             from_module=TRUE; /*compiler_error("Array size can't be found");*/
         else {
             from_module=FALSE;
@@ -522,9 +522,9 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
        array, we can check bounds explicitly. */
 
     if ((AO1.marker == ARRAY_MV) && (!from_module))
-    {   
+    {
         int passed_label = next_label++, failed_label = next_label++,
-            final_label = next_label++; 
+            final_label = next_label++;
         /* Calculate the largest permitted array entry + 1
            Here "size_ao.value" = largest permitted entry of its own kind */
         max_ao = size_ao;
@@ -537,7 +537,7 @@ static void access_memory_z(int oc, assembly_operand AO1, assembly_operand AO2,
         }
         if ((!byte_flag)
             && ((array_types[y] == BYTE_ARRAY)
-                || (array_types[y] == STRING_ARRAY) 
+                || (array_types[y] == STRING_ARRAY)
                 || (array_types[y] == BUFFER_ARRAY)))
         {   if ((size_ao.value % 2) == 0)
                  max_ao.value = size_ao.value/2 - 1;
@@ -723,7 +723,7 @@ static void compile_conditional_z(int oc,
 {   assembly_operand AO3; int the_zc, error_label = label,
     va_flag = FALSE, va_label;
 
-    ASSERT_ZCODE(); 
+    ASSERT_ZCODE();
 
     if (oc<200)
     {   if ((runtime_error_checking_switch) && (oc == jin_zc))
@@ -770,7 +770,7 @@ static void compile_conditional_z(int oc,
         return;
     }
 
-    AO3.type = VARIABLE_OT; AO3.value = 0; AO3.marker = 0; 
+    AO3.type = VARIABLE_OT; AO3.value = 0; AO3.marker = 0;
 
     the_zc = (version_number == 3)?call_zc:call_vs_zc;
     if (oc == 201)
@@ -784,7 +784,7 @@ static void compile_conditional_z(int oc,
 static void value_in_void_context_g(assembly_operand AO)
 {   char *t;
 
-    ASSERT_GLULX(); 
+    ASSERT_GLULX();
 
     switch(AO.type)
     {   case CONSTANT_OT:
@@ -812,7 +812,7 @@ static void write_result_g(assembly_operand to, assembly_operand from)
 static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
     assembly_operand AO3)
 {   int vr;
-    int data_len, read_flag; 
+    int data_len, read_flag;
     assembly_operand zero_ao, max_ao, size_ao, en_ao, type_ao, an_ao,
         index_ao, five_ao;
     int passed_label, failed_label, final_label, x, y;
@@ -821,13 +821,13 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
     else if ((oc == aloads_gc) || (oc == astores_gc)) data_len = 2;
     else data_len = 4;
 
-    if ((oc == aloadb_gc) || (oc == aloads_gc) || (oc == aload_gc)) 
+    if ((oc == aloadb_gc) || (oc == aloads_gc) || (oc == aload_gc))
       read_flag = TRUE;
-    else 
+    else
       read_flag = FALSE;
 
     if (AO1.marker == ARRAY_MV)
-    {   
+    {
         zero_ao.value = 0; zero_ao.marker = 0;
 
         size_ao = zero_ao; size_ao.value = -1;
@@ -866,7 +866,7 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
        array, we can check bounds explicitly. */
 
     if (AO1.marker == ARRAY_MV)
-    {   
+    {
         /* Calculate the largest permitted array entry + 1
            Here "size_ao.value" = largest permitted entry of its own kind */
         max_ao = size_ao;
@@ -917,7 +917,7 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
             return;
         }
 
-        passed_label = next_label++; 
+        passed_label = next_label++;
         failed_label = next_label++;
         final_label = next_label++;
 
@@ -949,9 +949,9 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
            present, so that we can achieve the same effect on the stack
            that executing the opcode would have had */
 
-        if ((AO1.type == LOCALVAR_OT) && (AO1.value == 0)) 
+        if ((AO1.type == LOCALVAR_OT) && (AO1.value == 0))
             assembleg_2(copy_gc, stack_pointer, zero_operand);
-        if ((AO2.type == LOCALVAR_OT) && (AO2.value == 0)) 
+        if ((AO2.type == LOCALVAR_OT) && (AO2.value == 0))
             assembleg_2(copy_gc, stack_pointer, zero_operand);
         if ((AO3.type == LOCALVAR_OT) && (AO3.value == 0))
         {   if ((oc == aloadb_gc) || (oc == aload_gc))
@@ -970,14 +970,14 @@ static void access_memory_g(int oc, assembly_operand AO1, assembly_operand AO2,
     /* Otherwise, compile a call to the veneer which verifies that
        the proposed read/write is within dynamic Z-machine memory. */
 
-    switch(oc) { 
+    switch(oc) {
         case aloadb_gc: vr = RT__ChLDB_VR; break;
         case aload_gc: vr = RT__ChLDW_VR; break;
         case astoreb_gc: vr = RT__ChSTB_VR; break;
-        case astore_gc: vr = RT__ChSTW_VR; break; 
+        case astore_gc: vr = RT__ChSTW_VR; break;
     }
 
-    if ((oc == aloadb_gc) || (oc == aload_gc)) 
+    if ((oc == aloadb_gc) || (oc == aload_gc))
       assembleg_call_2(veneer_routine(vr), AO1, AO2, AO3);
     else
       assembleg_call_3(veneer_routine(vr), AO1, AO2, AO3, zero_operand);
@@ -990,7 +990,7 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
   int ln;
   int check_sp = FALSE, passed_label, failed_label, last_label;
 
-  if (veneer_mode) 
+  if (veneer_mode)
     return AO1;
 
   /*  Assemble to code to check that the operand AO1 is ofclass Object:
@@ -1006,13 +1006,13 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
       built-in tree functions will safely return 0 on this object. */
 
   /*  Sometimes we can already see that the object number is valid. */
-  if (AO1.marker == OBJECT_MV && 
+  if (AO1.marker == OBJECT_MV &&
     ((AO1.value >= 1) && (AO1.value <= no_objects))) {
     return AO1;
   }
 
   passed_label = next_label++;
-  failed_label = next_label++;  
+  failed_label = next_label++;
 
   if ((AO1.type == LOCALVAR_OT) && (AO1.value == 0) && (AO1.marker == 0)) {
     /* That is, if AO1 is the stack pointer */
@@ -1024,10 +1024,10 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
   else {
     AO = AO1;
   }
-  
+
   if ((rte_number == IN_RTE) || (rte_number == HAS_RTE)
     || (rte_number == PROPERTY_RTE) || (rte_number == PROP_NUM_RTE)
-    || (rte_number == PROP_ADD_RTE)) {   
+    || (rte_number == PROP_ADD_RTE)) {
     /* Allow classes */
     /* Test if zero... */
     assembleg_1_branch(jz_gc, AO, failed_label);
@@ -1058,13 +1058,13 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
     AO3.type = CONSTANT_OT;
     assembleg_2_branch(jne_gc, stack_pointer, AO3, passed_label);
   }
-  
+
   assemble_label_no(failed_label);
   AO2.marker = 0;
-  AO2.value = rte_number; 
+  AO2.value = rte_number;
   set_constant_ot(&AO2);
   assembleg_call_2(veneer_routine(RT__Err_VR), AO2, AO1, zero_operand);
-  
+
   if (error_label != -1) {
     /* Jump to the error label */
     if (error_label == -3) assembleg_1(return_gc, zero_operand);
@@ -1093,18 +1093,18 @@ static assembly_operand check_nonzero_at_runtime_g(assembly_operand AO1,
       return temp_var2;
     }
   }
-    
+
   assemble_label_no(passed_label);
   return AO1;
 }
 
 static void compile_conditional_g(condclass *cc,
     assembly_operand AO1, assembly_operand AO2, int label, int flag)
-{   assembly_operand AO4; 
+{   assembly_operand AO4;
     int the_zc, error_label = label,
     va_flag = FALSE, va_label;
 
-    ASSERT_GLULX(); 
+    ASSERT_GLULX();
 
     the_zc = (flag ? cc->posform : cc->negform);
 
@@ -1113,7 +1113,7 @@ static void compile_conditional_g(condclass *cc,
 
       case HAS_CC:
         if (runtime_error_checking_switch) {
-          if (flag) 
+          if (flag)
             error_label = next_label++;
           AO1 = check_nonzero_at_runtime(AO1, error_label, HAS_RTE);
           if (is_constant_ot(AO2.type) && AO2.marker == 0) {
@@ -1159,7 +1159,7 @@ static void compile_conditional_g(condclass *cc,
             assembleg_store(stack_pointer, en_ao);
             assembleg_3(call_gc, veneer_routine(RT__Err_VR),
               three_operand, zero_operand);
-            va_flag = TRUE; 
+            va_flag = TRUE;
             va_label = next_label++;
             assembleg_jump(va_label);
             assemble_label_no(pa_label);
@@ -1174,7 +1174,7 @@ static void compile_conditional_g(condclass *cc,
           AO4.marker = 0;
           AO4.type = BYTECONSTANT_OT;
           if ((AO1.type == LOCALVAR_OT) && (AO1.value == 0)) {
-            if ((AO2.type == LOCALVAR_OT) && (AO2.value == 0)) 
+            if ((AO2.type == LOCALVAR_OT) && (AO2.value == 0))
               assembleg_0(stkswap_gc);
             assembleg_3(add_gc, AO2, AO4, stack_pointer);
             assembleg_0(stkswap_gc);
@@ -1191,7 +1191,7 @@ static void compile_conditional_g(condclass *cc,
 
       case IN_CC:
         if (runtime_error_checking_switch) {
-          if (flag) 
+          if (flag)
             error_label = next_label++;
           AO1 = check_nonzero_at_runtime(AO1, error_label, IN_RTE);
         }
@@ -1472,7 +1472,7 @@ static void generate_code_from(int n, int void_flag)
 
   }
   else {
-    if (operators[opnum].opcode_number_g >= FIRST_CC 
+    if (operators[opnum].opcode_number_g >= FIRST_CC
       && operators[opnum].opcode_number_g <= LAST_CC) {
       /*  Conditional terms such as '==': */
 
@@ -1485,13 +1485,13 @@ static void generate_code_from(int n, int void_flag)
 
       /*  If the comparison is "equal to (constant) 0", change it
           to the simple "zero" test. Unfortunately, this doesn't
-          work for the commutative form "(constant) 0 is equal to". 
+          work for the commutative form "(constant) 0 is equal to".
           At least I don't think it does. */
 
       if ((cc == &condclasses[1]) && (arity == 2)) {
         i = ET[ET[n].down].right;
         if ((ET[i].value.value == 0)
-          && (ET[i].value.marker == 0) 
+          && (ET[i].value.marker == 0)
           && is_constant_ot(ET[i].value.type)) {
           cc = &condclasses[0];
         }
@@ -1500,7 +1500,7 @@ static void generate_code_from(int n, int void_flag)
       /*  If the condition has truth state flag, branch to
           label a, and if not, to label b.  Possibly one of a, b
           equals -1, meaning "continue from this instruction".
-          
+
           branch_away is the label which is a branch away (the one
           which isn't immediately after) and flag is the truth
           state to branch there.
@@ -1509,35 +1509,35 @@ static void generate_code_from(int n, int void_flag)
           of the use of the 'or' operator) the branch_other label
           is created if need be.
       */
-      
+
       /*  Reduce to the case where the branch_away label does exist:  */
 
       if (a == -1) { a = b; b = -1; flag = !flag; }
 
       branch_away = a; branch_other = b;
       if (branch_other != -1) make_jump_away = TRUE;
-      
+
       if ((arity > 2) && (flag == FALSE)) {
         /*  In this case, we have an 'or' situation where multiple
             instructions are needed and where the overall condition
             is negated.  That is, we have, e.g.
-            
+
             if not (A cond B or C or D) then branch_away
-            
+
             which we transform into
-            
+
             if (A cond B) then branch_other
             if (A cond C) then branch_other
             if not (A cond D) then branch_away
             .branch_other                                          */
-        
+
         if (branch_other == -1) {
           branch_other = next_label++; make_branch_label = TRUE;
         }
       }
 
       if (cc == &condclasses[0]) {
-        assembleg_1_branch((flag ? cc->posform : cc->negform), 
+        assembleg_1_branch((flag ? cc->posform : cc->negform),
           ET[below].value, branch_away);
       }
       else {
@@ -1561,7 +1561,7 @@ static void generate_code_from(int n, int void_flag)
           else {
             left_operand = ET[below].value;
           }
-          i = ET[below].right; 
+          i = ET[below].right;
           arity--;
 
           /*  "left_operand" now holds the quantity to be tested;
@@ -1581,17 +1581,17 @@ static void generate_code_from(int n, int void_flag)
               compile_conditional_g(cc, left_operand,
             ET[i].value, branch_other, !flag);
 
-            i = ET[i].right; 
+            i = ET[i].right;
             arity--;
           }
         }
       }
-      
+
       /*  NB: These two conditions cannot both occur, fortunately!  */
-      
+
       if (make_branch_label) assemble_label_no(branch_other);
       if (make_jump_away) assembleg_jump(branch_other);
-      
+
       goto OperatorGenerated;
     }
 
@@ -1603,7 +1603,7 @@ static void generate_code_from(int n, int void_flag)
         error_named("Evaluating this has no effect:",
             operators[opnum].description);
 
-    /*  Where shall we put the resulting value? (In Glulx, this could 
+    /*  Where shall we put the resulting value? (In Glulx, this could
         be smarter, and peg the result into ZEROCONSTANT.) */
 
     if (void_flag) Result = temp_var1;  /*  Throw it away  */
@@ -1921,7 +1921,7 @@ static void generate_code_from(int n, int void_flag)
                              ET[ET[below].right].value, Result);
                          break;
 
-                     case GLK_SYSF: 
+                     case GLK_SYSF:
                          error("The glk() system function does not exist in Z-code");
                          break;
                  }
@@ -2455,7 +2455,7 @@ static void generate_code_from(int n, int void_flag)
                  }
                }
                else {
-                 /* We have to get the rightmost on the stack, below the 
+                 /* We have to get the rightmost on the stack, below the
                     others. */
                  if (AO3.type == LOCALVAR_OT && AO3.value == 0) {
                    if (AO2.type == LOCALVAR_OT && AO2.value == 0) {
@@ -2465,7 +2465,7 @@ static void generate_code_from(int n, int void_flag)
                    else {
                      assembleg_store(stack_pointer, AO4);
                      assembleg_0(stkswap_gc);
-                     assembleg_store(stack_pointer, AO2); 
+                     assembleg_store(stack_pointer, AO2);
                    }
                  }
                  else {
@@ -2525,9 +2525,9 @@ static void generate_code_from(int n, int void_flag)
                  {
                      case RANDOM_SYSF:
                          if (j>1)
-                         {  assembly_operand AO, AO2; 
+                         {  assembly_operand AO, AO2;
                             int arg_c, arg_et;
-                            AO.value = j; 
+                            AO.value = j;
                             AO.marker = 0;
                             set_constant_ot(&AO);
                             AO2.type = CONSTANT_OT;
@@ -2562,7 +2562,7 @@ static void generate_code_from(int n, int void_flag)
                                     PARENT_RTE);
                             AO2.type = BYTECONSTANT_OT;
                             AO2.value = 5;
-                            AO2.marker = 0; 
+                            AO2.marker = 0;
                             assembleg_3(aload_gc, AO, AO2, Result);
                          }
                          break;
@@ -2610,22 +2610,22 @@ static void generate_code_from(int n, int void_flag)
                             AO2.value = 6;
                             assemble_label_no(next_label);
                             assembleg_1_branch(jz_gc, temp_var2, next_label+1);
-                            assembleg_3(add_gc, temp_var1, one_operand, 
+                            assembleg_3(add_gc, temp_var1, one_operand,
                               temp_var1);
                             assembleg_3(aload_gc, temp_var2, AO2, temp_var2);
                             assembleg_0_branch(jump_gc, next_label);
                             assemble_label_no(next_label+1);
                             next_label += 2;
-                            if (!void_flag) 
+                            if (!void_flag)
                               write_result_g(Result, temp_var1);
                          }
                          break;
 
-                     case INDIRECT_SYSF: 
+                     case INDIRECT_SYSF:
                          i = ET[below].right;
                          goto IndirectFunctionCallG;
 
-                     case GLK_SYSF: 
+                     case GLK_SYSF:
                          AO2 = veneer_routine(Glk__Wrap_VR);
                          i = ET[below].right;
                          goto DoFunctionCall;
@@ -2652,12 +2652,12 @@ static void generate_code_from(int n, int void_flag)
                          assembleg_store(temp_var1, temp_var2);
                          assembleg_0_branch(jump_gc, next_label);
                          assemble_label_no(next_label+1);
-                         if (!void_flag) 
+                         if (!void_flag)
                            write_result_g(Result, temp_var1);
                          next_label += 2;
                          break;
 
-                     case ELDER_SYSF: 
+                     case ELDER_SYSF:
                          AO = ET[ET[below].right].value;
                          if (runtime_error_checking_switch)
                            AO = check_nonzero_at_runtime(AO, -1,
@@ -2671,7 +2671,7 @@ static void generate_code_from(int n, int void_flag)
                          AO2.value = 7;
                          assembleg_3(aload_gc, temp_var1, AO2, temp_var1);
                          assembleg_1_branch(jz_gc, temp_var1, next_label+2);
-                         assembleg_2_branch(jeq_gc, temp_var3, temp_var1, 
+                         assembleg_2_branch(jeq_gc, temp_var3, temp_var1,
                            next_label+1);
                          assemble_label_no(next_label);
                          AO2.value = 6;
@@ -2742,7 +2742,7 @@ static void generate_code_from(int n, int void_flag)
 
                  j = 0;
                  while (i != -1) {
-                     if (ET[i].value.type == LOCALVAR_OT 
+                     if (ET[i].value.type == LOCALVAR_OT
                        && ET[i].value.value == 0) {
                        onstack++;
                      }
@@ -2867,9 +2867,9 @@ assembly_operand code_generate(assembly_operand AO, int context, int label)
                   else assemblez_1_branch(jz_zc, AO, label, TRUE);
                 }
                 else {
-                  if (label < -2) 
+                  if (label < -2)
                     assembleg_1_branch(jnz_gc, AO, label);
-                  else 
+                  else
                     assembleg_1_branch(jz_gc, AO, label);
                 }
                 AO.type = OMITTED_OT;

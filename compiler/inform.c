@@ -2,7 +2,7 @@
 /*   "inform" :  The top level of Inform: switches, pathnames, filenaming    */
 /*               conventions, ICL (Inform Command Line) files, main          */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -66,7 +66,7 @@ int INDIV_PROP_START;
 
 /* The length of an object, as written in tables.c. It's easier to define
    it here than to repeat the same expression all over the source code.
-   Not used in Z-code. 
+   Not used in Z-code.
 */
 int OBJECT_BYTE_LENGTH;
 
@@ -104,7 +104,7 @@ static void select_target(int targ)
     scale_factor = 0; /* It should never even get used in Glulx */
 
     if (NUM_ATTR_BYTES % 4 != 3) {
-      NUM_ATTR_BYTES += (3 - (NUM_ATTR_BYTES % 4)); 
+      NUM_ATTR_BYTES += (3 - (NUM_ATTR_BYTES % 4));
       warning_numbered("NUM_ATTR_BYTES must be a multiple of four, plus three. Increasing to", NUM_ATTR_BYTES);
     }
 
@@ -120,7 +120,7 @@ static void select_target(int targ)
   if (DICT_WORD_SIZE > MAX_DICT_WORD_SIZE) {
     DICT_WORD_SIZE = MAX_DICT_WORD_SIZE;
     warning_numbered(
-      "DICT_WORD_SIZE cannot exceed MAX_DICT_WORD_SIZE; resetting", 
+      "DICT_WORD_SIZE cannot exceed MAX_DICT_WORD_SIZE; resetting",
       MAX_DICT_WORD_SIZE);
     /* MAX_DICT_WORD_SIZE can be increased in header.h without fear. */
   }
@@ -778,7 +778,7 @@ Inform translates plain filenames (such as \"xyzzy\") into full pathnames\n\
       Modules:         %s\n\n",
       Source_Extension, Include_Extension,
       Code_Extension, V4Code_Extension, V5Code_Extension, V6Code_Extension,
-      V7Code_Extension, V8Code_Extension, GlulxCode_Extension, 
+      V7Code_Extension, V8Code_Extension, GlulxCode_Extension,
       Module_Extension);
     printf("\
    except that any extension you give (on the command line or in a filename\n\
@@ -1387,7 +1387,7 @@ static int execute_icl_header(char *argname)
   int line = 0;
   int errcount = 0;
   int i;
-  char filename[PATHLEN]; 
+  char filename[PATHLEN];
   int x = 0;
 
   do
@@ -1522,7 +1522,7 @@ static void banner(void)
         (VNUMBER/100)%10, (VNUMBER/10)%10, VNUMBER%10);
     if (0) {
         sprintf(banner_line+strlen(banner_line), " (biplatform, G%d.%d%d)",
-            (GLULX_RELEASE_NUMBER/100)%10, (GLULX_RELEASE_NUMBER/10)%10, 
+            (GLULX_RELEASE_NUMBER/100)%10, (GLULX_RELEASE_NUMBER/10)%10,
             GLULX_RELEASE_NUMBER%10);
     }
 #ifdef MACHINE_STRING

@@ -2,7 +2,7 @@
 /*   "errors" : Warnings, errors and fatal errors                            */
 /*              (with error throwback code for RISC OS machines)             */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -33,7 +33,7 @@ static void print_preamble(void)
     else p = InputFiles[j-1].filename;
 
     if (!p) p = ""; /* ###-call me paranoid */
-    
+
     switch(error_format)
     {
         case 0:  /* RISC OS error message format */

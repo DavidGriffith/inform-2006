@@ -3,7 +3,7 @@
 /*              by the compiler (e.g. DefArt) which the program doesn't      */
 /*              provide                                                      */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -2139,7 +2139,7 @@ static void mark_as_needed_g(int code)
 
 extern assembly_operand veneer_routine(int code)
 {   assembly_operand AO;
-    if (!glulx_mode) { 
+    if (!glulx_mode) {
         AO.type = LONG_CONSTANT_OT;
         AO.marker = VROUTINE_MV;
         AO.value = code;
@@ -2293,7 +2293,7 @@ static void compile_symbol_table_routine(void)
 
 extern void compile_veneer(void)
 {   int i, j, try_veneer_again;
-    VeneerRoutine *VRs; 
+    VeneerRoutine *VRs;
 
     if (module_switch) return;
 

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "directs" : Directives (# commands)                                     */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -295,7 +295,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
                     }
                 }
             } while (n > 0);
-            ifdef_sp--; 
+            ifdef_sp--;
             dont_enter_into_symbol_table = FALSE;
             directives.enabled = FALSE;
         }

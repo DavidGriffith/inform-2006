@@ -2,7 +2,7 @@
 /*   "memory" : Memory management and ICL memory setting commands            */
 /*              (For "memoryerror", see "errors.c")                          */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -177,7 +177,7 @@ int32 MAX_NUM_STATIC_STRINGS;
 
 /* The way memory sizes are set causes great nuisance for those parameters
    which have different defaults under Z-code and Glulx. We have to get
-   the defaults right whether the user sets "-G $HUGE" or "$HUGE -G". 
+   the defaults right whether the user sets "-G $HUGE" or "$HUGE -G".
    And an explicit value set by the user should override both defaults. */
 static int32 MAX_ZCODE_SIZE_z, MAX_ZCODE_SIZE_g;
 static int MAX_PROP_TABLE_SIZE_z, MAX_PROP_TABLE_SIZE_g;
@@ -698,11 +698,11 @@ extern void memory_command(char *command)
                 MAX_ADJECTIVES=j, flag=1;
             if (strcmp(command,"MAX_DICT_ENTRIES")==0)
                 MAX_DICT_ENTRIES=j, flag=1;
-            if (strcmp(command,"DICT_WORD_SIZE")==0) 
+            if (strcmp(command,"DICT_WORD_SIZE")==0)
             {   DICT_WORD_SIZE=j, flag=1;
                 DICT_WORD_SIZE_g=DICT_WORD_SIZE_z=j;
             }
-            if (strcmp(command,"NUM_ATTR_BYTES")==0) 
+            if (strcmp(command,"NUM_ATTR_BYTES")==0)
             {   NUM_ATTR_BYTES=j, flag=1;
                 NUM_ATTR_BYTES_g=NUM_ATTR_BYTES_z=j;
             }

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "expressp" :  The expression parser                                     */
 /*                                                                           */
-/*   Part of Inform 6.30                                                     */
+/*   Part of Inform 6.31                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -107,7 +107,7 @@ but not used as a value:", unicode);
                     else {
                         current_token.value = unicode;
                         if (current_token.value >= 0x8000
-                          || current_token.value < -0x8000) 
+                          || current_token.value < -0x8000)
                             current_token.type = LARGE_NUMBER_TT;
                         else current_token.type = SMALL_NUMBER_TT;
                     }
@@ -178,7 +178,7 @@ but not used as a value:", unicode);
             else {
                 if (((current_token.marker != 0)
                   && (current_token.marker != VARIABLE_MV))
-                  || (v < -0x8000) || (v >= 0x8000)) 
+                  || (v < -0x8000) || (v >= 0x8000))
                     current_token.type = LARGE_NUMBER_TT;
                 else current_token.type = SMALL_NUMBER_TT;
             }
@@ -197,7 +197,7 @@ but not used as a value:", unicode);
                     current_token.type = SMALL_NUMBER_TT;
             }
             else {
-                if (current_token.value < -0x8000 
+                if (current_token.value < -0x8000
                   || current_token.value >= 0x8000)
                     current_token.type = LARGE_NUMBER_TT;
                 else
@@ -606,7 +606,7 @@ static int32 value_of_system_constant_z(int t)
 }
 
 static int32 value_of_system_constant_g(int t)
-{ 
+{
   switch (t) {
   case classes_table_SC:
     return Write_RAM_At + class_numbers_offset;
@@ -639,7 +639,7 @@ extern int32 value_of_system_constant(int t)
   if (!glulx_mode)
     return value_of_system_constant_z(t);
   else
-    return value_of_system_constant_g(t);    
+    return value_of_system_constant_g(t);
 }
 
 static int evaluate_term(token_data t, assembly_operand *o)
@@ -682,7 +682,7 @@ static int evaluate_term(token_data t, assembly_operand *o)
              return(TRUE);
         case DICTWORD_TT:
              /*  Find the dictionary address, adding to dictionary if absent */
-             if (!glulx_mode) 
+             if (!glulx_mode)
                  o->type = LONG_CONSTANT_OT;
              else
                  o->type = CONSTANT_OT;
@@ -690,7 +690,7 @@ static int evaluate_term(token_data t, assembly_operand *o)
              return(TRUE);
         case DQ_TT:
              /*  Create as a static string  */
-             if (!glulx_mode) 
+             if (!glulx_mode)
                  o->type = LONG_CONSTANT_OT;
              else
                  o->type = CONSTANT_OT;
@@ -734,7 +734,7 @@ static int evaluate_term(token_data t, assembly_operand *o)
              if (!glulx_mode) {
                  o->type = LONG_CONSTANT_OT;
                  switch(t.value)
-                 {   
+                 {
                  case version_number_SC:
                      o->type = SHORT_CONSTANT_OT;
                      o->marker = 0;
@@ -943,11 +943,11 @@ static void emit_token(token_data t)
     {
         o1 = emitter_stack[emitter_sp - i];
         if (is_property_t(o1.symtype) ) {
-            switch(t.value) 
+            switch(t.value)
             {
                 case FCALL_OP:
-                case SETEQUALS_OP: case NOTEQUAL_OP: 
-                case CONDEQUALS_OP: 
+                case SETEQUALS_OP: case NOTEQUAL_OP:
+                case CONDEQUALS_OP:
                 case PROVIDES_OP: case NOTPROVIDES_OP:
                 case PROP_ADD_OP: case PROP_NUM_OP:
                 case SUPERCLASS_OP:
@@ -968,7 +968,7 @@ static void emit_token(token_data t)
             if ((o1.marker == 0) && is_constant_ot(o1.type))
             {   switch(t.value)
                 {   case UNARY_MINUS_OP: x = -o1.value; goto FoldConstant;
-                    case ARTNOT_OP: 
+                    case ARTNOT_OP:
                          if (!glulx_mode)
                              x = (~o1.value) & 0xffff;
                          else
@@ -1013,7 +1013,7 @@ static void emit_token(token_data t)
                             ov1 = -ov1;
                             ov2 = -ov2;
                           }
-                          if (ov1 >= 0) 
+                          if (ov1 >= 0)
                             x = ov1 / ov2;
                           else
                             x = -((-ov1) / ov2);
@@ -1022,7 +1022,7 @@ static void emit_token(token_data t)
                           if (ov2 < 0) {
                             ov2 = -ov2;
                           }
-                          if (ov1 >= 0) 
+                          if (ov1 >= 0)
                             x = ov1 % ov2;
                           else
                             x = -((-ov1) % ov2);
@@ -1108,7 +1108,7 @@ static void emit_token(token_data t)
 
     FoldConstantC:
 
-    /* In Glulx, skip this test; we can't check out-of-range errors 
+    /* In Glulx, skip this test; we can't check out-of-range errors
        for 32-bit arithmetic. */
 
     if (!glulx_mode && ((x<-32768) || (x > 32767)))
@@ -1151,9 +1151,9 @@ the range -32768 to +32767:", folding_error);
     else {
         if (x == 0)
             emitter_stack[emitter_sp - 1].type = ZEROCONSTANT_OT;
-        else if (x >= -128 && x <= 127) 
+        else if (x >= -128 && x <= 127)
             emitter_stack[emitter_sp - 1].type = BYTECONSTANT_OT;
-        else if (x >= -32768 && x <= 32767) 
+        else if (x >= -32768 && x <= 32767)
             emitter_stack[emitter_sp - 1].type = HALFCONSTANT_OT;
         else
             emitter_stack[emitter_sp - 1].type = CONSTANT_OT;
@@ -1464,7 +1464,7 @@ static void func_args_on_stack(int n, int context)
 {
   /* Make sure that the arguments of every function-call expression
      are stored to the stack. If any aren't (ie, if any arguments are
-     constants or variables), cover them with push operators. 
+     constants or variables), cover them with push operators.
      (The very first argument does not need to be so treated, because
      it's the function address, not a function argument. We also
      skip the treatment for most system functions.) */
@@ -1473,7 +1473,7 @@ static void func_args_on_stack(int n, int context)
 
   ASSERT_GLULX();
 
-  if (ET[n].right != -1) 
+  if (ET[n].right != -1)
     func_args_on_stack(ET[n].right, context);
   if (ET[n].down == -1) {
     pn = ET[n].up;
@@ -1482,9 +1482,9 @@ static void func_args_on_stack(int n, int context)
       if (opnum == FCALL_OP
         || opnum == MESSAGE_CALL_OP
         || opnum == PROP_CALL_OP) {
-        /* If it's an FCALL, get the operand which contains the function 
+        /* If it's an FCALL, get the operand which contains the function
            address (or system-function number) */
-        if (opnum == MESSAGE_CALL_OP 
+        if (opnum == MESSAGE_CALL_OP
           || opnum == PROP_CALL_OP
           || ((fnaddr=ET[pn].down) != n
             && (ET[fnaddr].value.type != SYSFUN_OT
@@ -1495,9 +1495,9 @@ static void func_args_on_stack(int n, int context)
           if (new == MAX_EXPRESSION_NODES)
             memoryerror("MAX_EXPRESSION_NODES9", MAX_EXPRESSION_NODES);
           ET[new] = ET[n];
-          ET[n].down = new; 
+          ET[n].down = new;
           ET[n].operator_number = PUSH_OP;
-          ET[new].up = n; 
+          ET[new].up = n;
           ET[new].right = -1;
         }
         }
@@ -1672,7 +1672,7 @@ extern assembly_operand parse_expression(int context)
                 ET[AO.value].up = -1;
             }
             else {
-                if ((context != CONSTANT_CONTEXT) && is_property_t(AO.symtype) 
+                if ((context != CONSTANT_CONTEXT) && is_property_t(AO.symtype)
                     && (arrow_allowed) && (!bare_prop_allowed))
                     warning("Bare property name found. \"self.prop\" intended?");
             }

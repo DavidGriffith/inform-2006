@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   Header file for Inform:  Z-machine ("Infocom" format) compiler          */
 /*                                                                           */
-/*                              Inform 6.30                                  */
+/*                              Inform 6.31                                  */
 /*                                                                           */
 /*   This header file and the others making up the Inform source code are    */
 /*   copyright (c) Graham Nelson 1993 - 2004                                 */
@@ -739,7 +739,7 @@ typedef struct objecttz {
 
 typedef struct propg {
     int num;
-    int continuation; 
+    int continuation;
     int flags;
     int32 datastart;
     int32 datalen;
@@ -747,7 +747,7 @@ typedef struct propg {
 
 /* Only one of this object. */
 typedef struct fproptg {
-    uchar atts[MAX_NUM_ATTR_BYTES]; 
+    uchar atts[MAX_NUM_ATTR_BYTES];
     int numprops;
     propg *props;
     int propdatasize;
@@ -1161,7 +1161,7 @@ typedef struct operator_s
 #define RETURN_Q_CONTEXT   9
 
 #define LOWEST_SYSTEM_VAR_NUMBER 249        /* globals 249 to 255 are used
-                                               in compiled code (Z-code 
+                                               in compiled code (Z-code
                                                only; in Glulx, the range can
                                                change) */
 
@@ -1686,7 +1686,7 @@ typedef struct operator_s
 #define RT__ChG_VR        30
 #define RT__ChGt_VR       31
 #define RT__ChPS_VR       32
-#define RT__ChPR_VR       33 
+#define RT__ChPR_VR       33
 #define RT__TrPS_VR       34
 #define RT__ChLDB_VR      35
 #define RT__ChLDW_VR      36
@@ -1837,7 +1837,7 @@ typedef struct operator_s
 #define LABEL_MV              36     /* Ditto: marks "jump" operands */
 #define DELETED_MV            37     /* Ditto: marks bytes deleted from code */
 #define BRANCH_MV             38     /* Used in "asm.c" for routine coding */
-#define BRANCHMAX_MV          58     /* In fact, the range BRANCH_MV to 
+#define BRANCHMAX_MV          58     /* In fact, the range BRANCH_MV to
                                         BRANCHMAX_MV all means the same thing.
                                         The position within the range means
                                         how far back from the label to go
@@ -2080,11 +2080,11 @@ extern void assembleg_1_branch(int internal_number,
   assembly_operand o1, int label);
 extern void assembleg_2_branch(int internal_number,
   assembly_operand o1, assembly_operand o2, int label);
-extern void assembleg_call_1(assembly_operand oaddr, assembly_operand o1, 
+extern void assembleg_call_1(assembly_operand oaddr, assembly_operand o1,
   assembly_operand odest);
-extern void assembleg_call_2(assembly_operand oaddr, assembly_operand o1, 
+extern void assembleg_call_2(assembly_operand oaddr, assembly_operand o1,
   assembly_operand o2, assembly_operand odest);
-extern void assembleg_call_3(assembly_operand oaddr, assembly_operand o1, 
+extern void assembleg_call_3(assembly_operand oaddr, assembly_operand o1,
   assembly_operand o2, assembly_operand o3, assembly_operand odest);
 extern void assembleg_inc(assembly_operand o1);
 extern void assembleg_dec(assembly_operand o1);
@@ -2195,7 +2195,7 @@ extern void throwback_end(void);
 extern int vivc_flag;
 extern operator operators[];
 
-extern assembly_operand stack_pointer, temp_var1, temp_var2, temp_var3, 
+extern assembly_operand stack_pointer, temp_var1, temp_var2, temp_var3,
     temp_var4, zero_operand, one_operand, two_operand, three_operand,
     valueless_operand;
 
