@@ -1206,7 +1206,7 @@ static void parse_statement_z(int break_label, int continue_label)
                      AO.value = svals[token_value];
                  else
                  {   ebf_error("'objectloop' variable", token_text);
-                     panic_mode_error_recovery(); break;
+                     panic_mode_error_recovery(); put_token_back(); break;
                  }
                  AO.type = VARIABLE_OT;
                  if ((module_switch) && (AO.value >= MAX_LOCAL_VARIABLES)
@@ -1218,7 +1218,6 @@ static void parse_statement_z(int break_label, int continue_label)
                  misc_keywords.enabled = FALSE;
                  if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
                      flag = FALSE;
-
                  ln = 0;
                  if ((token_type == MISC_KEYWORD_TT)
                      && (token_value == NEAR_MK)) ln = 1;
@@ -1226,10 +1225,14 @@ static void parse_statement_z(int break_label, int continue_label)
                      && (token_value == FROM_MK)) ln = 2;
                  if ((token_type == CND_TT) && (token_value == IN_COND))
                  {   get_next_token();
-                     get_next_token();
-                     if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
-                         ln = 3;
-                     put_token_back();
+                     if ((token_type != SYMBOL_TT) ||
+                         (sflags[token_value] & UNKNOWN_SFLAG > 0 || svals[token_value] > 0))
+                     {
+                         get_next_token();
+                         if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
+                            ln = 3;
+                         put_token_back();
+                     }
                      put_token_back();
                  }
 
@@ -1303,8 +1306,10 @@ static void parse_statement_z(int break_label, int continue_label)
                  ln2 = next_label++;
                  ln3 = next_label++;
                  if (flag)
-                 {   put_token_back();
-                     put_token_back();
+                 {  if ((token_type != SEP_TT) || (token_value != COLON_SEP)) {
+                        put_token_back();
+                        put_token_back();
+                    }
                      sequence_point_follows = TRUE;
                      code_generate(parse_expression(CONDITION_CONTEXT),
                          CONDITION_CONTEXT, ln3);
@@ -2208,7 +2213,7 @@ static void parse_statement_g(int break_label, int continue_label)
                  }
                  else {
                      ebf_error("'objectloop' variable", token_text);
-                     panic_mode_error_recovery();
+                     panic_mode_error_recovery(); put_token_back();
                      break;
                  }
                  /*if ((module_switch)
@@ -2229,10 +2234,14 @@ static void parse_statement_g(int break_label, int continue_label)
                      && (token_value == FROM_MK)) ln = 2;
                  if ((token_type == CND_TT) && (token_value == IN_COND))
                  {   get_next_token();
-                     get_next_token();
-                     if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
-                         ln = 3;
-                     put_token_back();
+                     if ((token_type != SYMBOL_TT) ||
+                         (sflags[token_value] & UNKNOWN_SFLAG > 0 || svals[token_value] > 0))
+                     {
+                         get_next_token();
+                         if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
+                             ln = 3;
+                         put_token_back();
+                     }
                      put_token_back();
                  }
 
@@ -2328,8 +2337,11 @@ static void parse_statement_g(int break_label, int continue_label)
                  ln2 = next_label++;
                  ln3 = next_label++;
                  if (flag)
-                 {   put_token_back();
-                     put_token_back();
+                 {   
+                     if ((token_type != SEP_TT) || (token_value != COLON_SEP)) {
+                        put_token_back();
+                        put_token_back();
+                     }
                      sequence_point_follows = TRUE;
                      code_generate(parse_expression(CONDITION_CONTEXT),
                          CONDITION_CONTEXT, ln3);
