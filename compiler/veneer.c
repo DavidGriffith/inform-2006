@@ -164,8 +164,7 @@ static VeneerRoutine VRs_z[VENEER_ROUTINES] =
     {   "PrintShortName",
         "obj; switch(metaclass(obj))\
          {   0: print \"nothing\";\
-             Object: @print_obj obj;\
-             Class: print \"class \"; @print_obj obj;\
+             Object, Class: @print_obj obj;\
              Routine: print \"(routine at \", obj, \")\";\
              String: print \"(string at \", obj, \")\";\
          } ]", "", "", "", "", ""
@@ -940,8 +939,7 @@ static VeneerRoutine VRs_g[VENEER_ROUTINES] =
     {   "PrintShortName",
         "obj q; switch(metaclass(obj))\
          {   0: print \"nothing\";\
-             Object: q = obj-->3; @streamstr q;\
-             Class: print \"class \"; q = obj-->3; @streamstr q;\
+             Object, Class: q = obj-->3; @streamstr q;\
              Routine: print \"(routine at \", obj, \")\";\
              String: print \"(string at \", obj, \")\";\
          } ]", "", "", "", "", ""
