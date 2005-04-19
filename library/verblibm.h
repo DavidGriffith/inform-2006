@@ -1475,7 +1475,8 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     rfalse;
 ];
 
-[ AttemptToTakeObject item     ancestor after_recipient i j k;
+[ AttemptToTakeObject item
+    ancestor after_recipient i k;
     ! Try to transfer the given item to the actor: return false
     ! if successful, true if unsuccessful, printing a suitable message
     ! in the latter case.
@@ -1496,8 +1497,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     ! Does the actor already directly contain the item?
     if (item in actor) return L__M(##Take, 5, item);
 
-    ! Can the actor touch the item, or is there (e.g.) a closed container
-    ! in the way?
+    ! Can the actor touch the item, or is there (e.g.) a closed container in the way?
     if (ObjectIsUntouchable(item, false, true)) rtrue;
 
     ! The item is now known to be accessible.
@@ -1516,16 +1516,12 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     if (item has scenery) return L__M(##Take, 10, item);
     if (item has static)  return L__M(##Take, 11, item);
 
-    ! The item is now known to be available for taking.  Is the player
-    ! carrying too much?  If so, possibly juggle items into the rucksack
-    ! to make room.
+    ! The item is now known to be available for taking.  Is the player carrying
+    ! too much?  If so, possibly juggle items into the rucksack to make room.
 
-    if (actor == player) {
-        k = 0; objectloop (j in player) if (j hasnt worn) k++;
-        if (k >= ValueOrRun(player, capacity) && SackIsFull()) return L__M(##Take, 12);
-    }
     if (ObjectDoesNotFit(item, actor) ||
         LibraryExtensions.RunWhile(ext_objectdoesnotfit, false, item, actor)) return;
+    if (AtFullCapacity(item, actor)) return L__M(##Take, 12);
 
     ! Transfer the item.
 
@@ -1536,13 +1532,21 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     if (after_recipient) {
         k = action; action = ##LetGo;
         if (RunRoutines(after_recipient, after)) { action = k; rtrue; }
-        action=k;
+        action = k;
     }
     rfalse;
 ];
 
-[ SackIsFull obj
-    ks;
+[ AtFullCapacity n s
+    obj k;
+    n = n; ! suppress compiler warning
+    if (s == actor) objectloop (obj in s) if (obj hasnt worn) k++;
+    else            k = children(s);
+    if (k < RunRoutines(s, capacity) || (s == player && RoomInSack())) rfalse;
+];
+
+[ RoomInSack
+    obj ks;
     if (SACK_OBJECT && SACK_OBJECT in player) {
         ks = keep_silent; keep_silent = 2;
         for (obj=youngest(player) : obj : obj=elder(obj))
@@ -1550,12 +1554,12 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
                 <Insert obj SACK_OBJECT>;
                 if (obj in SACK_OBJECT) {
                     keep_silent = ks;
-                    L__M(##Take, 13, obj, SACK_OBJECT);
-                    rfalse;
+                    return L__M(##Take, 13, obj, SACK_OBJECT);
                 }
             }
         keep_silent = ks;
     }
+    rfalse;
 ];
 
 ! ----------------------------------------------------------------------------
@@ -1719,10 +1723,9 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     if (ancestor == actor)      return L__M(##PutOn, 4);
     if (noun has worn && ImplicitDisrobe(noun)) return;
 
-    if (children(second) >= ValueOrRun(second, capacity))
-        return L__M(##PutOn, 6, second);
     if (ObjectDoesNotFit(noun, second) ||
         LibraryExtensions.RunWhile(ext_objectdoesnotfit, false, noun, second)) return;
+    if (AtFullCapacity(noun, second)) return L__M(##PutOn, 6, second);
 
     move noun to second;
 
@@ -1754,10 +1757,9 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     if (second hasnt container) return L__M(##Insert, 2, second);
     if (noun has worn && ImplicitDisrobe(noun)) return;
 
-    if (children(second) >= ValueOrRun(second, capacity))
-        return L__M(##Insert, 7, second);
     if (ObjectDoesNotFit(noun, second) ||
         LibraryExtensions.RunWhile(ext_objectdoesnotfit, false, noun, second)) return;
+    if (AtFullCapacity(noun, second)) return L__M(##Insert, 7, second);
 
     move noun to second;
 
