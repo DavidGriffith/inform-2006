@@ -2904,25 +2904,32 @@ Constant UNLIT_BIT  =  32;
     else                           L__M(##Miscellany, 49, actor);
 
     #Ifdef TARGET_ZCODE;
-    for (i=2 : i<INPUT_BUFFER_LEN : i++) buffer2->i=' ';
+    for (i=2 : i<INPUT_BUFFER_LEN : i++) buffer2->i = ' ';
     #Endif; ! TARGET_ZCODE
     answer_words = Keyboard(buffer2, parse2);
 
-    first_word=(parse2-->1);
+    first_word = WordValue(1, parse2);
     #Ifdef LanguageIsVerb;
-    if (first_word==0) {
-        j = wn; first_word=LanguageIsVerb(buffer2, parse2, 1); wn = j;
+    if (first_word == 0) {
+        j = wn; first_word = LanguageIsVerb(buffer2, parse2, 1); wn = j;
     }
     #Endif; ! LanguageIsVerb
 
-    ! Once again, if the reply looks like a command, give it to the
-    ! parser to get on with and forget about the question...
+    ! Once again, if the reply looks like a command (that is, VERB ... or XXX,VERB ...),
+    ! give it to the parser to get on with and forget about the question...
 
-    if (first_word ~= 0) {
-        j = first_word->#dict_par1;
-        if (j & DICT_VERB) {
+    if (first_word) {
+        if ((first_word->#dict_par1) & DICT_VERB) {
             CopyBuffer(buffer, buffer2);
             return REPARSE_CODE;
+        }
+        if (NumberWords(parse2) > 2) {
+            j = WordValue(2, parse2);
+            k = WordValue(3, parse2);
+            if (j == ',//' && k && (k->#dict_par1) & DICT_VERB) {
+                CopyBuffer(buffer, buffer2);
+                return REPARSE_CODE;
+            }
         }
     }
 
@@ -3016,8 +3023,8 @@ Constant UNLIT_BIT  =  32;
     ! out by Adjudicate() so as not to repeat ourselves on plural objects...
 
     asking_player = true;
-    if (context==CREATURE_TOKEN) L__M(##Miscellany, 45);
-    else                         L__M(##Miscellany, 46);
+    if (context == CREATURE_TOKEN) L__M(##Miscellany, 45);
+    else                           L__M(##Miscellany, 46);
 
     j = number_of_classes; marker = 0;
     for (i=1 : i<=number_of_classes : i++) {
@@ -3034,13 +3041,13 @@ Constant UNLIT_BIT  =  32;
     ! ...and get an answer:
 
   .WhichOne;
+
     #Ifdef TARGET_ZCODE;
     for (i=WORDSIZE : i<INPUT_BUFFER_LEN : i++) buffer2->i = ' ';
     #Endif; ! TARGET_ZCODE
     answer_words = Keyboard(buffer2, parse2);
 
-    ! Conveniently, parse2-->1 is the first word in both ZCODE and GLULX.
-    first_word = (parse2-->1);
+    first_word = WordValue(1, parse2);
     asking_player = false;
 
     ! Take care of "all", because that does something too clever here to do
@@ -3072,11 +3079,19 @@ Constant UNLIT_BIT  =  32;
         j = wn; first_word = LanguageIsVerb(buffer2, parse2, 1); wn = j;
     }
     #Endif; ! LanguageIsVerb
-    if (first_word ~= 0) {
-        j = first_word->#dict_par1;
-        if ((j & DICT_VERB) && ~~LanguageVerbMayBeName(first_word)) {
+
+    if (first_word) {
+        if (((first_word->#dict_par1) & DICT_VERB) && ~~LanguageVerbMayBeName(first_word)) {
             CopyBuffer(buffer, buffer2);
             return REPARSE_CODE;
+        }
+        if (NumberWords(parse2) > 2) {
+            j = WordValue(2, parse2);
+            k = WordValue(3, parse2);
+            if (j == ',//' && k && (k->#dict_par1) & DICT_VERB) {
+                CopyBuffer(buffer, buffer2);
+                return REPARSE_CODE;
+            }
         }
     }
 
