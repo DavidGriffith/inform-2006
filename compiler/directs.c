@@ -17,7 +17,7 @@ typedef struct conststr_s {
 int no_routines,                   /* Number of routines compiled so far     */
     no_named_routines,             /* Number not embedded in objects         */
     no_locals,                     /* Number of locals in current routine    */
-    no_termcs;                     /* Number of terminating characters       */
+    no_termcs,                     /* Number of terminating characters       */
     no_sepcs;                      /* Number of separating characters        */
 int terminating_characters[32];
 uchar separating_characters[32];
