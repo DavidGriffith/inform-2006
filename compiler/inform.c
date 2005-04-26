@@ -1101,7 +1101,8 @@ One or more words can be supplied as \"commands\". These may be:\n\n\
      $large           make standard \"large game\" settings %s\n\
      $small           make standard \"small game\" settings %s\n\
      $?SETTING        explain briefly what SETTING is for\n\
-     $SETTING=number  change SETTING to given number\n\n\
+     $SETTING=number  change SETTING to given number\n\
+                %% may be used instead of $ for these commands\n\n\
   (filename)    read in a list of commands (in the format above)\n\
                 from this \"setup file\"\n\n",
     (DEFAULT_MEMORY_SIZE==HUGE_SIZE)?"(default)":"",
@@ -1382,7 +1383,7 @@ extern void switches(char *p, int cmode)
 }
 
 static int icl_command(char *p)
-{   if ((p[0]=='+')||(p[0]=='-')||(p[0]=='$')
+{   if ((p[0]=='+')||(p[0]=='-')||(p[0]=='$')||(p[0]=='%')
         || ((p[0]=='(')&&(p[strlen(p)-1]==')')) ) return TRUE;
     return FALSE;
 }
@@ -1540,7 +1541,8 @@ static void execute_icl_command(char *p)
     switch(p[0])
     {   case '+': set_path_command(p+1); break;
         case '-': switches(p,1); break;
-        case '$': memory_command(p+1); break;
+        case '$':
+        case '%': memory_command(p+1); break;
         case '(': strcpy(cli_buff,p+1); cli_buff[strlen(cli_buff)-1]=0;
                   {   int x = 0;
                       do
