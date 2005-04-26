@@ -30,7 +30,7 @@
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-#define RELEASE_DATE "27th Aug 2004 development version"
+#define RELEASE_DATE "18th Dec 2004 development version"
 #define RELEASE_NUMBER 1631
 #define GLULX_RELEASE_NUMBER 38
 #define MODULE_VERSION_NUMBER 1
@@ -1274,37 +1274,38 @@ typedef struct operator_s
 
 /*  Index numbers into the keyword group "statements" (see "lexer.c")  */
 
-#define BOX_CODE         0
-#define BREAK_CODE       1
-#define CONTINUE_CODE    2
-#define SDEFAULT_CODE    3
-#define DO_CODE          4
-#define ELSE_CODE        5
-#define FONT_CODE        6
-#define FOR_CODE         7
-#define GIVE_CODE        8
-#define IF_CODE          9
-#define INVERSION_CODE   10
-#define JUMP_CODE        11
-#define MOVE_CODE        12
-#define NEW_LINE_CODE    13
-#define OBJECTLOOP_CODE  14
-#define PRINT_CODE       15
-#define PRINT_RET_CODE   16
-#define QUIT_CODE        17
-#define READ_CODE        18
-#define REMOVE_CODE      19
-#define RESTORE_CODE     20
-#define RETURN_CODE      21
-#define RFALSE_CODE      22
-#define RTRUE_CODE       23
-#define SAVE_CODE        24
-#define SPACES_CODE      25
-#define STRING_CODE      26
-#define STYLE_CODE       27
-#define SWITCH_CODE      28
-#define UNTIL_CODE       29
-#define WHILE_CODE       30
+#define ASSERT_CODE      0
+#define BOX_CODE         1
+#define BREAK_CODE       2
+#define CONTINUE_CODE    3
+#define SDEFAULT_CODE    4
+#define DO_CODE          5
+#define ELSE_CODE        6
+#define FONT_CODE        7
+#define FOR_CODE         8
+#define GIVE_CODE        9
+#define IF_CODE          10
+#define INVERSION_CODE   11
+#define JUMP_CODE        12
+#define MOVE_CODE        13
+#define NEW_LINE_CODE    14
+#define OBJECTLOOP_CODE  15
+#define PRINT_CODE       16
+#define PRINT_RET_CODE   17
+#define QUIT_CODE        18
+#define READ_CODE        19
+#define REMOVE_CODE      20
+#define RESTORE_CODE     21
+#define RETURN_CODE      22
+#define RFALSE_CODE      23
+#define RTRUE_CODE       24
+#define SAVE_CODE        25
+#define SPACES_CODE      26
+#define STRING_CODE      27
+#define STYLE_CODE       28
+#define SWITCH_CODE      29
+#define UNTIL_CODE       30
+#define WHILE_CODE       31
 
 #define ASSIGNMENT_CODE  100
 #define FUNCTION_CODE    101
@@ -1663,7 +1664,7 @@ typedef struct operator_s
 /*   (must correspond to entries in the table in "veneer.c")                 */
 /* ------------------------------------------------------------------------- */
 
-#define VENEER_ROUTINES 52
+#define VENEER_ROUTINES 53
 
 #define Box__Routine_VR    0
 
@@ -1715,13 +1716,14 @@ typedef struct operator_s
 #define RT__ChPrintA_VR   44
 #define RT__ChPrintS_VR   45
 #define RT__ChPrintO_VR   46
+#define AssertFailed_VR   47
 
 /* Glulx-only veneer routines */
-#define OB__Move_VR       47
-#define OB__Remove_VR     48
-#define Print__Addr_VR    49
-#define Glk__Wrap_VR      50
-#define Dynam__String_VR  51
+#define OB__Move_VR       48
+#define OB__Remove_VR     49
+#define Print__Addr_VR    50
+#define Glk__Wrap_VR      51
+#define Dynam__String_VR  52
 
 /* ------------------------------------------------------------------------- */
 /*   Run-time-error numbers (must correspond with RT__Err code in veneer)    */
