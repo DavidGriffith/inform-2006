@@ -1556,7 +1556,7 @@ Constant NOARTICLE_BIT $1000;       ! Print no articles, definite or not
     ! which the actor is not in.
 
     i = parent(item);
-    if (i ~= ancestor && (i has container or supporter)) {
+    if (i && i ~= ancestor && (i has container or supporter)) {
         after_recipient = i;
         k = action; action = ##LetGo;
         if (RunRoutines(i, before)) { action = k; rtrue; }
