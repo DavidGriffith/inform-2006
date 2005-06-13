@@ -1812,6 +1812,8 @@ printf("        +---------------------+   %06lx\n", (long int) Out_Size);
 
 extern void construct_storyfile(void)
 {
+  if (no_errors) return;
+
   if (!glulx_mode)
     construct_storyfile_z();
   else
