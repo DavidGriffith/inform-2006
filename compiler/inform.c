@@ -1189,6 +1189,7 @@ printf("  G   compile a Glulx game file\n");
 printf("  H   use Huffman encoding to compress Glulx strings\n");
 printf("  I   reject obsolete usages as incompatible\n");
 printf("  M   compile as a Module for future linking\n");
+printf("  O0  do not optimise\n");
 printf("  O1  optimise for memory\n");
 printf("  O2  optimise for speed (default)\n");
 
