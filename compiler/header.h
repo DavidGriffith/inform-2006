@@ -2364,6 +2364,7 @@ extern int  dont_enter_into_symbol_table;
 extern int  return_sp_as_variable;
 extern int  next_token_begins_syntax_line;
 extern char **local_variable_texts;
+extern int  File_sp;
 
 extern int32 token_value;
 extern int   token_type;

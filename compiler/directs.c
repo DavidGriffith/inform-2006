@@ -30,6 +30,7 @@ int32 routine_starts_line;         /* Source code line on which the current
 static int constant_made_yet;      /* Have any constants been defined yet?   */
 
 static int ifdef_stack[32], ifdef_sp;
+static int *ifdef_file_stack;
 
 /* ========================================================================= */
 /* Because of the limited use for string constant values during compilation, */
@@ -254,6 +255,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
 
     case END_CODE:
         terminate_file();
+        ifdef_sp=ifdef_file_stack[File_sp-1];
         return(FALSE);
 
     case ENDIF_CODE:
@@ -495,6 +497,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
             /* Import file*/
             load_sourcefile(name+offset, local_dir_only, suppress_warning);
         }
+        ifdef_file_stack[File_sp]=ifdef_sp;
         return FALSE;
 
     /* --------------------------------------------------------------------- */
@@ -1070,11 +1073,13 @@ extern void directs_begin_pass(void)
 
 extern void directs_allocate_arrays(void)
 {
+    ifdef_file_stack=my_calloc(sizeof(int),MAX_INCLUSION_DEPTH+1,"ifdef_file_stack int");
 }
 
 extern void directs_free_arrays(void)
 {
     free_constant_string_list();
+    my_free(ifdef_file_stack,"ifdef_file_stack int");
 }
 
 /* ========================================================================= */
