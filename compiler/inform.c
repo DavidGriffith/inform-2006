@@ -199,7 +199,7 @@ static void reset_switch_settings(void)
 {   asm_trace_setting=0;
     linker_trace_level=0;
     tokens_trace_level=0;
-    optimise_setting=2;
+    optimise_setting=0;
 
     store_the_text = FALSE;
 
@@ -1189,9 +1189,9 @@ printf("  G   compile a Glulx game file\n");
 printf("  H   use Huffman encoding to compress Glulx strings\n");
 printf("  I   reject obsolete usages as incompatible\n");
 printf("  M   compile as a Module for future linking\n");
-printf("  O0  do not optimise\n");
+printf("  O0  do not optimise (default)\n");
 printf("  O1  optimise for memory\n");
-printf("  O2  optimise for speed (default)\n");
+printf("  O2  optimise for speed\n");
 
 #ifdef ARCHIMEDES
 printf("\
