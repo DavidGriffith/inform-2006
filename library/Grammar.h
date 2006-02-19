@@ -102,7 +102,8 @@ Verb meta 'changes'
     * 'off'                                     -> ChangesOff;
 
 Verb meta 'gonear'
-    * noun                                      -> Gonear;
+    * number                                    -> GoNear
+    * noun                                      -> GoNear;
 
 Verb meta 'goto'
     * number                                    -> Goto;
@@ -117,15 +118,20 @@ Verb meta 'routines' 'messages'
 
 Verb meta 'scope'
     *                                           -> Scope
+    * number                                    -> Scope
     * noun                                      -> Scope;
 
+Verb meta 'showdict' 'dict'
+    *                                           -> ShowDict
+    * topic                                     -> ShowDict;
+
 Verb meta 'showobj'
-    *                                           -> Showobj
-    * number                                    -> Showobj
-    * multi                                     -> Showobj;
+    *                                           -> ShowObj
+    * number                                    -> ShowObj
+    * multi                                     -> ShowObj;
 
 Verb meta 'showverb'
-    * special                                   -> Showverb;
+    * special                                   -> ShowVerb;
 
 Verb meta 'timers' 'daemons'
     *                                           -> TimersOn
@@ -139,13 +145,16 @@ Verb meta 'trace'
     * 'off'                                     -> TraceOff;
 
 Verb meta 'abstract'
+    * number 'to' number                        -> XAbstract
     * noun 'to' noun                            -> XAbstract;
 
 Verb meta 'purloin'
+    * number                                    -> XPurloin
     * multi                                     -> XPurloin;
 
 Verb meta 'tree'
     *                                           -> XTree
+    * number                                    -> XTree
     * noun                                      -> XTree;
 
 #Ifdef TARGET_GLULX;
