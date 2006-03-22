@@ -1664,7 +1664,7 @@ typedef struct operator_s
 /*   (must correspond to entries in the table in "veneer.c")                 */
 /* ------------------------------------------------------------------------- */
 
-#define VENEER_ROUTINES 53
+#define VENEER_ROUTINES   54
 
 #define Box__Routine_VR    0
 
@@ -1717,13 +1717,14 @@ typedef struct operator_s
 #define RT__ChPrintS_VR   45
 #define RT__ChPrintO_VR   46
 #define AssertFailed_VR   47
+#define VerboseDebugMessages_VR 48
 
 /* Glulx-only veneer routines */
-#define OB__Move_VR       48
-#define OB__Remove_VR     49
-#define Print__Addr_VR    50
-#define Glk__Wrap_VR      51
-#define Dynam__String_VR  52
+#define OB__Move_VR       49
+#define OB__Remove_VR     50
+#define Print__Addr_VR    51
+#define Glk__Wrap_VR      52
+#define Dynam__String_VR  53
 
 /* ------------------------------------------------------------------------- */
 /*   Run-time-error numbers (must correspond with RT__Err code in veneer)    */
@@ -2092,13 +2093,13 @@ extern void assemblez_jump(int n);
 extern void assemblez_call_1(assembly_operand o1);
 extern void assemblez_call_1_to(assembly_operand o1, assembly_operand st);
 extern void assemblez_call_2(assembly_operand o1, assembly_operand o2);
-extern void assemblez_call_3(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_3(assembly_operand o1, assembly_operand o2,
   assembly_operand o3);
-extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2,
   assembly_operand o3, assembly_operand st);
-extern void assemblez_call_4(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_4(assembly_operand o1, assembly_operand o2,
   assembly_operand o3, assembly_operand o4);
-extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2,
   assembly_operand o3, assembly_operand o4, assembly_operand st);
 
 extern void assembleg_0(int internal_number);
