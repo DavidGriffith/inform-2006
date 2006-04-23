@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "lexer" : Lexical analyser                                              */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -980,7 +980,7 @@ extern void terminate_file(void)
 
 extern void print_main_line(void)
 {
-    if (File_sp>0) 
+    if (File_sp>0)
         printf (tx(" from line %d"), FileStack[0].LB.source_line);
 }
 
@@ -1107,11 +1107,11 @@ extern void get_next_token(void)
         {   j = circle[i].type;
             if ((j==0) || ((j>=100) && (j<200)))
                 interpret_identifier(i, FALSE);
-            else if (j==DQ_TT && (token_contexts[i] & 4096)) 
+            else if (j==DQ_TT && (token_contexts[i] & 4096))
             {
                 if (dont_enter_into_symbol_table)
                     context |= 4096;
-                else 
+                else
                     interpret_identifier(i, FALSE);
             }
         }
@@ -1142,7 +1142,7 @@ extern void get_next_token(void)
     circle[circle_position].line_ref = get_current_dbgl();
 
     switch(e)
-    {   case 0: 
+    {   case 0:
             if ((dont_enter_into_symbol_table <= -2) && (d == '\\'))
                 (*get_next_char)();
             char_error("Illegal character found in source:", d);

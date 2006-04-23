@@ -3,8 +3,8 @@
 /*               end of dynamic memory, gluing together all the required     */
 /*               tables.                                                     */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -1343,7 +1343,7 @@ static void construct_storyfile_g(void)
 
     WriteInt32(p+identifier_names_offset+0, Write_RAM_At + mark);
     WriteInt32(p+identifier_names_offset+4, no_properties);
-    
+
     for (i=0; i<no_properties; i++) {
       j = individual_name_strings[i];
       if (j)

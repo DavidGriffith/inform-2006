@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "asm" : The Inform assembler                                            */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -1307,8 +1307,8 @@ extern int32 assemble_routine_header(int no_locals,
       /*  function is called, if it's required.                              */
 
       if ((routine_asterisked) || (define_INFIX_switch))
-      {   
-          char fnt[MAX_IDENTIFIER_LENGTH + 10]; 
+      {
+          char fnt[MAX_IDENTIFIER_LENGTH + 10];
           assembly_operand PV, RFA, CON, STP, SLF; int ln, ln2;
 
           ln = next_label++;
@@ -1568,7 +1568,7 @@ static void transfer_routine_z(void)
             {   if (asm_trace_level >= 4) printf("Short form\n");
                 zcode_markers[i+1] = DELETED_MV;
             }
-            else if (addr<-0x2000 || addr>0x1fff) 
+            else if (addr<-0x2000 || addr>0x1fff)
             {   if (asm_trace_level >= 4) printf("Inverted branch and jump\n");
                 zcode_markers[i+1] = EXPANDED_MV;
             }
@@ -2262,7 +2262,7 @@ extern void assemblez_call_2(assembly_operand o1, assembly_operand o2)
       assemblez_2_to(call_zc, o1, o2, temp_var4);
 }
 
-extern void assemblez_call_3(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_3(assembly_operand o1, assembly_operand o2,
                              assembly_operand o3)
 {
     if (version_number >= 5)
@@ -2274,7 +2274,7 @@ extern void assemblez_call_3(assembly_operand o1, assembly_operand o2,
       assemblez_3_to(call_zc, o1, o2, o3, temp_var4);
 }
 
-extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2,
                                 assembly_operand o3, assembly_operand st)
 {
     if (version_number >= 4)
@@ -2283,7 +2283,7 @@ extern void assemblez_call_3_to(assembly_operand o1, assembly_operand o2,
       assemblez_3_to(call_zc, o1, o2, o3, st);
 }
 
-extern void assemblez_call_4(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_4(assembly_operand o1, assembly_operand o2,
                              assembly_operand o3, assembly_operand o4)
 {
     if (version_number >= 5)
@@ -2295,7 +2295,7 @@ extern void assemblez_call_4(assembly_operand o1, assembly_operand o2,
       assemblez_4_to(call_zc, o1, o2, o3, o4, temp_var4);
 }
 
-extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2, 
+extern void assemblez_call_4_to(assembly_operand o1, assembly_operand o2,
                                 assembly_operand o3, assembly_operand o4, assembly_operand st)
 {
     if (version_number >= 4)

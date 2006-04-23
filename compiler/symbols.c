@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "symbols" :  The symbols table; creating stock of reserved words        */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -204,7 +204,7 @@ extern int symbol_index(char *p, int hashcode)
 }
 
 extern void end_symbol_scope(int k)
-{   
+{
     /* make the given symbol invisible to symbol_index */
     int j;
     j = hash_code_from_string((char *) symbs[k]);
@@ -213,7 +213,7 @@ extern void end_symbol_scope(int k)
         return;
     }
     j = start_of_list[j];
-    while (j != -1) 
+    while (j != -1)
     {
         if (next_entry[j] == k)
         {   next_entry[j] = next_entry[k];
@@ -305,7 +305,7 @@ extern void issue_unused_warnings(void)
                 + INSF_SFLAG + USED_SFLAG + REPLACE_SFLAG)) == 0)
              && (stypes[i] != OBJECT_T))
             dbnu_warning(typename(stypes[i]), (char *) symbs[i], slines[i]);
-        if (((sflags[i] & (REPLACE_SFLAG + ALIASED_SFLAG)) 
+        if (((sflags[i] & (REPLACE_SFLAG + ALIASED_SFLAG))
                 == REPLACE_SFLAG + ALIASED_SFLAG) && stypes[i+1] == CONSTANT_T)
             sflags[i+1] |= UNKNOWN_SFLAG;
     }
@@ -466,7 +466,7 @@ extern void write_the_identifier_names(void)
         array_name_strings[j]
             = compile_string(idname_string, FALSE, FALSE);
     }
-    if (define_INFIX_switch) { 
+    if (define_INFIX_switch) {
         for (i=0; i<no_symbols; i++)
         {   if (stypes[i] == GLOBAL_VARIABLE_T)
             {   sprintf(idname_string, "%s", (char *) symbs[i]);

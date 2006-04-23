@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "expressp" :  The expression parser                                     */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -130,10 +130,10 @@ but not used as a value:", unicode);
                     && (current_token.text[1] == 'N')
                     && (current_token.text[2] == '_')
                     && (strlen(current_token.text)==7))
-                {   
+                {
                     v = (VNUMBER >= atoi(current_token.text+3));
                 }
-                else 
+                else
                 {
                     v = ((sflags[symbol] & UNKNOWN_SFLAG) == 0);
                     mark_symbol_as_used = v;
@@ -643,7 +643,7 @@ static int32 value_of_system_constant_z(int t)
 
 static int32 value_of_system_constant_g(int t)
 {
-    switch (t) 
+    switch (t)
     {   case classes_table_SC:
             return Write_RAM_At + class_numbers_offset;
         case identifiers_table_SC:
@@ -739,7 +739,7 @@ static int32 value_of_system_constant_g(int t)
         case class_objects_array_SC:
             return Write_RAM_At + class_numbers_offset;
         case highest_object_number_SC:
-            return no_objects-1;  
+            return no_objects-1;
   }
 
   error_named("System constant not implemented in Glulx",
@@ -1707,7 +1707,7 @@ extern assembly_operand parse_expression(int context)
                                 minus sign is ambiguous, and brackets always
                                 indicate subexpressions, not function calls
 
-            IFDEF_CONTEXT       like CONSTANT_CONTEXT, but identifiers are 
+            IFDEF_CONTEXT       like CONSTANT_CONTEXT, but identifiers are
                                 given values according to whether defined
 
         Return value: an assembly operand.

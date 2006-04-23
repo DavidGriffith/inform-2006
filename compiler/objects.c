@@ -6,8 +6,8 @@
 /*                    checks syntax and translates such directives into      */
 /*                    specifications for the object-maker.                   */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -328,18 +328,18 @@ extern void make_objectloop_lists(void)
        to do some limited backpatching on the copied properties_table */
     memcpy(p, properties_table, properties_table_size);
     for (i = 0; i  < zmachine_backpatch_size; i += 2+WORDSIZE)
-    {   if (read_byte_from_memory_block(&zmachine_backpatch_table, i) == INHERIT_MV 
+    {   if (read_byte_from_memory_block(&zmachine_backpatch_table, i) == INHERIT_MV
             && read_byte_from_memory_block(&zmachine_backpatch_table, i+1) == PROP_ZA)
         {   j = 0;
             for (n = 2; n < 2 + WORDSIZE; n++)
                 j = j*256 + read_byte_from_memory_block(&zmachine_backpatch_table, i+n);
-            if (glulx_mode) 
+            if (glulx_mode)
             {   j = (int32) p + j;
                 k = ReadInt32(j) + (int32) p;
                 k = ReadInt32(k);
                 WriteInt32((uchar *)j, k);
             }
-            else 
+            else
             {   k = 256*p[j] + p[j+1];
                 k = 256*p[k] + p[k+1];
                 p[j] = k/256;
@@ -347,8 +347,8 @@ extern void make_objectloop_lists(void)
             }
         }
     }
-        
-    for (j=0; j<no_arrays; j++) 
+
+    for (j=0; j<no_arrays; j++)
         if (array_sizes[j] == 0) {
             k = array_symbols[j];
             l = (char *) symbs[k];
@@ -370,18 +370,18 @@ extern void make_objectloop_lists(void)
             if (asm_trace_level >= 2) printf ("Creating array for %s(%d): ", l, n);
 
             prop_ptr = 0;
-            for (i=1; i<=no_objects; i++) 
-            {   incl = 0; 
+            for (i=1; i<=no_objects; i++)
+            {   incl = 0;
                 if (glulx_mode)
                 {   if (prop_ptr == objectsg[i-1].propaddr) /* not class */
                     {   int q, r;
                         pp2 = (int32) p+prop_ptr; r = ReadInt32(pp2); pp2 +=4;
                         for (q=0; q<r; q++)
                         {   propnum = pp2+10*q; propnum = ReadInt16(propnum);
-                            if (m == 0 && propnum == n && 
+                            if (m == 0 && propnum == n &&
                                 (((uchar *)(pp2+10*q))[9] & 1) == 0)
                                 incl = TRUE;
-                            if (m && propnum == 2) 
+                            if (m && propnum == 2)
                             {   pp2 = (pp2+10*q+4); r = (int32) p + ReadInt32(pp2);
                                 pp2 -= 2; proplen = ReadInt16(pp2);
                                 for (q=0; q<proplen; q++, r+=WORDSIZE)
@@ -395,7 +395,7 @@ extern void make_objectloop_lists(void)
                     }
                 }
                 else /* Z-code */  /* skip past shortname */
-                {   pp2 = prop_ptr + 1+ 2* (uchar) p[prop_ptr]; 
+                {   pp2 = prop_ptr + 1+ 2* (uchar) p[prop_ptr];
                     while ((propnum = p[pp2]) != 0)
                     {   if (propnum >= 0x80) {
                             proplen=((uchar) p[++pp2]);
@@ -403,20 +403,20 @@ extern void make_objectloop_lists(void)
                         }
                         else
                             proplen=1+propnum/0x40;
-                        pp2++; 
+                        pp2++;
                         propnum = propnum & 0x3F;
                         if (m == 0 && propnum == n)
                             incl = TRUE;
                         if (m == 0 && n >= INDIV_PROP_START && propnum == 3)
                         {   int q, r; /* have to search individual properties too */
                             q = p[pp2]*256 + p[pp2+1];
-                            while ((r=(uchar)individuals_table[q]*256 + 
+                            while ((r=(uchar)individuals_table[q]*256 +
                                 (uchar)individuals_table[q+1]) != 0)
                             {   if ((r & 0x7fff) == n) incl = TRUE;
                                 q = q + 3 + (uchar)individuals_table[q+2];
                             }
                         }
-                        if (m && propnum == 2) 
+                        if (m && propnum == 2)
                             for (; proplen>0; proplen -= 2, pp2 += 2) {
                                 if (p[pp2]*256 + p[pp2+1] == n)
                                     incl = TRUE;
@@ -425,19 +425,19 @@ extern void make_objectloop_lists(void)
                     } /* while propnum != 0 */
                 }
 
-                if (incl) 
-                {   
+                if (incl)
+                {
                     if (asm_trace_level >= 2) printf ("%d ", i);
                     if (dynamic_array_area_size+WORDSIZE*2 >= MAX_STATIC_DATA)
                         memoryerror("MAX_STATIC_DATA", MAX_STATIC_DATA);
-                    if (glulx_mode) 
-                    {   
+                    if (glulx_mode)
+                    {
                         WriteInt32(dynamic_array_area+dynamic_array_area_size, i);
                         backpatch_zmachine(OBJECT_MV, ARRAY_ZA,
                             dynamic_array_area_size - 4*MAX_GLOBAL_VARIABLES);
                         dynamic_array_area_size += 4;
                     }
-                    else 
+                    else
                     {
                         dynamic_array_area[dynamic_array_area_size++] = i/256;
                         dynamic_array_area[dynamic_array_area_size++] = i%256;
@@ -1972,17 +1972,17 @@ extern void make_object(int nearby_flag,
 
     individual_prop_table_size = 0;
 
-    if (nearby_flag) 
+    if (nearby_flag)
     {
         tree_depth=1;
         obsolete_warning("Nearby instead of Object ->");
     }
-    else 
+    else
         tree_depth=0;
 
     if (specified_class != -1) goto HeaderPassed;
 
-    get_next_token(); 
+    get_next_token();
 
     /*  Read past and count a sequence of "->"s, if any are present          */
 

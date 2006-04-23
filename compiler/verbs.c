@@ -2,8 +2,8 @@
 /*   "verbs" :  Manages actions and grammar tables; parses the directives    */
 /*              Verb and Extend.                                             */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -135,7 +135,7 @@ extern void make_fake_action(void)
 
     if (!(sflags[i] & UNKNOWN_SFLAG))
     {   ebf_error("new fake action name", token_text);
-        duplicate_error();    
+        duplicate_error();
         panic_mode_error_recovery(); return;
     }
 

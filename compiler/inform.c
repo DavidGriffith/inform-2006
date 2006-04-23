@@ -2,8 +2,8 @@
 /*   "inform" :  The top level of Inform: switches, pathnames, filenaming    */
 /*               conventions, ICL (Inform Command Line) files, main          */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -436,7 +436,7 @@ Module_Path or ICL_Path variables. Other paths are for output only.", FN_ALT);
         }
         else path[i++] = value[j++];
         if (i == PATHLEN-1) {
-            printf("Fatal error: A specified path is longer than %d characters.\n", 
+            printf("Fatal error: A specified path is longer than %d characters.\n",
                 PATHLEN-1);
             exit(1);
         }
@@ -1036,7 +1036,7 @@ compiling modules: disabling -S switch\n");
         close_transcript_file();
     }
 
-    if (no_errors==0) output_file(); 
+    if (no_errors==0) output_file();
 
     if (no_errors==0) { output_has_occurred = TRUE; }
     else { output_has_occurred = FALSE; }
@@ -1070,7 +1070,7 @@ static void cli_print_help(int help_level)
 	int i;
     printf(
 "\nThis program is a compiler of Infocom format (also called \"Z-machine\")\n\
-story files: copyright (c) Graham Nelson 1993 - 2004.\n\n");
+story files: copyright (c) Graham Nelson 1993 - 2006.\n\n");
 
    /* For people typing just "inform", a summary only: */
 
@@ -1568,8 +1568,7 @@ static void execute_icl_command(char *p)
 
 char banner_line[80];
 
-static void banner(void)
-{
+static void banner(void) {
     sprintf(banner_line, "Inform %d.%d%d",
         (VNUMBER/100)%10, (VNUMBER/10)%10, VNUMBER%10);
     if (0) {
@@ -1580,8 +1579,7 @@ static void banner(void)
 #ifdef MACHINE_STRING
     sprintf(banner_line+strlen(banner_line), " for %s", MACHINE_STRING);
 #endif
-    sprintf(banner_line+strlen(banner_line), " (%s)",
-        RELEASE_DATE);
+    sprintf(banner_line+strlen(banner_line), " (%s)", RELEASE_DATE);
     printf("%s\n", banner_line);
 }
 

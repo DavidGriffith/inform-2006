@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "directs" : Directives (# commands)                                     */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -50,16 +50,16 @@ void record_token_string(int token_id, char* text)
     cs_next->textvalue=my_calloc(sizeof(char),strlen(text)+1,"constant_string string");
     strcpy(cs_next->textvalue,text);
 
-    if(cs_oldest==NULL) 
+    if(cs_oldest==NULL)
         cs_oldest=cs_youngest=cs_next; /* First element, so oldest and youngest */
-    else 
+    else
     {
         cs_youngest->child=cs_next; /* Point old youngest to new youngest */
         cs_youngest=cs_next; /* Reset youngest pointer */
     }
 }
 char* retrieve_token_string(int token_id){
-    conststr_s *current_p=cs_oldest; 
+    conststr_s *current_p=cs_oldest;
     while(current_p!=NULL){
         if(current_p->consttoken_id==token_id) return current_p->textvalue;
         current_p=current_p->child;
@@ -68,7 +68,7 @@ char* retrieve_token_string(int token_id){
 }
 void free_constant_string_list()
 {
-    conststr_s *next_p=NULL,*current_p=cs_oldest; 
+    conststr_s *next_p=NULL,*current_p=cs_oldest;
     while(current_p!=NULL){
         next_p=current_p->child;
         my_free(&(current_p->textvalue),"constant_string string");
@@ -171,8 +171,8 @@ extern int parse_given_directive(void)
 
         /* Save off the untranslated string value here; we may need these
            during compilation (particularly #include directives) */
-        if(token_type==DQ_TT) record_token_string(i,token_text); 
-        
+        if(token_type==DQ_TT) record_token_string(i,token_text);
+
         {   assembly_operand AO = parse_expression(CONSTANT_CONTEXT);
             if (AO.marker != 0)
             {   assign_marked_symbol(i, AO.marker, AO.value,
@@ -457,11 +457,11 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
     /* --------------------------------------------------------------------- */
 
     case INCLUDE_CODE:
-        get_next_token(); 
+        get_next_token();
         /* Check for errors*/
         if (token_type != DQ_TT && token_type != SYMBOL_TT)
         {   ebf_error("filename as constant or in double-quotes", token_text);
-            panic_mode_error_recovery(); 
+            panic_mode_error_recovery();
             return FALSE;
         }
         /* Assign value to name (lookuping value of constant if necessary)*/
@@ -470,28 +470,28 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
 			if(name==NULL)
 			{
 				ebf_error("string-type constant", token_text);
-				panic_mode_error_recovery(); 
+				panic_mode_error_recovery();
 				return FALSE;
 			}
 			sflags[token_value] |= USED_SFLAG;
         }
         else name = token_text;
-        
+
         /* More error checks*/
         get_next_token();
         if (!((token_type == SEP_TT) && (token_value == SEMICOLON_SEP))) /* Ensure followed by semicolon*/
             ebf_error("semicolon ';' after Include filename", token_text);
 
         if(strlen(name)==0) ebf_error("filename is empty", token_text);/* Ensure not empty*/
-        
+
         if (strcmp(name, "language__") == 0) /* One special case */
             load_sourcefile(Language_Name, 0, 0);
-        else 
+        else
         {    /* Detect include options, and separate from filename */
             int suppress_warning=0, local_dir_only=0, offset=0;
             char c0=name[0], c1=name[1];
-            if (c0 == '>' || c1 == '>') local_dir_only=1; 
-            if (c0 == '?' || c1 == '?') suppress_warning=1; 
+            if (c0 == '>' || c1 == '>') local_dir_only=1;
+            if (c0 == '?' || c1 == '?') suppress_warning=1;
             offset=suppress_warning+local_dir_only;
             if(offset == 1 && c0 == c1) offset=2; /* Handle ">>file.h" or "??file.h" */
             /* Import file*/
@@ -663,7 +663,7 @@ Fake_Action directives to a point after the inclusion of \"Parser\".)");
         {   put_token_back();
             break;
         }
-        if ((token_type != SYMBOL_TT) || ((sflags[token_value] & UNKNOWN_SFLAG) == 0) 
+        if ((token_type != SYMBOL_TT) || ((sflags[token_value] & UNKNOWN_SFLAG) == 0)
             || i+1 != token_value)
         {   ebf_error("';' or new routine name", token_text);
             if (i+1 < token_value) token_value = i;

@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "states" :  Statement translator                                        */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -52,10 +52,10 @@ static void parse_action(void)
     if ((token_type == SEP_TT) && (token_value == LESS_SEP))
     {   level = 2; get_next_token();
     }
-    
+
     get_next_token();
     comma_flag = (token_type == SEP_TT && token_value == COMMA_SEP);
-    put_token_back(); put_token_back(); 
+    put_token_back(); put_token_back();
     get_next_token();
     dont_enter_into_symbol_table = FALSE;
 
@@ -72,7 +72,7 @@ static void parse_action(void)
 
     get_next_token();
     if (token_type == SEP_TT && token_value == COMMA_SEP && args == 0)
-    {   if (version_number < 5) 
+    {   if (version_number < 5)
             error("<x, y> syntax is not available in V3 or V4");
         args = 3;
         AO3 = zero_operand; AO4 = zero_operand; AO5 = AO2;
@@ -102,7 +102,7 @@ static void parse_action(void)
 
     AO = veneer_routine(R_Process_VR);
     if (args >= 3) AO5 = code_generate(AO5, QUANTITY_CONTEXT, -1);
-    if (glulx_mode && args == 3 && (AO5.type != LOCALVAR_OT || AO5.value != 0)) 
+    if (glulx_mode && args == 3 && (AO5.type != LOCALVAR_OT || AO5.value != 0))
         assembleg_store(stack_pointer, AO5);
     if (args >= 2) AO4 = code_generate(AO4, QUANTITY_CONTEXT, -1);
     if (glulx_mode && args == 3 && (AO4.type != LOCALVAR_OT || AO4.value != 0))
@@ -112,9 +112,9 @@ static void parse_action(void)
         assembleg_store(stack_pointer, AO3);
     if (codegen_action)
           AO2 = code_generate(AO2, QUANTITY_CONTEXT, -1);
-    if (glulx_mode && args == 3 && (AO2.type != LOCALVAR_OT || AO2.value != 0)) 
+    if (glulx_mode && args == 3 && (AO2.type != LOCALVAR_OT || AO2.value != 0))
         assembleg_store(stack_pointer, AO2);
-    
+
     if (!glulx_mode) {
 
       switch(args)
@@ -1244,22 +1244,22 @@ static void parse_statement_z(int break_label, int continue_label)
                      put_token_back();
                  }
 
-                 /*  Objectloops that can be optimised from 
+                 /*  Objectloops that can be optimised from
                      object features known at compile time. */
-                 if (((token_type == CND_TT) && 
+                 if (((token_type == CND_TT) &&
                      (token_value == PROVIDES_COND || token_value == OFCLASS_COND))
                      || ((token_type == SEP_TT) && (token_value == PROPADD_SEP)))
                  {   ln4 = (token_value == OFCLASS_COND);
                      get_next_token();
-                     if (optimise_setting > 1 && version_number > 3 && token_type == SYMBOL_TT 
+                     if (optimise_setting > 1 && version_number > 3 && token_type == SYMBOL_TT
                              && stypes[token_value] != GLOBAL_VARIABLE_T && !module_switch
                              && svals[token_value] > 2) { /* Not Object or Class */
                          char obj_array_name[MAX_IDENTIFIER_LENGTH+4];
                          int i;
                          sprintf(obj_array_name, "%s__%c", token_text, ln4?'C':'P');
-                         
+
                          get_next_token();
-                         if ((token_type == SEP_TT) && 
+                         if ((token_type == SEP_TT) &&
                              (token_value == CLOSEB_SEP))
                          {
                              i = symbol_index(obj_array_name, -1);
@@ -1272,9 +1272,9 @@ static void parse_statement_z(int break_label, int continue_label)
                              if (no_arrays == MAX_ARRAYS)
                                     memoryerror("MAX_ARRAYS", MAX_ARRAYS);
                              AO2.value = i; AO2.type = LONG_CONSTANT_OT; AO2.marker = SYMBOL_MV;
-                             
+
                              AO3.type = LONG_CONSTANT_OT; AO3.marker = ARRAY_MV;
-                             AO3.value = dynamic_array_area_size; 
+                             AO3.value = dynamic_array_area_size;
                              dynamic_array_area[dynamic_array_area_size++] = 0x01;
                              dynamic_array_area[dynamic_array_area_size++] = 0x1d;
                              if (dynamic_array_area_size >= MAX_STATIC_DATA)
@@ -2341,20 +2341,20 @@ static void parse_statement_g(int break_label, int continue_label)
                      put_token_back();
                  }
 
-                 /*  Objectloops that can be optimised from 
+                 /*  Objectloops that can be optimised from
                      object features known at compile time. */
-                 if (((token_type == CND_TT) && 
+                 if (((token_type == CND_TT) &&
                      (token_value == PROVIDES_COND || token_value == OFCLASS_COND))
                      || ((token_type == SEP_TT) && (token_value == PROPADD_SEP)))
                  {   ln4 = (token_value == OFCLASS_COND);
                      get_next_token();
-                     if (optimise_setting > 1 && token_type == SYMBOL_TT 
+                     if (optimise_setting > 1 && token_type == SYMBOL_TT
                              && stypes[token_value] != GLOBAL_VARIABLE_T && !module_switch
                              && svals[token_value] > 2) { /* Not Object or Class */
                          char obj_array_name[MAX_IDENTIFIER_LENGTH+4];
                          int i;
                          sprintf(obj_array_name, "%s__%c", token_text, ln4?'C':'P');
-                         
+
                          get_next_token();
                          if ((token_type == SEP_TT) && (token_value == CLOSEB_SEP))
                          {
@@ -2368,10 +2368,10 @@ static void parse_statement_g(int break_label, int continue_label)
                              if (no_arrays == MAX_ARRAYS)
                                     memoryerror("MAX_ARRAYS", MAX_ARRAYS);
                              AO2.value = i; AO2.type = CONSTANT_OT; AO2.marker = SYMBOL_MV;
-                             
+
                              AO3.type = CONSTANT_OT; AO3.marker = ARRAY_MV;
-                             AO3.value = dynamic_array_area_size -4*MAX_GLOBAL_VARIABLES;  
-                             /* Glulx measures Array backpatches from top of globals */ 
+                             AO3.value = dynamic_array_area_size -4*MAX_GLOBAL_VARIABLES;
+                             /* Glulx measures Array backpatches from top of globals */
                              dynamic_array_area[dynamic_array_area_size++] = 0;
                              dynamic_array_area[dynamic_array_area_size++] = 0;
                              dynamic_array_area[dynamic_array_area_size++] = 0;
@@ -2504,7 +2504,7 @@ static void parse_statement_g(int break_label, int continue_label)
                  ln2 = next_label++;
                  ln3 = next_label++;
                  if (flag)
-                 {   
+                 {
                      if ((token_type != SEP_TT) || (token_value != COLON_SEP)) {
                         put_token_back();
                         put_token_back();

@@ -2,8 +2,8 @@
 /*   "errors" : Warnings, errors and fatal errors                            */
 /*              (with error throwback code for RISC OS machines)             */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -341,7 +341,7 @@ extern void duplicate_error(void)
         if (slines[token_value]>0) j=InputFiles[slines[token_value]/0x10000-1].filename;
         else j="";
         printf("> \"%s\" is a previously declared %s at \"%s\" line %d.\n",
-            (char *) symbs[token_value], typename(stypes[token_value]), j, 
+            (char *) symbs[token_value], typename(stypes[token_value]), j,
             slines[token_value]%0x10000);
     }
 }
@@ -390,9 +390,9 @@ extern void obsolete_warning(char *s1)
     if (obsolete_switch || nowarnings_switch)
     {   no_suppressed_warnings++; return; }
     sprintf(error_message_buff, tx("Obsolete usage: %s"),tx(s1));
-    if (incompatibility_switch) 
+    if (incompatibility_switch)
         error(error_message_buff);
-    else 
+    else
         message(2,error_message_buff);
 }
 
@@ -543,14 +543,14 @@ static void read_translation_file(void)
         {   error("Exceeded translation maximum.");
             break;
         }
-        switch (tline[0]) 
+        switch (tline[0])
         {   case '!':
             case 0:
             case '\n':
                 break;
             case '>':
                 if (strlen(tline) < 2) break;
-                if (!expect_new)                 
+                if (!expect_new)
                 {   printf("Multiple-line translations not allowed in %s:\n %s\n", Translation_Name, tline);
                     break;
                 }

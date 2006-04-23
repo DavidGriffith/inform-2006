@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "text" : Text translation, the abbreviations optimiser, the dictionary  */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -1198,7 +1198,7 @@ extern void optimise_abbreviations(void)
     {   test.text[0]=all_text[i];
         test.text[1]=all_text[i+1];
         test.text[2]=all_text[i+2];
-        if (selected==0 && 
+        if (selected==0 &&
             (iso_to_alphabet_grid[test.text[0]]>=26) && test.text[0]!='~')
             test.text[2]=0;
         test.text[3]=0;
@@ -1259,7 +1259,7 @@ extern void optimise_abbreviations(void)
                 tlbtab[i].occurrences);
     */
 
-    for (i=0; i<64; i++) bestyet2[i].length=0; 
+    for (i=0; i<64; i++) bestyet2[i].length=0;
     available=256;
     while ((available>0)&&(selected<64))
     {   printf("Pass %d\n", ++pass_no);
@@ -1952,9 +1952,9 @@ static void recursively_show_z(int node)
         recursively_show_z(dtree[node].branch[1]);
 }
 
-static void recursively_show_g(int node)
-{
-  warning("### Glulx dictionary-show not yet implemented.");
+static void recursively_show_g(int node) {
+    warning("Game text record will not contain a dictionary listing \
+-- this feature is not yet implemented in Glulx.");
 }
 
 static void show_alphabet(int i)

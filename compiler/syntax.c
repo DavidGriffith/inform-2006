@@ -1,8 +1,8 @@
 /* ------------------------------------------------------------------------- */
 /*   "syntax" : Syntax analyser and compiler                                 */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -202,7 +202,7 @@ extern int parse_directive(int internal_flag)
         {   token_value++;
             is_aliased = TRUE;
         }
-        
+
         routine_symbol = token_value;
 
         if ((sflags[routine_symbol] & REPLACE_SFLAG) && (is_systemfile()))
@@ -278,9 +278,9 @@ extern void get_next_token_not_directive(void)
         directive_keywords.enabled = FALSE;
         directives.enabled = s1;
         segment_markers.enabled = s2;
-        statements.enabled = 
-            conditions.enabled = 
-            local_variables.enabled = 
+        statements.enabled =
+            conditions.enabled =
+            local_variables.enabled =
             system_functions.enabled = s3;
     }
 }

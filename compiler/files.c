@@ -7,8 +7,8 @@
 /*             routines in "inform.c", since they are tied up with ICL       */
 /*             settings and are very host OS-dependent.                      */
 /*                                                                           */
-/*   Part of Inform 6.31                                                     */
-/*   copyright (c) Graham Nelson 1993 - 2004                                 */
+/*   Part of Inform 6.40                                                     */
+/*   copyright (c) Graham Nelson 1993 - 2006                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
@@ -83,7 +83,7 @@ extern void load_sourcefile(char *filename_given, int same_directory_flag, int i
     if (InputFiles[input_file].handle==NULL)
         fatalerror_named("Couldn't open source file", name);
 
-    if (line_trace_level > 0) 
+    if (line_trace_level > 0)
     {
         printf(tx("Opening file"));
         print_main_line();
@@ -121,7 +121,7 @@ extern void close_all_source(void)
 
 extern char *file_read_line(char *buf, int maxlen, FILE *f)
 {   /* replacement for fgets() to deal with Mac line-endings, and chopping
-    off final line terminator.  Used by execute_icl_header(), 
+    off final line terminator.  Used by execute_icl_header(),
     read_translation_file() and read_source_to_iso_file() */
     static char lc;
     int i, c;
