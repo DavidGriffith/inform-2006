@@ -805,8 +805,8 @@ Inform translates plain filenames (such as \"xyzzy\") into full pathnames\n\
    \".\" then Inform uses no file extension at all (removing the \".\").\n\n");
 #endif
 
-    printf("Names of five individual files can also be set using the same\n\
-  + command notation (though they aren't really pathnames).  These are:\n\n\
+    printf("   Names of five individual files can also be set using the same\n\
+   + command notation (though they aren't really pathnames).  These are:\n\n\
       transcript_name  (text written by -r switch): now \"%s\"\n\
       debugging_name   (data written by -k switch): now \"%s\"\n\
       language_name    (library file defining natural language of game):\n\
@@ -983,6 +983,8 @@ static void rennab(int32 time_taken)
 /* ------------------------------------------------------------------------- */
 
 static int execute_icl_header(char *file1);
+static void print_switch_settings(void);
+static void help_on_switches(int s, int i);
 
 static int compile(int number_of_files_specified, char *file1, char *file2)
 {   int32 time_start;
@@ -1053,6 +1055,8 @@ compiling modules: disabling -S switch\n");
 
     if (store_the_text) my_free(&all_text,"transcription text");
 
+    if (listing_switch) print_switch_settings();
+
     return (no_errors==0)?0:1;
 }
 
@@ -1060,32 +1064,30 @@ compiling modules: disabling -S switch\n");
 /*   The command line interpreter                                            */
 /* ------------------------------------------------------------------------- */
 
-static char* error_format_name[] = {
+/* static char* error_format_name[] = {
     "Archimedes", "Microsoft", "Macintosh MPW", "GCC", NULL,
     "Reversed Archimedes", "Reversed Microsoft", "Reversed Macintosh MPW",
-    "Reversed GCC", NULL};
+    "Reversed GCC", NULL}; */
 
-static void cli_print_help(int help_level)
-{
+static void cli_print_help(int help_level) {
 	int i;
     printf(
 "\nThis program is a compiler of Infocom format (also called \"Z-machine\")\n\
 story files: copyright (c) Graham Nelson 1993 - 2006.\n\n");
 
-   /* For people typing just "inform", a summary only: */
+    /* For people typing just "inform", a summary only: */
 
-   if (help_level==0)
-   {
+    if (help_level==0) {
 
-#ifndef PROMPT_INPUT
-  printf("Usage: \"inform [commands...] <file1> [<file2>]\"\n\n");
-#else
-  printf("When run, Inform prompts you for commands (and switches),\n\
+        #ifndef PROMPT_INPUT
+        printf("Usage: \"inform [commands...] <file1> [<file2>]\"\n\n");
+        #else
+        printf("When run, Inform prompts you for commands (and switches),\n\
 which are optional, then an input <file1> and an (optional) output\n\
 <file2>.\n\n");
-#endif
+        #endif
 
-  printf(
+        printf(
 "<file1> is the Inform source file of the game to be compiled. <file2>,\n\
 if given, overrides the filename Inform would normally use for the\n\
 compiled output.  Try \"inform -h1\" for file-naming conventions.\n\n\
@@ -1095,7 +1097,7 @@ One or more words can be supplied as \"commands\". These may be:\n\n\
   +dir          set Include_Path to this directory\n\
   +PATH=dir     change the PATH to this directory\n\n\
   $...          one of the following memory commands:\n");
-  printf(
+        printf(
 "     $list            list current memory allocation settings\n\
      $huge            make standard \"huge game\" settings %s\n\
      $large           make standard \"large game\" settings %s\n\
@@ -1109,278 +1111,615 @@ One or more words can be supplied as \"commands\". These may be:\n\n\
     (DEFAULT_MEMORY_SIZE==LARGE_SIZE)?"(default)":"",
     (DEFAULT_MEMORY_SIZE==SMALL_SIZE)?"(default)":"");
 
-#ifndef PROMPT_INPUT
-    printf("For example: \"inform -dexs $huge curses\".\n\n");
-#endif
+        #ifndef PROMPT_INPUT
+        printf("For example: \"inform -dexs $huge curses\".\n\n");
+        #endif
 
-    printf(
-"For fuller information, see the Inform Designer's Manual.\n");
+        printf("For fuller information, see the Inform Designer's Manual.\n");
+        return;
+    }
 
-       return;
-   }
+    /* The -h1 (filenaming) help information: */
 
-   /* The -h1 (filenaming) help information: */
+    if (help_level == 1) { help_on_filenames(); return; }
 
-   if (help_level == 1) { help_on_filenames(); return; }
+    /* The -h2 (switches) help information: */
 
-   /* The -h2 (switches) help information: */
-
-   printf("Help on the full list of legal switch commands:\n\n\
-  a   trace assembly-language (without hex dumps; see -t)\n\
-  c   more concise error messages\n\
-  d   contract double spaces after full stops in text\n\
-  d2  contract double spaces after exclamation and question marks, too\n\
-  e   economy mode (slower): make use of declared abbreviations\n");
-
-   printf("\
-  f   frequencies mode: show how useful abbreviations are\n\
-  g   traces calls to functions (except in the library)\n\
-  g2  traces calls to all functions\n\
-  h   print this information\n");
-
-   printf("\
-  i   ignore default switches set within the file\n\
-  j   list objects as constructed\n\
-  k   output Infix debugging information to \"%s\" (and switch -D on)\n\
-  l   list every statement run through Inform\n\
-  m   say how much memory has been allocated\n\
-  n   print numbers of properties, attributes and actions\n",
-          Debugging_Name);
-   printf("\
-  o   print offset addresses\n\
-  p   give percentage breakdown of story file\n\
-  q   keep quiet about obsolete usages\n\
-  r   record all the text to \"%s\"\n\
-  s   give statistics\n\
-  t   trace assembly-language (with full hex dumps; see -a)\n",
-      Transcript_Name);
-
-   printf("\
-  u   work out most useful abbreviations (very very slowly)\n\
-  v3  compile to version-3 (\"Standard\") story file\n\
-  v4  compile to version-4 (\"Plus\") story file\n\
-  v5  compile to version-5 (\"Advanced\") story file: the default\n\
-  v6  compile to version-6 (\"Graphical\") story file\n\
-  v8  compile to version-8 (expanded \"Advanced\") story file\n\
-  w   disable warning messages\n\
-  x   print # for every 100 lines compiled\n\
-  y   trace linking system\n\
-  z   print memory map of the Z-machine\n\n");
-
-printf("\
-  B   use big memory model (for large V6/V7 files)\n\
-  C0  text character set is plain ASCII only\n\
-  Cn  text character set is ISO 8859-n (n = 1 to 9)\n\
-      (1 to 4, Latin1 to Latin4; 5, Cyrillic; 6, Arabic;\n\
-       7, Greek; 8, Hebrew; 9, Latin5.  Default is -C1.)\n");
-printf("  D   insert \"Constant DEBUG;\" automatically\n");
-
-for (i=0; i<10; i++)
-	if (error_format_name[i])
-printf("  E%d  %s-style error messages%s\n", i, error_format_name[i],
-      (error_format==i)?" (current setting)":"");
-
-#ifdef USE_TEMPORARY_FILES
-printf("  F0  use extra memory rather than temporary files\n");
-#else
-printf("  F1  use temporary files to reduce memory consumption\n");
-#endif
-printf("  G   compile a Glulx game file\n");
-printf("  H   use Huffman encoding to compress Glulx strings\n");
-printf("  I   reject obsolete usages as incompatible\n");
-printf("  M   compile as a Module for future linking\n");
-printf("  O0  do not optimise (default)\n");
-printf("  O1  optimise for memory\n");
-printf("  O2  optimise for speed\n");
-
-#ifdef ARCHIMEDES
-printf("\
-  R0  use filetype 060 + version number for games (default)\n\
-  R1  use official Acorn filetype 11A for all games\n");
-#endif
-printf("  S   compile strict error-checking at run-time (on by default)\n");
-#ifdef ARC_THROWBACK
-printf("  T   enable throwback of errors in the DDE\n");
-#endif
-printf("  U   insert \"Constant USE_MODULES;\" automatically\n");
-printf("  Wn  header extension table is at least n words (n = 3 to 99)\n");
-printf("  X   compile with INFIX debugging facilities present\n");
-  printf("\n");
+    printf("Help on the full list of legal switch commands:\n\n");
+    for (i='a'; i<='z'; i++) help_on_switches(i, TRUE);
+    for (i='A'; i<='Z'; i++) help_on_switches(i, TRUE);
+    printf("\n");
 }
 
-extern void switches(char *p, int cmode)
-{   int i, s=1, state;
+/* ------------------------------------------------------------------------- */
+/*   Compilation switch settings                                             */
+/* ------------------------------------------------------------------------- */
+
+extern void switches(char *p, int cmode) {
+    int i, s=1, state;
     /* Here cmode is 0 if switches list is from a "Switches" directive
        and 1 if from a "-switches" command-line or ICL list */
 
-    if (cmode==1)
-    {   if (p[0]!='-')
-        {   printf(
+    if (cmode == 1) {
+        if (p[0]!='-') {
+            printf(
                 "Ignoring second word which should be a -list of switches.\n");
             return;
         }
     }
-    for (i=cmode; p[i]!=0; i+=s, s=1)
-    {   state = TRUE;
-        if (p[i] == '~')
-        {   state = FALSE;
-            i++;
-        }
-        switch(p[i])
-        {
-        case 'a': asm_trace_setting = 1; break;
-        case 'b': bothpasses_switch = state; break;
-        case 'c': concise_switch = state; break;
-        case 'd': switch(p[i+1])
-                  {   case '1': double_space_setting=1; s=2; break;
-                      case '2': double_space_setting=2; s=2; break;
-                      default: double_space_setting=1; break;
-                  }
-                  break;
-        case 'e': economy_switch = state; break;
-        case 'f': frequencies_switch = state; break;
-        case 'g': switch(p[i+1])
-                  {   case '1': trace_fns_setting=1; s=2; break;
-                      case '2': trace_fns_setting=2; s=2; break;
-                      default: trace_fns_setting=1; break;
-                  }
-                  break;
-        case 'h': switch(p[i+1])
-                  {   case '1': cli_print_help(1); s=2; break;
-                      case '2': cli_print_help(2); s=2; break;
+    for (i=cmode; p[i]!=0; i+=s,s=1) {
+        state = TRUE;
+        if (p[i] == '~') { state = FALSE; i++; }
+        switch(p[i]) {
+          case 'a': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3':
+                        s=2; printf("Switch '-a' must be followed by 0 to 2\n"); break;
+                      case '2': s=2; asm_trace_setting = 2; break;
+                      case '0': s=2; asm_trace_setting = 0; break;
+                      case '1': s=2;
+                      default:       asm_trace_setting = 1; break;
+                    }
+                    break;
+          case 'b': bothpasses_switch = state; /* apparently no longer used */
+                    break;
+          case 'c': concise_switch = state;
+                    break;
+          case 'd': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3':
+                        s=2; printf("Switch '-d' must be followed by 0 to 2\n"); break;
+                      case '2': s=2; double_space_setting = 2; break;
+                      case '0': s=2; double_space_setting = 0; break;
+                      case '1': s=2;
+                      default:       double_space_setting = 1; break;
+                    }
+                    break;
+          case 'e': economy_switch = state;
+                    break;
+          case 'f': frequencies_switch = state;
+                    break;
+          case 'g': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3':
+                        s=2; printf("Switch '-g' must be followed by 0 to 2\n"); break;
+                      case '2': s=2; trace_fns_setting = 2; break;
+                      case '0': s=2; trace_fns_setting = 0; break;
+                      case '1': s=2;
+                      default:       trace_fns_setting = 1; break;
+                    }
+                    break;
+          case 'h': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3':
+                        s=2; printf("Switch '-h' must be followed by 0 to 2\n");
+                      case '2': s=2; cli_print_help(2); break;
+                      case '1': s=2; cli_print_help(1); break;
                       case '0': s=2;
-                      default:  cli_print_help(0); break;
-                  }
-                  break;
-        case 'i': ignore_switches_switch = state; break;
-        case 'j': listobjects_switch = state; break;
-        case 'k': if (cmode == 0)
-                      error("The switch '-k' can't be set with 'Switches'");
-                  else
-                  {   debugfile_switch = state;
-                      if (state) define_DEBUG_switch = TRUE;
-                  }
-                  break;
-        case 'l': listing_switch = state; break;
-        case 'm': memout_switch = state; break;
-        case 'n': printprops_switch = state; break;
-        case 'o': offsets_switch = state; break;
-        case 'p': percentages_switch = state; break;
-        case 'q': obsolete_switch = state; break;
-        case 'r': if (cmode == 0)
-                      error("The switch '-r' can't be set with 'Switches'");
-                  else
-                      transcript_switch = state; break;
-        case 's': statistics_switch = state; break;
-        case 't': asm_trace_setting=2; break;
-        case 'u': optimise_switch = state; break;
-        case 'v': if ((cmode==0) && (version_set_switch)) { s=2; break; }
-                  version_set_switch = TRUE; s=2;
-                  switch(p[i+1])
-                  {   case '3': select_version(3); break;
-                      case '4': select_version(4); break;
-                      case '5': select_version(5); break;
-                      case '6': select_version(6); break;
-                      case '7': select_version(7); break;
-                      case '8': select_version(8); break;
-                      default:  printf("-v must be followed by 3 to 8\n");
-                                version_set_switch=0; s=1;
-                                break;
-                  }
-                  if ((version_number < 5) && (r_e_c_s_set == FALSE))
-                      runtime_error_checking_switch = FALSE;
-                  break;
-        case 'w': nowarnings_switch = state; break;
-        case 'x': hash_switch = state; break;
-        case 'y': s=2; linker_trace_setting=p[i+1]-'0'; break;
-        case 'z': memory_map_switch = state; break;
-        case 'B': oddeven_packing_switch = state; break;
-        case 'C': s=2; character_set_setting=p[i+1]-'0';
-                  if ((character_set_setting < 0)
-                      || (character_set_setting > 9))
-                  {   printf("-C must be followed by 0 to 9\n");
-                      character_set_setting = 1;
-                  }
-                  if (cmode == 0) change_character_set();
-                  break;
-        case 'D': define_DEBUG_switch = state; break;
-        case 'E': switch(p[i+1])
-                  {   case '0': case '1': case '2': case '3':
-                      case '5': case '6': case '7': case '8':
-			  s=2; error_format=p[i+1]-'0'; break;
-                      default:  error_format=1; break;
-                  }
-                  break;
-        case 'F': switch(p[i+1])
-                  {   case '0': s=2; temporary_files_switch = FALSE; break;
-                      case '1': s=2; temporary_files_switch = TRUE; break;
-                      default:  temporary_files_switch = state; break;
-                  }
-                  break;
-        case 'I': incompatibility_switch = state; break;
-        case 'M': module_switch = state;
-                  if (state && (r_e_c_s_set == FALSE))
-                      runtime_error_checking_switch = FALSE;
-                  break;
-        case 'O': switch(p[i+1])
-                  {   case '0': s=2; optimise_setting=0; break;
-                      case '1': s=2; optimise_setting=1; break;
-                      case '2': s=2; optimise_setting=2; break;
-                      default:  optimise_setting=state?2:0; break;
-                  }
-                  break;
-#ifdef ARCHIMEDES
-        case 'R': switch(p[i+1])
-                  {   case '0': s=2; riscos_file_type_format=0; break;
-                      case '1': s=2; riscos_file_type_format=1; break;
-                      default:  riscos_file_type_format=1; break;
-                  }
-                  break;
-#endif
-#ifdef ARC_THROWBACK
-        case 'T': throwback_switch = state; break;
-#endif
-        case 'S': runtime_error_checking_switch = state;
-                  r_e_c_s_set = TRUE; break;
-        case 'G': if (cmode == 0)
-                      error("The switch '-G' can't be set with 'Switches'");
-                  else
-                  {   glulx_mode = state; /* ###- */
+                      default:       cli_print_help(0); break;
+                    }
+                    break;
+          case 'i': ignore_switches_switch = state;
+                    break;
+          case 'j': listobjects_switch = state;
+                    break;
+          case 'k': if (cmode == 0)
+                        error("Switch '-k' can't be set with 'Switches'");
+                    else {
+                        debugfile_switch = state;
+                        if (state) define_DEBUG_switch = TRUE;
+                    }
+                    break;
+          case 'l': listing_switch = state;
+                    break;
+          case 'm': memout_switch = state;
+                    break;
+          case 'n': printprops_switch = state;
+                    break;
+          case 'o': offsets_switch = state;
+                    break;
+          case 'p': percentages_switch = state;
+                    break;
+          case 'q': obsolete_switch = state;
+                    break;
+          case 'r': if (cmode == 0)
+                        error("Switch '-r' can't be set with 'Switches'");
+                    else
+                        transcript_switch = state;
+                    break;
+          case 's': statistics_switch = state;
+                    break;
+          case 't': asm_trace_setting = 2;
+                    printf("Switch '-t' is deprecated: use '-a2' instead\n");
+                    break;
+          case 'u': optimise_switch = state;
+                    break;
+          case 'v': if ((cmode == 0) && (version_set_switch)) { s=2; break; }
+                    version_set_switch = TRUE;
+                    switch(p[i+1]) {
+                      case '8': s=2; select_version(8); break;
+                      case '7': s=2; select_version(7); break;
+                      case '6': s=2; select_version(6); break;
+                      case '5': s=2; select_version(5); break;
+                      case '4': s=2; select_version(4); break;
+                      case '3': s=2; select_version(3); break;
+                      case '9': case '2': case '1': case '0':
+                        s=2;
+                      default:
+                        version_set_switch = FALSE;
+                        printf("Switch '-v' must be followed by 3 to 8\n"); break;
+                    }
+                    if ((version_number < 5) && (r_e_c_s_set == FALSE))
+                        runtime_error_checking_switch = FALSE;
+                    break;
+          case 'w': nowarnings_switch = state;
+                    break;
+          case 'x': hash_switch = state;
+                    break;
+          case 'y': switch(p[i+1]) {
+                      case '4': case '3': case '2': case '1': case '0':
+                        s=2; linker_trace_setting = p[i+1]-'0';
+                        break;
+                      case '9': case '8': case '7': case '6': case '5':
+                        s=2;
+                      default:
+                        printf("Switch '-y' must be followed by 0 to 4\n"); break;
+                    }
+                    break;
+          case 'z': memory_map_switch = state;
+                    break;
+       /* case 'A': printf("Unused\n");
+                    break; */
+          case 'B': oddeven_packing_switch = state;
+                    break;
+          case 'C': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3': case '2': case '1': case '0':
+                        s=2; character_set_setting = p[i+1]-'0';
+                        if (cmode == 0) change_character_set();
+                        break;
+                      default:
+                        printf("Switch '-C' must be followed by 0 to 9\n"); break;
+                    }
+                    break;
+          case 'D': define_DEBUG_switch = state;
+                    break;
+          case 'E': switch(p[i+1]) {
+                      case '8': case '7': case '6': case '5':
+                      case '3': case '2': case '1': case '0':
+			            s=2; error_format = p[i+1]-'0'; break;
+                      case '9': case '4':
+                        s=2;
+                      default:
+                        printf("Switch '-E' must be followed by 0 to 3, 5 to 8\n"); break;
+                    }
+                    break;
+          case 'F': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3': case '2':
+                        s=2; printf("Switch '-F' must be followed by 0 or 1\n"); break;
+                      case '1': s=2; temporary_files_switch = TRUE;  break;
+                      case '0': s=2; temporary_files_switch = FALSE; break;
+                      default:       temporary_files_switch = state; break;
+                    }
+                    break;
+          case 'G': if (cmode == 0)
+                      error("Switch '-G' can't be set with 'Switches'");
+                    else {
+                      glulx_mode = state; /* ###- */
                       adjust_memory_sizes();
-                  }
-                  break;
-        case 'H': compression_switch = state; break;
-        case 'U': define_USE_MODULES_switch = state; break;
-        case 'W': if ((p[i+1]>='0') && (p[i+1]<='9'))
-                  {   s=2; header_ext_setting = p[i+1]-'0';
-                      if ((p[i+2]>='0') && (p[i+2]<='9'))
-                      {   s=3; header_ext_setting *= 10;
-                          header_ext_setting += p[i+2]-'0';
-                      }
-                  }
-                  break;
-        case 'X': define_INFIX_switch = state; break;
-        default:
-          printf("Switch \"-%c\" unknown (try \"inform -h2\" for the list)\n",
-              p[i]);
-          break;
+                    }
+                    break;
+          case 'H': compression_switch = state;
+                    break;
+          case 'I': incompatibility_switch = state;
+                    break;
+       /* case 'J': printf("Unused\n");
+                    break; */
+       /* case 'K': printf("Unused\n");
+                    break; */
+       /* case 'L': printf("Unused\n");
+                    break; */
+          case 'M': module_switch = state;
+                    if (state && (r_e_c_s_set == FALSE))
+                        runtime_error_checking_switch = FALSE;
+                    break;
+       /* case 'N': printf("Unused\n");
+                    break; */
+          case 'O': switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3':
+                        s=2; printf("Switch '-O' must be followed by 0 to 2\n"); break;
+                      case '2': s=2; optimise_setting = 2; break;
+                      case '1': s=2; optimise_setting = 1; break;
+                      case '0': s=2; optimise_setting = 0; break;
+                      default:       optimise_setting = state?2:0; break;
+                    }
+                    break;
+       /* case 'P': printf("Unused\n");
+                    break; */
+       /* case 'Q': printf("Unused\n");
+                    break; */
+          case 'R':
+                    #ifdef ARCHIMEDES
+                    switch(p[i+1]) {
+                      case '9': case '8': case '7': case '6': case '5':
+                      case '4': case '3': case '2':
+                        s=2; printf("Switch '-R' must be followed by 0 or 1\n"); break;
+                      case '0': s=2; riscos_file_type_format = 0; break;
+                      case '1': s=2;
+                      default:       riscos_file_type_format = 1; break;
+                    }
+                    #endif
+                    break;
+          case 'S': runtime_error_checking_switch = state;
+                    r_e_c_s_set = TRUE;
+                    break;
+          case 'T':
+                    #ifdef ARC_THROWBACK
+                    throwback_switch = state;
+                    #endif
+                    break;
+          case 'U': define_USE_MODULES_switch = state;
+                    break;
+       /* case 'V': printf("Unused\n");
+                    break; */
+          case 'W': if ((p[i+1]>='0') && (p[i+1]<='9')) {
+                        s=2; header_ext_setting = p[i+1]-'0';
+                        if ((p[i+2]>='0') && (p[i+2]<='9')) {
+                            s=3; header_ext_setting *= 10;
+                            header_ext_setting += p[i+2]-'0';
+                        }
+                    }
+                    if (header_ext_setting < 3) {
+                        header_ext_setting = 0;
+                        printf("Switch '-W' must be followed by 3 to 99\n");
+                    }
+                    break;
+          case 'X': define_INFIX_switch = state;
+                    break;
+       /* case 'Y': printf("Unused\n");
+                    break; */
+       /* case 'Z': printf("Unused\n");
+                    break; */
+          default:
+                    printf("Switch '-%c' unknown (try \"inform -h2\" for the list)\n",
+                    p[i]);
+                    break;
         }
     }
-
-    if (optimise_switch && (!store_the_text))
-    {   store_the_text=TRUE;
-#ifdef PC_QUICKC
+    if (optimise_switch && (!store_the_text)) {
+        store_the_text=TRUE;
+        #ifdef PC_QUICKC
         if (memout_switch)
             printf("Allocation %ld bytes for transcription text\n",
                 (long) MAX_TRANSCRIPT_SIZE);
         all_text = halloc(MAX_TRANSCRIPT_SIZE,1);
         malloced_bytes += MAX_TRANSCRIPT_SIZE;
         if (all_text==NULL)
-         fatalerror("Can't hallocate memory for transcription text.  Darn.");
-#else
+            fatalerror("Can't hallocate memory for transcription text.  Darn.");
+        #else
         all_text=my_malloc(MAX_TRANSCRIPT_SIZE,"transcription text");
-#endif
+        #endif
     }
+}
+
+/* ------------------------------------------------------------------------- */
+/*   Display compilation switch settings                                     */
+/* ------------------------------------------------------------------------- */
+
+static void help_on_switches(int s, int i) {
+    int j;
+    switch (s) {
+      case 'a':
+        if (i == TRUE) { i=0; j=2; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: break;
+              case 1: printf("  -a1  show generated assembly-language\n"); break;
+              case 2: printf("  -a2  show generated assembly-language with full hex dumps\n"); break;
+            }
+        break;
+/*      printf("  -a   show generated assembly-language\n");
+        break; */
+      case 'b':
+        if (i != TRUE) printf("  -b   (obsolete?)\n");
+        break;
+      case 'c':
+        printf("  -c   show error messages in concise form\n");
+        break;
+      case 'd':
+        if (i == TRUE) { i=0; j=2; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: break;
+              case 1: printf("  -d1  contract double spaces after \".\" in text\n"); break;
+              case 2: printf("  -d2  contract double spaces after \".!?\" in text\n"); break;
+            }
+        break;
+      case 'e':
+        printf("  -e   use declared abbreviations\n");
+        break;
+      case 'f':
+        printf("  -f   show how useful abbreviations are\n");
+        break;
+      case 'g':
+        if (i == TRUE) { i=0; j=2; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: break;
+              case 1: printf("  -g1  trace calls to functions, except in the library\n"); break;
+              case 2: printf("  -g2  trace calls to all functions\n"); break;
+            }
+        break;
+      case 'h':
+        if (i == TRUE) { i=0; j=2; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: printf("  -h   show overview help\n"); break;
+              case 1: printf("  -h1  show help on files\n"); break;
+              case 2: printf("  -h2  show help on switches\n"); break;
+            }
+        break;
+      case 'i':
+        printf("  -i   ignore default switches set within the file\n");
+        break;
+      case 'j':
+        printf("  -j   show objects as constructed\n");
+        break;
+      case 'k':
+        printf("  -k   write Infix debugging information to \"%s\"\n", Debugging_Name);
+        break;
+      case 'l':
+        printf("  -l   show compiler switch settings and file names\n");
+        break;
+      case 'm':
+        printf("  -m   show memory allocated by the compiler\n");
+        break;
+      case 'n':
+        printf("  -n   show numbers of properties, attributes and actions\n");
+        break;
+      case 'o':
+        printf("  -o   show offset addresses\n");
+        break;
+      case 'p':
+        printf("  -p   show percentage breakdown of story file\n");
+        break;
+      case 'q':
+        printf("  -q   don't show obsolete usage warnings\n");
+        break;
+      case 'r':
+        printf("  -r   write game text to \"%s\"\n", Transcript_Name);
+        break;
+      case 's':
+        printf("  -s   show statistics\n");
+        break;
+      case 't':
+        if (i != TRUE) printf("  -t   show generated assembly-language with full hex dumps (deprecated: use '-a2' instead)\n");
+        break;
+      case 'u':
+        printf("  -u   show most useful abbreviations\n");
+        break;
+      case 'v':
+        if ((i == TRUE) || (!glulx_mode)) {
+            if (i == TRUE) { i=3; j=8; } else j=i;
+            for (; i<=j; i++)
+                switch (i) {
+                  case 3: printf("  -v3  compile to version-3 (\"Standard\") story file\n"); break;
+                  case 4: printf("  -v4  compile to version-4 (\"Plus\") story file\n"); break;
+                  case 5: printf("  -v5  compile to version-5 (\"Advanced\") story file\n"); break;
+                  case 6: printf("  -v6  compile to version-6 (\"Graphical\") story file\n"); break;
+                  case 7: printf("  -v7  compile to version-7 (obsolete) story file\n"); break;
+                  case 8: printf("  -v8  compile to version-8 (expanded \"Advanced\") story file\n"); break;
+                  case 9: printf("  -v8  compile to version-9 (new) story file\n"); break;
+                }
+        }
+        break;
+      case 'w':
+        printf("  -w   don't show warning messages\n");
+        break;
+      case 'x':
+        printf("  -x   show # for every 100 lines compiled\n");
+        break;
+      case 'y':
+        if (i == TRUE) printf("  -yn  trace linker calls at level n (n = 1 to 4)\n");
+        else           printf("  -y%d  trace linker calls at level %d\n", i, i);
+        break;
+      case 'z':
+        printf("  -z   show memory map of the Virtual Machine\n");
+        break;
+      case 'A':
+        if (i != TRUE) printf("  -A   (unused)\n");
+        break;
+      case 'B':
+        printf("  -B   use big memory model, for large V6/V7 files\n");
+        break;
+      case 'C':
+        if (i == TRUE) { i=0; j=9; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: printf("  -C0  text character set is 7-bit ASCII\n"); break;
+              case 1: printf("  -C1  text character set is ISO 8859-1: Latin 1\n"); break;
+              case 2: printf("  -C2  text character set is ISO 8859-2: Latin 2\n"); break;
+              case 3: printf("  -C3  text character set is ISO 8859-3: Latin 3\n"); break;
+              case 4: printf("  -C4  text character set is ISO 8859-4: Latin 4\n"); break;
+              case 5: printf("  -C5  text character set is ISO 8859-5: Cyrillic\n"); break;
+              case 6: printf("  -C6  text character set is ISO 8859-6: Arabic\n"); break;
+              case 7: printf("  -C7  text character set is ISO 8859-7: Greek\n"); break;
+              case 8: printf("  -C8  text character set is ISO 8859-8: Hebrew\n"); break;
+              case 9: printf("  -C9  text character set is ISO 8859-9: Latin 5\n"); break;
+            }
+        break;
+      case 'D':
+        printf("  -D   compile in DEBUG mode\n");
+        break;
+      case 'E':
+        if (i == TRUE) { i=0; j=9; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: printf("  -E0  show error messages in Archimedes format\n"); break;
+              case 1: printf("  -E1  show error messages in Microsoft format\n"); break;
+              case 2: printf("  -E2  show error messages in Macintosh MPW format\n"); break;
+              case 3: printf("  -E3  show error messages in GCC format\n"); break;
+              case 4: break;
+              case 5: printf("  -E5  show error messages in Reversed Archimedes format\n"); break;
+              case 6: printf("  -E6  show error messages in Reversed Microsoft format\n"); break;
+              case 7: printf("  -E7  show error messages in Reversed Macintosh MPW format\n"); break;
+              case 8: printf("  -E8  show error messages in Reversed GCC format\n"); break;
+              case 9: break;
+            }
+        break;
+      case 'F':
+        #ifdef USE_TEMPORARY_FILES
+        if ((i == TRUE) || (i == 1))
+            printf("  -F0  use extra memory rather than temporary files\n");
+        #else
+        if (i == TRUE)
+            printf("  -F1  use temporary files to reduce memory consumption\n");
+        #endif
+        break;
+      case 'G':
+        printf("  -G   compile for Glulx Virtual Machine\n");
+        break;
+      case 'H':
+        if ((i == TRUE) || (glulx_mode))
+            printf("  -H   use Huffman encoding to compress Glulx strings\n");
+        break;
+      case 'I':
+        printf("  -I   reject obsolete usages as incompatible\n");
+        break;
+      case 'J':
+        if (i != TRUE) printf("  -J   (unused)\n");
+        break;
+      case 'K':
+        if (i != TRUE) printf("  -K   (unused)\n");
+        break;
+      case 'L':
+        if (i != TRUE) printf("  -L   (unused)\n");
+        break;
+      case 'M':
+        printf("  -M   compile as a Module for future linking\n");
+        break;
+      case 'N':
+        if (i != TRUE) printf("  -N   (unused)\n");
+        break;
+      case 'O':
+        if (i == TRUE) { i=0; j=2; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: break;
+              case 1: printf("  -O1  optimise story file for mimimum memory\n"); break;
+              case 2: printf("  -O2  optimise story file for maximum speed\n"); break;
+            }
+        break;
+      case 'P':
+        if (i != TRUE) printf("  -P   (unused)\n");
+        break;
+      case 'Q':
+        if (i != TRUE) printf("  -Q   (unused)\n");
+        break;
+      case 'R':
+        #ifdef ARCHIMEDES
+        if (i == TRUE) { i=0; j=1; } else j=i;
+        for (; i<=j; i++)
+            switch (i) {
+              case 0: printf("  -R0  use filetype 060 + version number for story files\n"); break;
+              case 1: printf("  -R1  use official Acorn filetype 11A for all story files\n"); break;
+            }
+        #else
+        printf("  -R   (reserved)\n");
+        #endif
+        break;
+      case 'S':
+        printf("  -S   compile in STRICT mode\n");
+        break;
+      case 'T':
+        #ifdef ARC_THROWBACK
+        printf("  -T   enable throwback of errors in the DDE\n");
+        #else
+        printf("  -T   (reserved)\n");
+        #endif
+        break;
+      case 'U':
+        printf("  -U   compile in USE_MODULES mode\n");
+        break;
+      case 'V':
+        if (i != TRUE) printf("  -V   (unused)\n");
+        break;
+      case 'W':
+        if (i == TRUE) printf("  -Wn  header extension table is at least n words (n = 3 to 99)\n");
+        else           printf("  -W%d  header extension table is at least %d words\n", i, i);
+        break;
+      case 'X':
+        printf("  -X   compile in INFIX debug mode\n");
+        break;
+      case 'Y':
+        if (i != TRUE) printf("  -Y   (unused)\n");
+        break;
+      case 'Z':
+        if (i != TRUE) printf("  -Z   (unused)\n");
+        break;
+    }
+}
+
+static void print_switch_settings(void) {
+    printf("\nCompiler switches:\n");
+    if (asm_trace_setting)              help_on_switches('a', asm_trace_setting);
+    if (bothpasses_switch)              help_on_switches('b', FALSE);
+    if (concise_switch)                 help_on_switches('c', FALSE);
+    if (double_space_setting)           help_on_switches('d', double_space_setting);
+    if (economy_switch)                 help_on_switches('e', FALSE);
+    if (frequencies_switch)             help_on_switches('f', FALSE);
+    if (trace_fns_setting)              help_on_switches('g', trace_fns_setting);
+    if (FALSE)                          help_on_switches('h', FALSE);
+    if (ignore_switches_switch)         help_on_switches('i', FALSE);
+    if (listobjects_switch)             help_on_switches('j', FALSE);
+    if (debugfile_switch)               help_on_switches('k', FALSE);
+    if (listing_switch)                 help_on_switches('l', FALSE);
+    if (memout_switch)                  help_on_switches('m', FALSE);
+    if (printprops_switch)              help_on_switches('n', FALSE);
+    if (offsets_switch)                 help_on_switches('o', FALSE);
+    if (percentages_switch)             help_on_switches('p', FALSE);
+    if (obsolete_switch)                help_on_switches('q', FALSE);
+    if (transcript_switch)              help_on_switches('r', FALSE);
+    if (statistics_switch)              help_on_switches('s', FALSE);
+    if (FALSE)                          help_on_switches('t', FALSE);
+    if (optimise_switch)                help_on_switches('u', FALSE);
+    if (version_number && !glulx_mode)  help_on_switches('v', version_number);
+    if (nowarnings_switch)              help_on_switches('w', FALSE);
+    if (hash_switch)                    help_on_switches('x', FALSE);
+    if (linker_trace_setting)           help_on_switches('y', linker_trace_setting);
+    if (memory_map_switch)              help_on_switches('z', FALSE);
+    if (FALSE)                          help_on_switches('A', FALSE);
+    if (oddeven_packing_switch)         help_on_switches('B', FALSE);
+    if (TRUE)                           help_on_switches('C', character_set_setting);
+    if (define_DEBUG_switch)            help_on_switches('D', FALSE);
+    if (TRUE)                           help_on_switches('E', error_format);
+    if (TRUE)                           help_on_switches('F', temporary_files_switch);
+    if (glulx_mode)                     help_on_switches('G', FALSE);
+    if (compression_switch)             help_on_switches('H', FALSE);
+    if (incompatibility_switch)         help_on_switches('I', FALSE);
+    if (FALSE)                          help_on_switches('J', FALSE);
+    if (FALSE)                          help_on_switches('K', FALSE);
+    if (FALSE)                          help_on_switches('L', FALSE);
+    if (module_switch)                  help_on_switches('M', FALSE);
+    if (FALSE)                          help_on_switches('N', FALSE);
+    if (optimise_setting)               help_on_switches('O', optimise_setting);
+    if (FALSE)                          help_on_switches('P', FALSE);
+    if (FALSE)                          help_on_switches('Q', FALSE);
+    #ifdef ARCHIMEDES
+    if (TRUE)                           help_on_switches('R', riscos_file_type_format);
+    #endif
+    if (runtime_error_checking_switch)  help_on_switches('S', FALSE);
+    #ifdef ARC_THROWBACK
+    if (throwback_switch)               help_on_switches('T', FALSE);
+    #endif
+    if (define_USE_MODULES_switch)      help_on_switches('U', FALSE);
+    if (FALSE)                          help_on_switches('V', FALSE);
+    if (header_ext_setting)             help_on_switches('W', header_ext_setting);
+    if (define_INFIX_switch)            help_on_switches('X', FALSE);
+    if (FALSE)                          help_on_switches('Y', FALSE);
+    if (FALSE)                          help_on_switches('Z', FALSE);
 }
 
 static int icl_command(char *p)
@@ -1681,8 +2020,8 @@ static int sub_main(int argc, char **argv)
 
     read_command_line(argc, argv);
 
-    if (cli_files_specified > 0)
-    {   return_code = compile(cli_files_specified, cli_file1, cli_file2);
+    if (cli_files_specified > 0) {
+        return_code = compile(cli_files_specified, cli_file1, cli_file2);
 
         if (return_code != 0) return(return_code);
     }
